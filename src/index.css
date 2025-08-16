@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #16a34a;
+    --color-secondary: #f2f2f2;
+    --color-accent: #6D7074;
+    --color-background: #ffffff;
+    --color-background-input: #0f172a;
+    --color-foreground: #020817;
+    --color-foreground2: #0f172a;
+    --color-card: #FFFFFF;
+    --color-card2: #f2f2f2;
+    --color-popover: #FFFFFF;
+    --color-muted: #F0F1F3;
+    --color-destructive: #ff9999;
+    --color-border: #E0E0E0;
+    --color-input: #0f172a;
+    --color-ring: #0A8537;
+
+    --font-family-sans: 'Anek Telugu', sans-serif;
+    
+    --font-size-heading: 36px;
+    --font-size-body: 14px;
+    
+    --font-weight-heading: 700;
+    --font-weight-body: 400;
+}
+
+.dark {
+    --color-primary: #4ade80;
+    --color-secondary: #1e293b; 
+    --color-accent: #cbd5e1; 
+    --color-background: #0f172a;
+    --color-background-input: #ffffff;
+    --color-foreground: #f1f5f9;
+    --color-foreground2: #1e293b;
+    --color-card: #0f172a;
+    --color-card2: #1e293b;
+    --color-popover: #1e293b; 
+    --color-muted: #334155;
+    --color-destructive: #ef4444;
+    --color-border: #475569;
+    --color-input: #FFFFFF;
+    --color-ring: #22c55e;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Anek+Telugu:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@layer base {
+    * {
+        border-color: var(--color-border);
+    }
+
+    body {
+        background-color: var(--color-background);
+        color: var(--color-foreground);
+        font-family: 'Anek Telugu', sans-serif;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 700;
+    }
+
+    p {
+        font-weight: 400;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    .btn-hover {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+}
+
+@layer utilities {
+    .text-heading {
+        font-size: 36px;
+        font-weight: 700;
+    }
+
+    .text-body {
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    .btn-neon-hover {
+        transition: all 0.3s ease;
+    }
+
+    .btn-neon-hover:hover {
+        box-shadow: 
+            0 0 20px rgba(22, 163, 74, 0.5),
+            0 0 40px rgba(22, 163, 74, 0.3), 
+            0 0 60px rgba(22, 163, 74, 0.1);
+    }
+
+    .dark .btn-neon-hover:hover {
+        box-shadow: 
+            0 0 20px rgba(74, 222, 128, 0.6),
+            0 0 40px rgba(74, 222, 128, 0.4),
+            0 0 60px rgba(74, 222, 128, 0.2);
+    }
+}
