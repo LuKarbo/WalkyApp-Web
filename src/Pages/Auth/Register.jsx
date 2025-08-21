@@ -1,16 +1,33 @@
 import { useState } from "react";
-import { FiEye, FiEyeOff, FiGithub, FiTwitter, FiLinkedin } from "react-icons/fi";
+import { FiEye, FiEyeOff} from "react-icons/fi";
 
 function Register({ onRegister, switchToLogin }) {
-    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
         password: "",
         confirmPassword: "",
-        terms: false
+        terms: false,
     });
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (formData.password !== formData.confirmPassword) {
+        setErrors({ confirmPassword: "Las contraseñas no coinciden" });
+        return;
+        }
+
+        try {
+            onRegister(formData);
+        } catch (err) {
+            setErrors({ general: "Error al registrar usuario" });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const validateEmail = (email) => {
         return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
@@ -45,26 +62,6 @@ function Register({ onRegister, switchToLogin }) {
             confirmPassword: value !== formData.password ? "Passwords do not match" : ""
         }));
         }
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        if (formData.password !== formData.confirmPassword) {
-        setErrors(prev => ({
-            ...prev,
-            confirmPassword: "Passwords do not match"
-        }));
-        return;
-        }
-        
-        if (errors.email || errors.password || errors.confirmPassword || 
-            !formData.email || !formData.password || !formData.fullName || !formData.terms) {
-        return;
-        }
-        
-        console.log("Register submitted:", formData);
-        onRegister(formData);
     };
 
     return (
@@ -159,35 +156,10 @@ function Register({ onRegister, switchToLogin }) {
                 </label>
                 </div>
 
-                <button
-                type="submit"
-                className="w-full bg-primary text-background py-2 rounded-lg hover:bg-ring transition-colors font-medium"
-                >
-                Create Account
+                {errors.general && <p className="text-destructive">{errors.general}</p>}
+                <button type="submit" disabled={loading} className="w-full bg-primary text-background py-2 rounded-lg hover:bg-ring transition-colors font-medium">
+                    {loading ? "Creando cuenta..." : "Create Account"}
                 </button>
-
-                <div className="mt-6">
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-card/70 text-accent">Or continue with</span>
-                    </div>
-                </div>
-
-                <div className="mt-6 flex gap-4 justify-center">
-                    <button type="button" className="p-2 rounded-lg border border-border hover:bg-muted transition-colors">
-                    <FiGithub className="w-5 h-5" />
-                    </button>
-                    <button type="button" className="p-2 rounded-lg border border-border hover:bg-muted transition-colors">
-                    <FiTwitter className="w-5 h-5" />
-                    </button>
-                    <button type="button" className="p-2 rounded-lg border border-border hover:bg-muted transition-colors">
-                    <FiLinkedin className="w-5 h-5" />
-                    </button>
-                </div>
-                </div>
 
                 <p className="text-center text-sm text-accent mt-6">
                 Already have an account? 

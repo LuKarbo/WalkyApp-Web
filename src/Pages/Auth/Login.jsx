@@ -1,14 +1,34 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff, FiGithub, FiTwitter, FiLinkedin } from "react-icons/fi";
+import {AuthController} from "../../BackEnd/Controllers/AuthController.js"
 
 function Login({ onLogin, switchToRegister }) {
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
         password: "",
-        rememberMe: false
+        rememberMe: false,
     });
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (errors.email || errors.password || !formData.email || !formData.password) return;
+
+        try {
+            console.log(formData);
+            setLoading(true);
+            if (formData.rememberMe) {
+                localStorage.setItem("user", JSON.stringify(formData));
+            }
+            onLogin(formData);
+        } catch (err) {
+            setErrors({ general: "Credenciales inválidas" });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const validateEmail = (email) => {
         return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
@@ -39,22 +59,11 @@ function Login({ onLogin, switchToRegister }) {
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        if (errors.email || errors.password || !formData.email || !formData.password) {
-        return;
-        }
-        
-        console.log("Login submitted:", formData);
-        onLogin(formData);
-    };
-
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative py-8 px-4"
             style={{
-            //backgroundImage: `url(https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3)`
-            backgroundImage: `url('../../../public/backgroundFirts.jpg')`
+                //backgroundImage: `url(https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3)`
+                backgroundImage: `url('../../../public/backgroundFirts.jpg')`
             }}>
             <div className="absolute inset-0 backdrop-blur-[6px] bg-foreground/30"></div>
             
@@ -120,11 +129,9 @@ function Login({ onLogin, switchToRegister }) {
                             </button>
                         </div>
 
-                        <button
-                            type="submit"
-                            className="w-full bg-primary text-background py-2 rounded-lg hover:bg-ring transition-colors font-medium"
-                        >
-                            Sign In
+                        {errors.general && <p className="text-destructive">{errors.general}</p>}
+                        <button type="submit" disabled={loading} className="w-full bg-primary text-background py-2 rounded-lg hover:bg-ring transition-colors font-medium">
+                            {loading ? "Cargando..." : "Sign In"}
                         </button>
 
                         <div className="mt-6">
@@ -135,18 +142,6 @@ function Login({ onLogin, switchToRegister }) {
                                 <div className="relative flex justify-center text-sm">
                                     <span className="px-2 bg-card/70 text-accent">Or continue with</span>
                                 </div>
-                            </div>
-
-                            <div className="mt-6 flex gap-4 justify-center">
-                                <button type="button" className="p-2 rounded-lg border border-border hover:bg-muted transition-colors">
-                                    <FiGithub className="w-5 h-5" />
-                                </button>
-                                <button type="button" className="p-2 rounded-lg border border-border hover:bg-muted transition-colors">
-                                    <FiTwitter className="w-5 h-5" />
-                                </button>
-                                <button type="button" className="p-2 rounded-lg border border-border hover:bg-muted transition-colors">
-                                    <FiLinkedin className="w-5 h-5" />
-                                </button>
                             </div>
                         </div>
 

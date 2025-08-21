@@ -65,7 +65,18 @@ const Navbar = ({
     activeItem,
     setActiveItem,
     user,
+    onLogout,
 }) => {
+
+    const handleMenuClick = (id) => {
+        if (id === "logout") {
+            onLogout();
+        } else {
+            setActiveItem(id);
+        }
+    };
+
+
     return (
         <aside
             className={`${
@@ -121,7 +132,7 @@ const Navbar = ({
             {menuItems[user?.role || "client"].map((item) => (
             <button
                 key={item.id}
-                onClick={() => setActiveItem(item.id)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-colors
                 ${
                     activeItem === item.id
@@ -136,11 +147,10 @@ const Navbar = ({
 
             <div className="border-t border-border dark:border-accent my-4"></div>
 
-            {/* Cargar secciones del menu */}
             {commonMenuItems.map((item) => (
             <button
                 key={item.id}
-                onClick={() => setActiveItem(item.id)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-colors
                 ${
                     activeItem === item.id
