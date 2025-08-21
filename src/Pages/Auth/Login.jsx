@@ -17,18 +17,18 @@ function Login({ onLogin, switchToRegister }) {
         if (errors.email || errors.password || !formData.email || !formData.password) return;
 
         try {
-            console.log(formData);
             setLoading(true);
             if (formData.rememberMe) {
                 localStorage.setItem("user", JSON.stringify(formData));
             }
-            onLogin(formData);
+            await onLogin(formData); 
         } catch (err) {
-            setErrors({ general: "Credenciales inválidas" });
+            setErrors({ general: err.message || "Credenciales inválidas" });
         } finally {
             setLoading(false);
         }
     };
+
 
     const validateEmail = (email) => {
         return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
