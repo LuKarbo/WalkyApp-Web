@@ -7,7 +7,7 @@ export const AuthAPI = {
                 id: "1",
                 name: "John Doe",
                 email: "asd@gmail.com",
-                role: "admin",
+                role: "support",
                 profileImage:
                     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
                 token: "fake-jwt-token",
@@ -39,7 +39,7 @@ export const AuthAPI = {
                 id: "1",
                 name: "John Doe",
                 email: "asd@gmail.com",
-                role: "admin",
+                role: "support",
                 profileImage:
                     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
             };

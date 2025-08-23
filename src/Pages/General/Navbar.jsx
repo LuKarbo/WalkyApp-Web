@@ -5,55 +5,69 @@ import {
     FiUsers,
     FiSettings,
     FiPieChart,
-    FiFileText,
+    FiBarChart,
     FiBookOpen,
     FiClock,
-    FiDollarSign,
     FiTrendingUp,
     FiMessageSquare,
-    FiHelpCircle,
-    FiAlertCircle,
     FiEdit,
-    FiShield,
     FiBell,
     FiLogOut,
     FiMoon,
     FiSun,
-    FiCalendar,
+    FiSearch,
+    FiStar,
+    FiUserPlus,
+    FiTool,
+    FiHeart,
+    FiSend,
+    FiMail,
 } from "react-icons/fi";
 
 const menuItems = {
+    // Menú para Administrador
     admin: [
-        { icon: FiHome, label: "Dashboard", id: "dashboard" },
-        { icon: FiUsers, label: "User Management", id: "users" },
-        { icon: FiSettings, label: "System Configuration", id: "config" },
-        { icon: FiPieChart, label: "Analytics", id: "analytics" },
-        { icon: FiFileText, label: "Reporting", id: "reports" },
+        { icon: FiBarChart, label: "Estadísticas", id: "statistics" },
+        { icon: FiUsers, label: "Usuarios", id: "users" },
+        { icon: FiHeart, label: "Mascotas por usuario", id: "pets-by-user" },
+        { icon: FiClock, label: "Paseos por usuario", id: "walks-by-user" },
+        { icon: FiUserPlus, label: "Solicitudes de Alta", id: "registration-requests" },
+        { icon: FiMail, label: "Consultas", id: "tickets-general" },
+        { icon: FiTool, label: "Admin Menu", id: "promotions" },
     ],
+    
+    // Menú para Cliente
     client: [
-        { icon: FiBookOpen, label: "My Services", id: "services" },
-        { icon: FiClock, label: "Booking History", id: "bookings" },
-        { icon: FiMessageSquare, label: "Support Tickets", id: "tickets" },
-        { icon: FiSettings, label: "Profile Settings", id: "settings" },
+        { icon: FiHome, label: "Home", id: "home" },
+        { icon: FiSearch, label: "Buscar Paseador", id: "search-walker" },
+        { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
+        { icon: FiHeart, label: "Mis Mascotas", id: "my-pets" },
+        { icon: FiSend, label: "Solicitar permisos", id: "my-account-perms" },
+        { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
     ],
+    
+    // Menú para Paseador
     walker: [
-        { icon: FiClock, label: "Active Walks", id: "walks" },
-        { icon: FiCalendar, label: "Schedule", id: "schedule" },
-        { icon: FiDollarSign, label: "Earnings", id: "earnings" },
-        { icon: FiTrendingUp, label: "Performance Stats", id: "stats" },
+        { icon: FiHome, label: "Home", id: "home" },
+        { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
+        { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
+        { icon: FiTrendingUp, label: "Estadísticas", id: "statistics" },
+        { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
     ],
+    
+    // Menú para Soporte
     support: [
-        { icon: FiMessageSquare, label: "Open Tickets", id: "open-tickets" },
-        { icon: FiHelpCircle, label: "Customer Inquiries", id: "inquiries" },
-        { icon: FiBookOpen, label: "Knowledge Base", id: "knowledge" },
-        { icon: FiAlertCircle, label: "Escalation Management", id: "escalations" },
+        { icon: FiMail, label: "Consultas", id: "tickets-general" },
+        { icon: FiClock, label: "Paseos Activos", id: "active-walks" },
     ],
 };
 
 const commonMenuItems = [
-    { icon: FiEdit, label: "Profile Edit", id: "profile" },
-    { icon: FiShield, label: "Security Settings", id: "security" },
-    { icon: FiBell, label: "Notifications", id: "notifications" },
+    { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+    { icon: FiBell, label: "Notificaciones", id: "notifications" },
+    { icon: FiUsers, label: "Grupos", id: "groups" },
+    { icon: FiBookOpen, label: "Mis Grupos", id: "my-groups" },
+    { icon: FiSettings, label: "Ajustes", id: "settings" },
     { icon: FiLogOut, label: "Logout", id: "logout" },
 ];
 
@@ -145,7 +159,10 @@ const Navbar = ({
             </button>
             ))}
 
-            <div className="border-t border-border dark:border-accent my-4"></div>
+            {/* Separador solo si hay elementos comunes */}
+            {commonMenuItems.length > 0 && (
+                <div className="border-t border-border dark:border-accent my-4"></div>
+            )}
 
             {commonMenuItems.map((item) => (
             <button
