@@ -1,7 +1,28 @@
-import React from 'react';
+import HomeComponent from '../../Pages/User/Home';
+import {
+    FiHome,
+    FiUsers,
+    FiSettings,
+    FiPieChart,
+    FiBarChart,
+    FiBookOpen,
+    FiClock,
+    FiTrendingUp,
+    FiMessageSquare,
+    FiEdit,
+    FiBell,
+    FiLogOut,
+    FiSearch,
+    FiStar,
+    FiUserPlus,
+    FiTool,
+    FiHeart,
+    FiSend,
+    FiMail,
+} from "react-icons/fi";
 
 // Componentes temporales 
-const Home = () => <div className="p-6"><h2 className="text-xl font-bold">Dashboard Principal</h2><p>Bienvenido a WalkyApp</p></div>;
+const Home = () => <HomeComponent/>;
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
 const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gestión de Usuarios</h2><p>Lista y administración de usuarios</p></div>;
 const PetsByUser = () => <div className="p-6"><h2 className="text-xl font-bold">Mascotas por Usuario</h2><p>Vista de mascotas registradas</p></div>;
@@ -26,6 +47,7 @@ const Notifications = () => <div className="p-6"><h2 className="text-xl font-bol
 const Profile = () => <div className="p-6"><h2 className="text-xl font-bold">Mi Perfil</h2><p>Información personal</p></div>;
 const Settings = () => <div className="p-6"><h2 className="text-xl font-bold">Ajustes</h2><p>Configuración de la aplicación</p></div>;
 
+// Mapeo de componentes
 export const menuComponents = {
     // Admin
     'statistics': Statistics,
@@ -58,33 +80,99 @@ export const menuComponents = {
     'settings': Settings,
 };
 
+// Configuración de menús por rol
+export const menuItems = {
+    // Menú para Administrador
+    admin: [
+        { icon: FiBarChart, label: "Estadísticas", id: "statistics" },
+        { icon: FiUsers, label: "Usuarios", id: "users" },
+        { icon: FiHeart, label: "Mascotas por usuario", id: "pets-by-user" },
+        { icon: FiClock, label: "Paseos por usuario", id: "walks-by-user" },
+        { icon: FiUserPlus, label: "Solicitudes de Alta", id: "registration-requests" },
+        { icon: FiMail, label: "Consultas", id: "tickets-general" },
+        { icon: FiTool, label: "Admin Menu", id: "promotions" },
+    ],
+    
+    // Menú para Cliente
+    client: [
+        { icon: FiHome, label: "Home", id: "home" },
+        { icon: FiSearch, label: "Buscar Paseador", id: "search-walker" },
+        { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
+        { icon: FiHeart, label: "Mis Mascotas", id: "my-pets" },
+        { icon: FiSend, label: "Ser Paseador", id: "my-account-perms" },
+        { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
+    ],
+    
+    // Menú para Paseador
+    walker: [
+        { icon: FiHome, label: "Home", id: "home" },
+        { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
+        { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
+        { icon: FiTrendingUp, label: "Estadísticas", id: "statistics" },
+        { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
+    ],
+    
+    // Menú para Soporte
+    support: [
+        { icon: FiMail, label: "Consultas", id: "tickets-general" },
+        { icon: FiClock, label: "Paseos Activos", id: "active-walks" },
+    ],
+};
+
+export const commonMenuItems = [
+    { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+    { icon: FiBell, label: "Notificaciones", id: "notifications" },
+    { icon: FiUsers, label: "Grupos", id: "groups" },
+    { icon: FiBookOpen, label: "Mis Grupos", id: "my-groups" },
+    { icon: FiSettings, label: "Ajustes", id: "settings" },
+    { icon: FiLogOut, label: "Logout", id: "logout" },
+];
+
+const menuTitles = {
+    'statistics': 'Estadísticas',
+    'users': 'Usuarios',
+    'pets-by-user': 'Mascotas por Usuario',
+    'walks-by-user': 'Paseos por Usuario',
+    'registration-requests': 'Solicitudes de Alta',
+    'tickets-general': 'Consultas',
+    'promotions': 'Promociones',
+    'home': 'Home',
+    'search-walker': 'Buscar Paseador',
+    'my-walks': 'Mis Paseos',
+    'my-pets': 'Mis Mascotas',
+    'my-account-perms': 'Ser Paseador',
+    'tickets': 'Consultas',
+    'my-reviews': 'Mis Reseñas',
+    'groups': 'Grupos',
+    'my-groups': 'Mis Grupos',
+    'active-walks': 'Paseos Activos',
+    'notifications': 'Notificaciones',
+    'profile': 'Mi Perfil',
+    'settings': 'Ajustes',
+};
+
 export const getComponentById = (id) => {
     return menuComponents[id] || Home;
 };
 
 export const getMenuTitle = (id) => {
-    const titles = {
-        'statistics': 'Estadísticas',
-        'users': 'Usuarios',
-        'pets-by-user': 'Mascotas por Usuario',
-        'walks-by-user': 'Paseos por Usuario',
-        'registration-requests': 'Solicitudes de Alta',
-        'tickets-general': 'Consultas',
-        'promotions': 'Promociones',
-        'home': 'Home',
-        'search-walker': 'Buscar Paseador',
-        'my-walks': 'Mis Paseos',
-        'my-pets': 'Mis Mascotas',
-        'my-account-perms': 'Solicitar Permisos',
-        'tickets': 'Consultas',
-        'my-reviews': 'Mis Reseñas',
-        'groups': 'Grupos',
-        'my-groups': 'Mis Grupos',
-        'active-walks': 'Paseos Activos',
-        'notifications': 'Notificaciones',
-        'profile': 'Mi Perfil',
-        'settings': 'Ajustes',
-    };
+    return menuTitles[id] || 'Dashboard';
+};
+
+export const getMenuItemsByRole = (role) => {
+    return menuItems[role] || menuItems.client;
+};
+
+export const getCommonMenuItems = () => {
+    return commonMenuItems;
+};
+
+export const getAllMenuItemsByRole = (role) => {
+    const roleMenuItems = getMenuItemsByRole(role);
+    const commonItems = getCommonMenuItems();
     
-    return titles[id] || 'Dashboard';
+    return {
+        roleItems: roleMenuItems,
+        commonItems: commonItems
+    };
 };

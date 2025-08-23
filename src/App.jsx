@@ -4,6 +4,7 @@ import MainContent from "./Pages/General/MainContent";
 import Login from "./Pages/Auth/Login.jsx";
 import Register from "./Pages/Auth/Register.jsx";
 import { AuthController } from "./BackEnd/Controllers/AuthController.js";
+import { UserProvider } from "./BackEnd/Context/UserContext";
 
 const App = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -96,19 +97,21 @@ const App = () => {
           />
         )
       ) : (
-        <div className="flex h-screen bg-background dark:bg-foreground">
-          <Navbar
-            isOpen={isOpen}
-            toggleSidebar={toggleSidebar}
-            isDarkMode={isDarkMode}
-            toggleDarkMode={toggleDarkMode}
-            activeItem={activeItem}
-            setActiveItem={setActiveItem}
-            user={user}
-            onLogout={handleLogout}
-          />
-          <MainContent activeItem={activeItem} isDarkMode={isDarkMode} />
-        </div>
+        <UserProvider user={user}>
+          <div className="flex h-screen bg-background dark:bg-foreground">
+            <Navbar
+              isOpen={isOpen}
+              toggleSidebar={toggleSidebar}
+              isDarkMode={isDarkMode}
+              toggleDarkMode={toggleDarkMode}
+              activeItem={activeItem}
+              setActiveItem={setActiveItem}
+              user={user}
+              onLogout={handleLogout}
+            />
+            <MainContent activeItem={activeItem} isDarkMode={isDarkMode} />
+          </div>
+        </UserProvider>
       )}
     </div>
   );

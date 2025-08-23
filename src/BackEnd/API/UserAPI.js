@@ -7,10 +7,10 @@ export const UserAPI = {
         // return await res.json();
 
         return {
-            id: "1",
+            id: 3,
             name: "John Doe",
             email: "asd@gmail.com",
-            role: "support",
+            role: "client",
             profileImage:
                 "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
             };

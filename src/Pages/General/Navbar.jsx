@@ -1,75 +1,11 @@
 import {
     FiMenu,
     FiX,
-    FiHome,
-    FiUsers,
-    FiSettings,
-    FiPieChart,
-    FiBarChart,
-    FiBookOpen,
-    FiClock,
-    FiTrendingUp,
-    FiMessageSquare,
-    FiEdit,
-    FiBell,
-    FiLogOut,
     FiMoon,
     FiSun,
-    FiSearch,
-    FiStar,
-    FiUserPlus,
-    FiTool,
-    FiHeart,
-    FiSend,
-    FiMail,
 } from "react-icons/fi";
 
-const menuItems = {
-    // Menú para Administrador
-    admin: [
-        { icon: FiBarChart, label: "Estadísticas", id: "statistics" },
-        { icon: FiUsers, label: "Usuarios", id: "users" },
-        { icon: FiHeart, label: "Mascotas por usuario", id: "pets-by-user" },
-        { icon: FiClock, label: "Paseos por usuario", id: "walks-by-user" },
-        { icon: FiUserPlus, label: "Solicitudes de Alta", id: "registration-requests" },
-        { icon: FiMail, label: "Consultas", id: "tickets-general" },
-        { icon: FiTool, label: "Admin Menu", id: "promotions" },
-    ],
-    
-    // Menú para Cliente
-    client: [
-        { icon: FiHome, label: "Home", id: "home" },
-        { icon: FiSearch, label: "Buscar Paseador", id: "search-walker" },
-        { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
-        { icon: FiHeart, label: "Mis Mascotas", id: "my-pets" },
-        { icon: FiSend, label: "Solicitar permisos", id: "my-account-perms" },
-        { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
-    ],
-    
-    // Menú para Paseador
-    walker: [
-        { icon: FiHome, label: "Home", id: "home" },
-        { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
-        { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
-        { icon: FiTrendingUp, label: "Estadísticas", id: "statistics" },
-        { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
-    ],
-    
-    // Menú para Soporte
-    support: [
-        { icon: FiMail, label: "Consultas", id: "tickets-general" },
-        { icon: FiClock, label: "Paseos Activos", id: "active-walks" },
-    ],
-};
-
-const commonMenuItems = [
-    { icon: FiEdit, label: "Mi Perfil", id: "profile" },
-    { icon: FiBell, label: "Notificaciones", id: "notifications" },
-    { icon: FiUsers, label: "Grupos", id: "groups" },
-    { icon: FiBookOpen, label: "Mis Grupos", id: "my-groups" },
-    { icon: FiSettings, label: "Ajustes", id: "settings" },
-    { icon: FiLogOut, label: "Logout", id: "logout" },
-];
+import { getAllMenuItemsByRole } from '../../BackEnd/Generics/Menu.jsx';
 
 const Navbar = ({
     isOpen,
@@ -90,6 +26,8 @@ const Navbar = ({
         }
     };
 
+    // Obtener los elementos del menú desde Menu.jsx
+    const { roleItems, commonItems } = getAllMenuItemsByRole(user?.role);
 
     return (
         <aside
@@ -143,7 +81,8 @@ const Navbar = ({
 
         {/* Menu */}
         <nav className="p-4 space-y-2 flex-1 overflow-auto">
-            {menuItems[user?.role || "client"].map((item) => (
+            {/* Elementos específicos del rol */}
+            {roleItems.map((item) => (
             <button
                 key={item.id}
                 onClick={() => handleMenuClick(item.id)}
@@ -160,11 +99,12 @@ const Navbar = ({
             ))}
 
             {/* Separador solo si hay elementos comunes */}
-            {commonMenuItems.length > 0 && (
+            {commonItems.length > 0 && (
                 <div className="border-t border-border dark:border-accent my-4"></div>
             )}
 
-            {commonMenuItems.map((item) => (
+            {/* Elementos comunes */}
+            {commonItems.map((item) => (
             <button
                 key={item.id}
                 onClick={() => handleMenuClick(item.id)}
