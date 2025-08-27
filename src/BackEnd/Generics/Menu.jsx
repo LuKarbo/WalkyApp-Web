@@ -50,6 +50,8 @@ const Trip = ({ contentParams }) => {
 };
 
 const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
+const MyWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Historial de paseos programados</p></div>;
+
 
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
@@ -60,9 +62,7 @@ const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl f
 const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
-
 const SearchWalker = () => <div className="p-6"><h2 className="text-xl font-bold">Buscar Paseador</h2><p>Encuentra el paseador perfecto</p></div>;
-const MyWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Historial de paseos programados</p></div>;
 const MyPets = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Mascotas</h2><p>Gestión de tus mascotas</p></div>;
 const MyAccountPerms = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitar Permisos</h2><p>Solicitudes de permisos especiales</p></div>;
 const Tickets = () => <div className="p-6"><h2 className="text-xl font-bold">Consultas</h2><p>Mis consultas al soporte</p></div>;

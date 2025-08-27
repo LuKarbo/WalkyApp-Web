@@ -2,110 +2,116 @@ import { format } from "date-fns";
 import { useNavigation } from "../../../../BackEnd/Context/NavigationContext";
 
 const TableComponent = ({ trips }) => {
-
     const { navigateToContent } = useNavigation();
 
     const handleViewTrip = (tripId) => {
         navigateToContent('trip', { tripId });
     };
 
+    const handleMyTrips = () => {
+        navigateToContent('my-walks');
+    };
+
     return (
         <div>
+            {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-foreground dark:text-background">
-                    Mis viajes activos 
+                    Mis paseos activos
                     <span className="text-lg font-normal text-accent dark:text-muted ml-2">
                         (limitado a 5)
                     </span>
                 </h2>
-                <button className="px-4 py-2 text-sm bg-primary/10 text-black hover:bg-primary/20 rounded-lg transition-colors duration-300 border border-primary/20">
-                    Ir a mis viajes
+                <button 
+                    onClick={handleMyTrips}
+                    className="px-4 py-2 text-sm bg-primary text-white rounded-lg shadow-md hover:bg-primary/90 transition-all duration-300 btn-hover"
+                >
+                    Ver todos
                 </button>
             </div>
-            
-            <div className="bg-card dark:bg-accent rounded-xl shadow-lg overflow-hidden border border-border dark:border-muted">
+
+            {/* Table */}
+            <div className="bg-card dark:bg-accent rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted">
                 <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gradient-to-r from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20">
+                    <table className="w-full text-sm">
+                        <thead className="bg-accent dark:bg-foreground2">
                             <tr>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground dark:text-background uppercase tracking-wider">
-                                    Trip ID
+                                {["Trip ID", "Dog Name", "Walker", "Start Time", "Status", "Actions"].map((col) => (
+                                <th
+                                    key={col}
+                                    className="px-6 py-3 text-left font-semibold text-white uppercase tracking-wider text-xs"
+                                >
+                                    {col}
                                 </th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground dark:text-background uppercase tracking-wider">
-                                    Dog Name
-                                </th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground dark:text-background uppercase tracking-wider">
-                                    Walker
-                                </th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground dark:text-background uppercase tracking-wider">
-                                    Start Time
-                                </th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground dark:text-background uppercase tracking-wider">
-                                    Status
-                                </th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground dark:text-background uppercase tracking-wider">
-                                    Actions
-                                </th>
+                                ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-border dark:divide-muted">
-                            {trips.map((trip, index) => (
-                                <tr 
-                                    key={trip.id} 
-                                    className={`hover:bg-muted/50 dark:hover:bg-foreground/10 transition-colors duration-200 ${
-                                        index % 2 === 0 ? 'bg-background/50 dark:bg-foreground/5' : ''
+                        <tbody>
+                        {trips.map((trip, index) => (
+                            <tr
+                                key={trip.id}
+                                className={`transition-colors duration-200 bg-white dark:bg-background hover:bg-muted/90`}
+                            >
+                            {/* Trip ID */}
+                            <td className="px-6 py-4 font-medium text-foreground dark:text-foreground">
+                                {trip.id}
+                            </td>
+
+                            {/* Dog Name */}
+                            <td className="px-6 py-4">
+                                <div className="flex items-center">
+                                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                        <span className="text-primary font-bold">{trip.dogName[0]}</span>
+                                    </div>
+                                    <span className="font-medium text-foreground dark:text-foreground">
+                                        {trip.dogName}
+                                    </span>
+                                </div>
+                            </td>
+
+                            {/* Walker */}
+                            <td className="px-6 py-4 text-foreground dark:text-foreground">
+                                {trip.walker}
+                            </td>
+
+                            {/* Start Time */}
+                            <td className="px-6 py-4 text-foreground dark:text-foreground">
+                                {format(new Date(trip.startTime), "MMM d, yyyy h:mm a")}
+                            </td>
+
+                            {/* Status */}
+                            <td className="px-6 py-4">
+                                <span
+                                    className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+                                        trip.status === "Active"
+                                        ? "bg-success/20 text-success"
+                                        : trip.status === "Completed"
+                                        ? "bg-neutral/20 text-neutral"
+                                        : "bg-warning/20 text-warning"
                                     }`}
                                 >
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-medium text-foreground dark:text-background">
-                                            {trip.id}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center mr-3">
-                                                <span className="text-primary text-sm font-bold">
-                                                    {trip.dogName[0]}
-                                                </span>
-                                            </div>
-                                            <div className="text-sm font-medium text-foreground dark:text-background">
-                                                {trip.dogName}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground dark:text-background">
-                                        {trip.walker}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground dark:text-background">
-                                        {format(new Date(trip.startTime), "MMM d, yyyy h:mm a")}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                                                trip.status === "Active" 
-                                                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" 
-                                                    : trip.status === "Completed" 
-                                                    ? "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400" 
-                                                    : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                            }`}
+                                {trip.status}
+                                </span>
+                            </td>
+
+                            {/* Actions */}
+                                <td className="px-6 py-4">
+                                    <div className="flex space-x-3">
+                                        <button
+                                            onClick={() => handleViewTrip(trip.id)}
+                                            className="px-3 py-1 text-sm rounded-lg border border-info/40 text-info hover:bg-info/10 transition-colors duration-200"
                                         >
-                                            {trip.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <div className="flex space-x-3">
-                                            <button 
-                                                onClick={() => handleViewTrip(trip.id)}
-                                                className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
-                                                View
-                                            </button>
-                                            <button className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors duration-200">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                            Ver
+                                        </button>
+                                        <button
+                                            className="px-3 py-1 text-sm rounded-lg border border-danger/40 text-danger hover:bg-danger/10 transition-colors duration-200"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
                         </tbody>
                     </table>
                 </div>

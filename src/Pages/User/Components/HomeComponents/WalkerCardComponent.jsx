@@ -45,7 +45,7 @@ const WalkerCardComponent = ({ walkers }) => {
                         <div className="p-4">
                             {walker.isPlaceholder ? (
                                 <div className="text-center">
-                                    <h3 className="font-bold text-lg text-primary mb-2">
+                                    <h3 className="font-bold text-lg text-secondary mb-2">
                                         {walker.title}
                                     </h3>
                                     <p className="text-accent dark:text-muted font-medium mb-2">
@@ -65,7 +65,7 @@ const WalkerCardComponent = ({ walkers }) => {
                                     <h3 className="font-bold text-lg text-foreground dark:text-background">
                                         {walker.name}
                                     </h3>
-                                    <div className="flex items-center text-yellow-400 mb-1">
+                                    <div className="flex items-center text-warning mb-1">
                                         <AiOutlineStar />
                                         <span className="ml-1">{walker.rating}</span>
                                     </div>
