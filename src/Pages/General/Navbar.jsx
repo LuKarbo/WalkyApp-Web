@@ -14,6 +14,7 @@ const Navbar = ({
     toggleDarkMode,
     activeItem,
     setActiveItem,
+    navigateToContent,
     user,
     onLogout,
 }) => {
@@ -22,11 +23,14 @@ const Navbar = ({
         if (id === "logout") {
             onLogout();
         } else {
-            setActiveItem(id);
+            if (navigateToContent) {
+                navigateToContent(id);
+            } else {
+                setActiveItem(id);
+            }
         }
     };
 
-    // Obtener los elementos del menú desde Menu.jsx
     const { roleItems, commonItems } = getAllMenuItemsByRole(user?.role);
 
     return (

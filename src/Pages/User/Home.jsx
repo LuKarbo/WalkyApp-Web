@@ -6,16 +6,15 @@ import { WalkerController } from '../../BackEnd/Controllers/WalkerController';
 import { WalksController } from '../../BackEnd/Controllers/WalksController';
 import { useUser } from '../../BackEnd/Context/UserContext';
 
-const Home = () => {
+const Home = ({ navigateToContent }) => {
     const [walkers, setWalkers] = useState([]);
     const [walks, setWalks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    
     const user = useUser();
     const userId = user?.id;
-    console.log(user);
+    
     const announcements = [
         {
             id: 1,
@@ -85,13 +84,22 @@ const Home = () => {
     return (
         <div className="w-full h-full p-6 bg-background dark:bg-foreground">
             {/* Banner de anuncios */}
-            <BannerHomeComponent announcements={announcements} />
+            <BannerHomeComponent 
+                announcements={announcements} 
+                navigateToContent={navigateToContent}
+            />
 
             {/* Sección de mejores paseadores */}
-            <WalkerCardComponent walkers={walkers} />
+            <WalkerCardComponent 
+                walkers={walkers} 
+                navigateToContent={navigateToContent}
+            />
 
             {/* Tabla de walks/paseos activos */}
-            <TableComponent trips={walks} />
+            <TableComponent 
+                trips={walks} 
+                navigateToContent={navigateToContent}
+            />
         </div>
     );
 };

@@ -5,17 +5,27 @@ import Login from "./Pages/Auth/Login.jsx";
 import Register from "./Pages/Auth/Register.jsx";
 import { AuthController } from "./BackEnd/Controllers/AuthController.js";
 import { UserProvider } from "./BackEnd/Context/UserContext";
+import { NavigationProvider } from "./BackEnd/Context/NavigationContext"; 
 
 const App = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [activeItem, setActiveItem] = useState("home"); 
+  const [contentParams, setContentParams] = useState(null);
   const [user, setUser] = useState(null);
   const [authScreen, setAuthScreen] = useState("login");
   const [loading, setLoading] = useState(true);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+
+  // Método para cambiar contenido del MainContent
+  // para utilizarlo se necesita el useNavegation del NavigationContext (pero solo funciona dentro de los componentes de NavigationProvider)
+  const navigateToContent = (contentId, params = null) => {
+    console.log("navigateToContent called:", { contentId, params });
+    setActiveItem(contentId);
+    setContentParams(params);
+  };
 
   // pagina principal por rol de usuario
   const getDefaultActiveItem = (userRole) => {
@@ -38,7 +48,9 @@ const App = () => {
     sessionStorage.setItem("token", loggedUser.token);
     setUser(loggedUser);
     
-    setActiveItem(getDefaultActiveItem(loggedUser.role));
+    const defaultItem = getDefaultActiveItem(loggedUser.role);
+    setActiveItem(defaultItem);
+    setContentParams(null);
   };
 
   const handleRegister = async (data) => {
@@ -52,6 +64,7 @@ const App = () => {
     setUser(null);
     setAuthScreen("login");
     setActiveItem("home"); 
+    setContentParams(null);
   };
 
   useEffect(() => {
@@ -98,19 +111,27 @@ const App = () => {
         )
       ) : (
         <UserProvider user={user}>
-          <div className="flex h-screen bg-background dark:bg-foreground">
-            <Navbar
-              isOpen={isOpen}
-              toggleSidebar={toggleSidebar}
-              isDarkMode={isDarkMode}
-              toggleDarkMode={toggleDarkMode}
-              activeItem={activeItem}
-              setActiveItem={setActiveItem}
-              user={user}
-              onLogout={handleLogout}
-            />
-            <MainContent activeItem={activeItem} isDarkMode={isDarkMode} />
-          </div>
+          <NavigationProvider navigateToContent={navigateToContent}>
+            <div className="flex h-screen bg-background dark:bg-foreground">
+              <Navbar
+                isOpen={isOpen}
+                toggleSidebar={toggleSidebar}
+                isDarkMode={isDarkMode}
+                toggleDarkMode={toggleDarkMode}
+                activeItem={activeItem}
+                setActiveItem={setActiveItem}
+                navigateToContent={navigateToContent}
+                user={user}
+                onLogout={handleLogout}
+              />
+              <MainContent 
+                activeItem={activeItem} 
+                contentParams={contentParams}
+                navigateToContent={navigateToContent}
+                isDarkMode={isDarkMode} 
+              />
+            </div>
+          </NavigationProvider>
         </UserProvider>
       )}
     </div>

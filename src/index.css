@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-    --color-primary: #16a34a;
-    --color-secondary: #f2f2f2;
-    --color-accent: #6D7074;
+    --color-primary: #16a34a;     
+    --color-secondary: #f2f2f2;   
+    --color-accent: #6D7074;      
     --color-background: #ffffff;
     --color-background-input: #0f172a;
     --color-foreground: #020817;
@@ -16,6 +16,15 @@
     --color-border: #E0E0E0;
     --color-input: #0f172a;
     --color-ring: #0A8537;
+
+    /* === NUEVOS === */
+    --color-warning: #facc15;   
+    --color-danger: #dc2626;    
+    --color-success: #22c55e;   
+    --color-info: #0284c7;      
+    --color-good: #14b8a6;      
+    --color-neutral: #9ca3af;   
+    --color-black: #f1f5f9; 
 
     --font-family-sans: 'Anek Telugu', sans-serif;
     
@@ -42,7 +51,17 @@
     --color-border: #475569;
     --color-input: #FFFFFF;
     --color-ring: #22c55e;
+
+    /* === NUEVOS (modo oscuro) === */
+    --color-warning: #eab308;   
+    --color-danger: #f87171;    
+    --color-success: #4ade80;   
+    --color-info: #38bdf8;      
+    --color-good: #2dd4bf;      
+    --color-neutral: #6b7280;  
+    --color-black: #0f172a;  
 }
+
 
 @import url('https://fonts.googleapis.com/css2?family=Anek+Telugu:wght@100;200;300;400;500;600;700;800;900&display=swap');
 

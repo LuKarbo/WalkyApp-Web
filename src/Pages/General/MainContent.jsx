@@ -1,6 +1,6 @@
 import { getComponentById, getMenuTitle } from '../../BackEnd/Generics/Menu.jsx';
 
-const MainContent = ({ activeItem }) => {
+const MainContent = ({ activeItem, contentParams, navigateToContent }) => {
 
     const ActiveComponent = getComponentById(activeItem);
     const pageTitle = getMenuTitle(activeItem);
@@ -15,7 +15,12 @@ const MainContent = ({ activeItem }) => {
             </div>
             
             <div className="bg-card dark:bg-accent rounded-lg shadow-lg min-h-[calc(100vh-200px)]">
-                <ActiveComponent />
+                {ActiveComponent && (
+                    <ActiveComponent 
+                        contentParams={contentParams} 
+                        navigateToContent={navigateToContent}
+                    />
+                )}
             </div>
         </main>
     );

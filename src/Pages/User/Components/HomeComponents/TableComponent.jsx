@@ -1,6 +1,14 @@
 import { format } from "date-fns";
+import { useNavigation } from "../../../../BackEnd/Context/NavigationContext";
 
 const TableComponent = ({ trips }) => {
+
+    const { navigateToContent } = useNavigation();
+
+    const handleViewTrip = (tripId) => {
+        navigateToContent('trip', { tripId });
+    };
+
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
@@ -10,7 +18,7 @@ const TableComponent = ({ trips }) => {
                         (limitado a 5)
                     </span>
                 </h2>
-                <button className="px-4 py-2 text-sm bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors duration-300 border border-primary/20">
+                <button className="px-4 py-2 text-sm bg-primary/10 text-black hover:bg-primary/20 rounded-lg transition-colors duration-300 border border-primary/20">
                     Ir a mis viajes
                 </button>
             </div>
@@ -86,7 +94,9 @@ const TableComponent = ({ trips }) => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                         <div className="flex space-x-3">
-                                            <button className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
+                                            <button 
+                                                onClick={() => handleViewTrip(trip.id)}
+                                                className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
                                                 View
                                             </button>
                                             <button className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors duration-200">

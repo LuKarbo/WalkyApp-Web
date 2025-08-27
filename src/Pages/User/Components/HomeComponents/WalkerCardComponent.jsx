@@ -1,6 +1,27 @@
 import { AiOutlineStar } from "react-icons/ai";
+import { useNavigation } from "../../../../BackEnd/Context/NavigationContext";
 
 const WalkerCardComponent = ({ walkers }) => {
+    
+    const { navigateToContent } = useNavigation();
+    
+    // ver perfil del paseador seleccionado
+    const handleViewProfile = (walkerId) => {
+        console.log('navigateToContent');
+        navigateToContent('walker-profile', { walkerId });
+    };
+
+    // solicitar paseo al paseador seleccionado
+    const handleRequestWalk = (walkerId) => {
+        navigateToContent('request-walk', { walkerId });
+    };
+
+    // formulario de joinTous
+    const handleJoinToUs = () => {
+        console.log();
+        navigateToContent('join-to-us');
+    };
+
     return (
         <div className="mb-8">
             <h2 className="text-2xl font-bold mb-4 text-foreground dark:text-background">
@@ -33,7 +54,9 @@ const WalkerCardComponent = ({ walkers }) => {
                                     <p className="text-sm text-foreground dark:text-background mb-4">
                                         {walker.description}
                                     </p>
-                                    <button className="w-full bg-gradient-to-r from-primary to-primary/80 text-white py-2 rounded-md hover:from-primary/90 hover:to-primary/70 transition-all duration-300">
+                                    <button 
+                                        onClick={() => handleJoinToUs()}
+                                        className="w-full bg-gradient-to-r from-primary to-primary/80 text-white py-2 rounded-md hover:from-primary/90 hover:to-primary/70 transition-all duration-300">
                                         Únete Ahora
                                     </button>
                                 </div>
@@ -52,9 +75,21 @@ const WalkerCardComponent = ({ walkers }) => {
                                     <p className="text-accent dark:text-muted mb-3">
                                         {walker.specialties}
                                     </p>
-                                    <button className="w-full bg-primary text-white py-2 rounded-md hover:bg-opacity-90 transition-all duration-300">
-                                        Book Now
-                                    </button>
+
+                                    <div className="flex gap-3">
+                                        <button 
+                                            onClick={() => handleRequestWalk(walker.id)}
+                                            className="w-full bg-primary text-white py-2 rounded-md hover:bg-opacity-90 transition-all duration-300"
+                                        >
+                                            Solicitar Paseo
+                                        </button>
+                                        <button 
+                                            onClick={() => handleViewProfile(walker.id)}
+                                            className="w-full bg-info text-white py-2 rounded-md hover:bg-opacity-90 transition-all duration-300"
+                                        >
+                                            Ver Perfil
+                                        </button>
+                                    </div>
                                 </>
                             )}
                         </div>

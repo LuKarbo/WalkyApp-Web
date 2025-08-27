@@ -3,7 +3,6 @@ import {
     FiHome,
     FiUsers,
     FiSettings,
-    FiPieChart,
     FiBarChart,
     FiBookOpen,
     FiClock,
@@ -21,8 +20,38 @@ import {
     FiMail,
 } from "react-icons/fi";
 
-// Componentes temporales 
+// Componentes En uso 
 const Home = () => <HomeComponent/>;
+
+const WalkerProfile = ({ contentParams }) => {
+    const { walkerId } = contentParams || {}; 
+    return (
+        <div className="p-6">
+            <h2 className="text-xl font-bold">
+                Perfil del Paseador: {walkerId}
+            </h2>
+            <p>Información personal del paseador seleccionado</p>
+        </div>
+    );
+};
+
+const Trip = ({ contentParams }) => {
+    const { tripId } = contentParams || {}; 
+    return (
+        <div className="p-6">
+            <h2 className="text-xl font-bold">
+                Info del Paseo {tripId}
+            </h2>
+            <p>
+                asdasdasdads
+            </p>
+        </div>
+    );
+};
+
+const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
+
+// Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
 const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gestión de Usuarios</h2><p>Lista y administración de usuarios</p></div>;
 const PetsByUser = () => <div className="p-6"><h2 className="text-xl font-bold">Mascotas por Usuario</h2><p>Vista de mascotas registradas</p></div>;
@@ -30,6 +59,7 @@ const WalksByUser = () => <div className="p-6"><h2 className="text-xl font-bold"
 const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitudes de Alta</h2><p>Solicitudes pendientes de aprobación</p></div>;
 const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
+
 
 const SearchWalker = () => <div className="p-6"><h2 className="text-xl font-bold">Buscar Paseador</h2><p>Encuentra el paseador perfecto</p></div>;
 const MyWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Historial de paseos programados</p></div>;
@@ -44,7 +74,7 @@ const MyGroups = () => <div className="p-6"><h2 className="text-xl font-bold">Mi
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
 const Notifications = () => <div className="p-6"><h2 className="text-xl font-bold">Notificaciones</h2><p>Centro de notificaciones</p></div>;
-const Profile = () => <div className="p-6"><h2 className="text-xl font-bold">Mi Perfil</h2><p>Información personal</p></div>;
+const UserProfile = () => <div className="p-6"><h2 className="text-xl font-bold">Mi Perfil</h2><p>Información personal</p></div>;
 const Settings = () => <div className="p-6"><h2 className="text-xl font-bold">Ajustes</h2><p>Configuración de la aplicación</p></div>;
 
 // Mapeo de componentes
@@ -65,7 +95,8 @@ export const menuComponents = {
     'my-pets': MyPets,
     'my-account-perms': MyAccountPerms,
     'tickets': Tickets,
-    
+    'join-to-us': JoinToUs,
+
     // Paseador
     'my-reviews': MyReviews,
     'groups': Groups,
@@ -75,8 +106,11 @@ export const menuComponents = {
     'active-walks': ActiveWalks,
     
     // General
+    'walker-profile': WalkerProfile,
+    'trip': Trip,
+
     'notifications': Notifications,
-    'profile': Profile,
+    'profile': UserProfile,
     'settings': Settings,
 };
 
@@ -99,7 +133,7 @@ export const menuItems = {
         { icon: FiSearch, label: "Buscar Paseador", id: "search-walker" },
         { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
         { icon: FiHeart, label: "Mis Mascotas", id: "my-pets" },
-        { icon: FiSend, label: "Ser Paseador", id: "my-account-perms" },
+        { icon: FiSend, label: "Ser Paseador", id: "join-to-us" },
         { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
     ],
     
@@ -129,6 +163,11 @@ export const commonMenuItems = [
 ];
 
 const menuTitles = {
+    'home': 'Home',
+    'walker-profile': 'Perfil Del Paseador',
+    'trip': 'Info de Paseo',
+    'join-to-us': 'Queres ser un Paseador?',
+
     'statistics': 'Estadísticas',
     'users': 'Usuarios',
     'pets-by-user': 'Mascotas por Usuario',
@@ -136,7 +175,6 @@ const menuTitles = {
     'registration-requests': 'Solicitudes de Alta',
     'tickets-general': 'Consultas',
     'promotions': 'Promociones',
-    'home': 'Home',
     'search-walker': 'Buscar Paseador',
     'my-walks': 'Mis Paseos',
     'my-pets': 'Mis Mascotas',
@@ -147,7 +185,7 @@ const menuTitles = {
     'my-groups': 'Mis Grupos',
     'active-walks': 'Paseos Activos',
     'notifications': 'Notificaciones',
-    'profile': 'Mi Perfil',
+    'userProfile': 'Mi Perfil',
     'settings': 'Ajustes',
 };
 
