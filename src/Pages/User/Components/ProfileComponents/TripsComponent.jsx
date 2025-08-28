@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { format } from "date-fns";
 
-const TripsComponent = ({ trips, onCancel, onView }) => {
+const TripsComponent = ({ trips, onCancel, onView, tripsError, tripsLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const tripsPerPage = 5;
 
-    // Limitar a máximo 10 trips
     const displayedTrips = trips.slice(0, 10);
     const totalPages = Math.ceil(displayedTrips.length / tripsPerPage);
     const paginatedTrips = displayedTrips.slice(
@@ -13,7 +12,6 @@ const TripsComponent = ({ trips, onCancel, onView }) => {
         currentPage * tripsPerPage
     );
 
-    // Función para obtener color según status
     const getStatusClasses = (status) => {
         switch (status) {
             case "Waiting":
@@ -29,6 +27,22 @@ const TripsComponent = ({ trips, onCancel, onView }) => {
                 return "bg-neutral/70 text-black";
         }
     };
+
+    if (tripsError) {
+        return (
+            <div className="bg-background dark:bg-foreground rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted p-4 text-red-600 font-semibold">
+                Error al cargar los viajes: {tripsError}
+            </div>
+        );
+    }
+
+    if (tripsLoading) {
+        return (
+            <div className="bg-background dark:bg-foreground rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted p-4">
+                Cargando Paseos...
+            </div>
+        );
+    }
 
     return (
         <div>

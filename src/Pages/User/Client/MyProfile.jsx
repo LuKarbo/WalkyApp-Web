@@ -43,7 +43,7 @@ const MyProfile = () => {
                 setTripsError(null);
                 if (!user?.id) return;
                 const data = await WalksController.fetchWalksByOwner(user.id);
-                setTrips(data.slice(0, 10)); // máximo 10 viajes
+                setTrips(data.slice(0, 10));
             } catch (err) {
                 console.error(err);
                 setTripsError("Error al cargar los paseos.");
@@ -100,6 +100,8 @@ const MyProfile = () => {
                     trips={trips}
                     onCancel={handleCancelTrip} 
                     onView={(tripId) => navigateToContent('trip', { tripId })}
+                    tripsError={tripsError}
+                    tripsLoading={loadingTrips}
                 />
 
             )}
