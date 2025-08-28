@@ -31,7 +31,7 @@ const TableComponent = ({ trips }) => {
             </div>
 
             {/* Table */}
-            <div className="bg-card dark:bg-accent rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted">
+            <div className="bg-background dark:bg-foreground rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="bg-accent dark:bg-foreground2">
@@ -50,10 +50,10 @@ const TableComponent = ({ trips }) => {
                         {trips.map((trip, index) => (
                             <tr
                                 key={trip.id}
-                                className={`transition-colors duration-200 bg-white dark:bg-background hover:bg-muted/90`}
+                                className={`transition-colors duration-200 bg-background dark:bg-foreground hover:bg-muted/30 dark:hover:bg-accent/30`}
                             >
                             {/* Trip ID */}
-                            <td className="px-6 py-4 font-medium text-foreground dark:text-foreground">
+                            <td className="px-6 py-4 font-medium text-foreground dark:text-background">
                                 {trip.id}
                             </td>
 
@@ -63,19 +63,19 @@ const TableComponent = ({ trips }) => {
                                     <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
                                         <span className="text-primary font-bold">{trip.dogName[0]}</span>
                                     </div>
-                                    <span className="font-medium text-foreground dark:text-foreground">
+                                    <span className="font-medium text-foreground dark:text-background">
                                         {trip.dogName}
                                     </span>
                                 </div>
                             </td>
 
                             {/* Walker */}
-                            <td className="px-6 py-4 text-foreground dark:text-foreground">
+                            <td className="px-6 py-4 text-foreground dark:text-background">
                                 {trip.walker}
                             </td>
 
                             {/* Start Time */}
-                            <td className="px-6 py-4 text-foreground dark:text-foreground">
+                            <td className="px-6 py-4 text-foreground dark:text-background">
                                 {format(new Date(trip.startTime), "MMM d, yyyy h:mm a")}
                             </td>
 
@@ -84,10 +84,10 @@ const TableComponent = ({ trips }) => {
                                 <span
                                     className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
                                         trip.status === "Active"
-                                        ? "bg-success/20 text-success"
+                                        ? "bg-success/70 text-black"
                                         : trip.status === "Completed"
-                                        ? "bg-neutral/20 text-neutral"
-                                        : "bg-warning/20 text-warning"
+                                        ? "bg-neutral/70 text-black"
+                                        : "bg-warning/70 text-black"
                                     }`}
                                 >
                                 {trip.status}
@@ -99,12 +99,12 @@ const TableComponent = ({ trips }) => {
                                     <div className="flex space-x-3">
                                         <button
                                             onClick={() => handleViewTrip(trip.id)}
-                                            className="px-3 py-1 text-sm rounded-lg border border-info/40 text-info hover:bg-info/10 transition-colors duration-200"
+                                            className="px-3 py-1 text-sm rounded-lg border border-info text-info hover:bg-info hover:text-black transition-colors duration-200"
                                         >
                                             Ver
                                         </button>
                                         <button
-                                            className="px-3 py-1 text-sm rounded-lg border border-danger/40 text-danger hover:bg-danger/10 transition-colors duration-200"
+                                            className="px-3 py-1 text-sm rounded-lg border border-danger text-danger hover:bg-danger hover:text-black transition-colors duration-200"
                                         >
                                             Cancelar
                                         </button>
