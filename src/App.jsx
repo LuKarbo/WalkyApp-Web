@@ -9,7 +9,7 @@ import { NavigationProvider } from "./BackEnd/Context/NavigationContext";
 
 const App = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isLightMode, setIsLightMode] = useState(true);
   const [activeItem, setActiveItem] = useState("home"); 
   const [contentParams, setContentParams] = useState(null);
   const [user, setUser] = useState(null);
@@ -17,7 +17,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
-  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+  const toggleLightMode = () => setIsLightMode(!isLightMode);
 
   // Método para cambiar contenido del MainContent
   // para utilizarlo se necesita el useNavegation del NavigationContext (pero solo funciona dentro de los componentes de NavigationProvider)
@@ -47,6 +47,7 @@ const App = () => {
     const loggedUser = await AuthController.login(credentials);
     sessionStorage.setItem("token", loggedUser.token);
     setUser(loggedUser);
+    console.log(loggedUser);
     
     const defaultItem = getDefaultActiveItem(loggedUser.role);
     setActiveItem(defaultItem);
@@ -96,7 +97,7 @@ const App = () => {
   );
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? "dark" : ""}`}>
+    <div className={`min-h-screen ${isLightMode ? "" : "dark"}`}>
       {!user ? (
         authScreen === "login" ? (
           <Login
@@ -116,8 +117,8 @@ const App = () => {
               <Navbar
                 isOpen={isOpen}
                 toggleSidebar={toggleSidebar}
-                isDarkMode={isDarkMode}
-                toggleDarkMode={toggleDarkMode}
+                isLightMode={isLightMode}
+                toggleLightMode={toggleLightMode}
                 activeItem={activeItem}
                 setActiveItem={setActiveItem}
                 navigateToContent={navigateToContent}
@@ -128,7 +129,7 @@ const App = () => {
                 activeItem={activeItem} 
                 contentParams={contentParams}
                 navigateToContent={navigateToContent}
-                isDarkMode={isDarkMode} 
+                isLightMode={isLightMode} 
               />
             </div>
           </NavigationProvider>

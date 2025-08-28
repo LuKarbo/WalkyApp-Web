@@ -1,4 +1,5 @@
 import HomeComponent from '../../Pages/User/Home';
+import MyProfile from '../../Pages/User/Client/MyProfile';
 import {
     FiHome,
     FiUsers,
@@ -49,6 +50,8 @@ const Trip = ({ contentParams }) => {
     );
 };
 
+const UserProfile = () => <MyProfile/>;
+
 const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
 const MyWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Historial de paseos programados</p></div>;
 
@@ -74,7 +77,6 @@ const MyGroups = () => <div className="p-6"><h2 className="text-xl font-bold">Mi
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
 const Notifications = () => <div className="p-6"><h2 className="text-xl font-bold">Notificaciones</h2><p>Centro de notificaciones</p></div>;
-const UserProfile = () => <div className="p-6"><h2 className="text-xl font-bold">Mi Perfil</h2><p>Información personal</p></div>;
 const Settings = () => <div className="p-6"><h2 className="text-xl font-bold">Ajustes</h2><p>Configuración de la aplicación</p></div>;
 
 // Mapeo de componentes
@@ -185,7 +187,7 @@ const menuTitles = {
     'my-groups': 'Mis Grupos',
     'active-walks': 'Paseos Activos',
     'notifications': 'Notificaciones',
-    'userProfile': 'Mi Perfil',
+    'profile': 'Mi Perfil',
     'settings': 'Ajustes',
 };
 

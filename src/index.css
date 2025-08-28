@@ -7,7 +7,8 @@
     --color-background: #ffffff;
     --color-background-input: #0f172a;
     --color-foreground: #020817;
-    --color-foreground2: #0f172a;
+    --color-foreground2: #f1f5f9;
+    --color-foreground-userProfile: #1e293b;
     --color-card: #FFFFFF;
     --color-card2: #f2f2f2;
     --color-popover: #FFFFFF;
@@ -45,6 +46,7 @@
     --color-background-input: #ffffff;
     --color-foreground: #f1f5f9;
     --color-foreground2: #1e293b;
+    --color-foreground-userProfile: #f1f1f1;
     --color-card: #0f172a;
     --color-card2: #1e293b;
     --color-popover: #1e293b; 

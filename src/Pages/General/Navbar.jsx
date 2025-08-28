@@ -10,8 +10,8 @@ import { getAllMenuItemsByRole } from '../../BackEnd/Generics/Menu.jsx';
 const Navbar = ({
     isOpen,
     toggleSidebar,
-    isDarkMode,
-    toggleDarkMode,
+    isLightMode,
+    toggleLightMode,
     activeItem,
     setActiveItem,
     navigateToContent,
@@ -128,11 +128,11 @@ const Navbar = ({
         {/* Cambio de Modo Claro/Oscuro */}
         <div className="p-4 border-t border-border dark:border-accent">
             <button
-            onClick={toggleDarkMode}
+            onClick={toggleLightMode}
             className="w-full flex items-center justify-center space-x-2 p-2 rounded-lg bg-muted dark:bg-accent hover:bg-primary dark:hover:bg-primary text-foreground dark:text-background"
             >
-            {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-            {isOpen && <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>}
+            {isLightMode ? <FiSun size={20} /> : <FiMoon size={20} />}
+            {isOpen && <span>{isLightMode ? "Light Mode" : "Dark Mode"}</span>}
             </button>
         </div>
         </aside>

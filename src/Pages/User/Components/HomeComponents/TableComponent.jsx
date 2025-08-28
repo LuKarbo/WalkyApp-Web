@@ -34,7 +34,7 @@ const TableComponent = ({ trips }) => {
             <div className="bg-background dark:bg-foreground rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-accent dark:bg-foreground2">
+                        <thead className="bg-foreground2">
                             <tr>
                                 {["Trip ID", "Dog Name", "Walker", "Start Time", "Status", "Actions"].map((col) => (
                                 <th
