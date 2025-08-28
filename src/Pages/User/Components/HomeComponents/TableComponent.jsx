@@ -86,8 +86,12 @@ const TableComponent = ({ trips }) => {
                                         trip.status === "Active"
                                         ? "bg-success/70 text-black"
                                         : trip.status === "Completed"
-                                        ? "bg-neutral/70 text-black"
-                                        : "bg-warning/70 text-black"
+                                        ? "bg-info/70 text-black"
+                                        : trip.status === "Waiting" || trip.status === "Scheduled"
+                                        ? "bg-warning/70 text-black"
+                                        : trip.status === "Cancelled"
+                                        ? "bg-danger/70 text-black"
+                                        : "bg-neutral/70 text-black"
                                     }`}
                                 >
                                 {trip.status}
@@ -103,11 +107,13 @@ const TableComponent = ({ trips }) => {
                                         >
                                             Ver
                                         </button>
-                                        <button
-                                            className="px-3 py-1 text-sm rounded-lg border border-danger text-danger hover:bg-danger hover:text-black transition-colors duration-200"
-                                        >
-                                            Cancelar
-                                        </button>
+                                        {(trip.status === "Waiting" || trip.status === "Scheduled") && (
+                                            <button
+                                                className="px-3 py-1 text-sm rounded-lg border border-danger text-danger hover:bg-danger hover:text-black transition-colors duration-200"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        )}
                                     </div>
                                 </td>
                             </tr>

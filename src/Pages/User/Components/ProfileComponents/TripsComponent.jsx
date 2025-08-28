@@ -1,19 +1,132 @@
-const TripsComponent = ({ trips, requestButtonClass }) => (
-    <div className="bg-foreground-userProfile p-6 rounded-lg shadow-lg mb-6">
-        <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-heading text-background">Últimos 10 Paseos</h2>
-            <button className={requestButtonClass}>
-                Solicitar Paseo
-            </button>
-        </div>
-        {trips.length === 0 ? (
-            <p className="text-accent dark:text-muted">Sin paseos realizados.</p>
-        ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <p className="text-accent dark:text-muted">DATOS</p>
+import { useState } from "react";
+import { format } from "date-fns";
+
+const TripsComponent = ({ trips, onCancel, onView }) => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const tripsPerPage = 5;
+
+    // Limitar a máximo 10 trips
+    const displayedTrips = trips.slice(0, 10);
+    const totalPages = Math.ceil(displayedTrips.length / tripsPerPage);
+    const paginatedTrips = displayedTrips.slice(
+        (currentPage - 1) * tripsPerPage,
+        currentPage * tripsPerPage
+    );
+
+    // Función para obtener color según status
+    const getStatusClasses = (status) => {
+        switch (status) {
+            case "Waiting":
+            case "Scheduled":
+                return "bg-warning/70 text-black";
+            case "Completed":
+                return "bg-success/70 text-black";
+            case "Active":
+                return "bg-info/70 text-black";
+            case "Cancelled":
+                return "bg-danger/70 text-black";
+            default:
+                return "bg-neutral/70 text-black";
+        }
+    };
+
+    return (
+        <div>
+            {/* Table */}
+            <div className="bg-background dark:bg-foreground rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                        <thead className="bg-foreground2">
+                            <tr>
+                                {["Trip ID", "Dog Name", "Walker", "Start Time", "Status", "Actions"].map((col) => (
+                                    <th
+                                        key={col}
+                                        className="px-6 py-3 text-left font-semibold text-white uppercase tracking-wider text-xs"
+                                    >
+                                        {col}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {paginatedTrips.map((trip) => (
+                                <tr
+                                    key={trip.id}
+                                    className="transition-colors duration-200 bg-background dark:bg-foreground hover:bg-muted/30 dark:hover:bg-accent/30"
+                                >
+                                    <td className="px-6 py-4 font-medium text-foreground dark:text-background">
+                                        {trip.id}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center">
+                                            <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                                <span className="text-primary font-bold">{trip.dogName[0]}</span>
+                                            </div>
+                                            <span className="font-medium text-foreground dark:text-background">
+                                                {trip.dogName}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-foreground dark:text-background">
+                                        {trip.walkerName}
+                                    </td>
+                                    <td className="px-6 py-4 text-foreground dark:text-background">
+                                        {format(new Date(trip.startTime), "MMM d, yyyy h:mm a")}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span
+                                            className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(trip.status)}`}
+                                        >
+                                            {trip.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex space-x-3">
+                                            <button
+                                                onClick={() => onView(trip.id)}
+                                                className="px-3 py-1 text-sm rounded-lg border border-info text-info hover:bg-info hover:text-black transition-colors duration-200"
+                                            >
+                                                Ver
+                                            </button>
+                                            {(trip.status === "Waiting" || trip.status === "Scheduled") && (
+                                                <button
+                                                    onClick={() => onCancel(trip.id)}
+                                                    className="px-3 py-1 text-sm rounded-lg border border-danger text-danger hover:bg-danger hover:text-black transition-colors duration-200"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        )}
-    </div>
-);
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="mt-4 flex justify-center space-x-2">
+                    <button
+                        className="px-3 py-1 border rounded disabled:opacity-50"
+                        onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Anterior
+                    </button>
+                    <span className="px-3 py-1">{currentPage} / {totalPages}</span>
+                    <button
+                        className="px-3 py-1 border rounded disabled:opacity-50"
+                        onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Siguiente
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
 
 export default TripsComponent;

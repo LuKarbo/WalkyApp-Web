@@ -95,7 +95,7 @@ const Home = ({ navigateToContent }) => {
                 navigateToContent={navigateToContent}
             />
 
-            {/* Tabla de walks/paseos activos */}
+            {/* Tabla de paseos activos */}
             <TableComponent 
                 trips={walks} 
                 navigateToContent={navigateToContent}

@@ -1,7 +1,8 @@
 import { FiSettings } from "react-icons/fi";
 
-const HeaderComponent = ({ userData, buttonBase, buttonInactive }) => (
-    <div className="bg-foreground-userProfile p-6 rounded-lg shadow-lg mb-6">
+const HeaderComponent = ({ userData, buttonBase, buttonInactive }) => {
+    return (
+        <div className="bg-foreground-userProfile p-6 rounded-lg shadow-lg mb-6">
         <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
                 <img
@@ -19,6 +20,7 @@ const HeaderComponent = ({ userData, buttonBase, buttonInactive }) => (
             </button>
         </div>
     </div>
-);
+    );
+};
 
 export default HeaderComponent;
