@@ -1,5 +1,7 @@
 import { useState } from "react";
-
+import {
+    FiSend,
+} from "react-icons/fi";
 
 const ChatMap = () => {
     const [messages, setMessages] = useState([]);

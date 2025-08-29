@@ -1,5 +1,7 @@
 import HomeComponent from '../../Pages/User/Home';
 import MyProfile from '../../Pages/User/Client/MyProfile';
+import MapChat from '../../Pages/Common/Chat-map';
+
 import {
     FiHome,
     FiUsers,
@@ -51,6 +53,7 @@ const Trip = ({ contentParams }) => {
 };
 
 const UserProfile = () => <MyProfile/>;
+const MapChatView  = () => <MapChat/>;
 
 const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
 const MyWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Historial de paseos programados</p></div>;
@@ -110,6 +113,7 @@ export const menuComponents = {
     // General
     'walker-profile': WalkerProfile,
     'trip': Trip,
+    'mapchat': MapChatView,
 
     'notifications': Notifications,
     'profile': UserProfile,
@@ -137,6 +141,7 @@ export const menuItems = {
         { icon: FiHeart, label: "Mis Mascotas", id: "my-pets" },
         { icon: FiSend, label: "Ser Paseador", id: "join-to-us" },
         { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
+        { icon: FiMessageSquare, label: "MapChat", id: "mapchat" },
     ],
     
     // Menú para Paseador
