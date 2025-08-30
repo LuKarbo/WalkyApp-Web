@@ -19,6 +19,7 @@ export const AuthService = {
             role: user.role,
             profileImage:
                 user.profileImage || "https://cdn.example.com/default-avatar.png",
+            suscription: user.suscription,
             token: user.token,
         };
     },

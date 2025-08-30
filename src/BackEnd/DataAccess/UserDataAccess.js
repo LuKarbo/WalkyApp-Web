@@ -6,4 +6,12 @@ export const UserDataAccess = {
         // Simplemente hace el pasamanos hacia la API
         return await UserAPI.getUserById(id);
     },
+
+    async updateUserProfile(id, profileData) {
+        return await UserAPI.updateUserProfile(id, profileData);
+    },
+
+    async changeUserPassword(id, passwordData) {
+        return await UserAPI.changeUserPassword(id, passwordData);
+    }
 };

@@ -8,16 +8,42 @@ import { UserProvider } from "./BackEnd/Context/UserContext";
 import { NavigationProvider } from "./BackEnd/Context/NavigationContext"; 
 
 const App = () => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [isLightMode, setIsLightMode] = useState(true);
-  const [activeItem, setActiveItem] = useState("home"); 
-  const [contentParams, setContentParams] = useState(null);
+  // Inicializar estados con valores del sessionStorage si existen
+  const [isOpen, setIsOpen] = useState(() => {
+    const saved = sessionStorage.getItem("sidebarOpen");
+    return saved ? JSON.parse(saved) : true;
+  });
+  
+  const [isLightMode, setIsLightMode] = useState(() => {
+    const saved = sessionStorage.getItem("lightMode");
+    return saved ? JSON.parse(saved) : true;
+  });
+  
+  const [activeItem, setActiveItem] = useState(() => {
+    const saved = sessionStorage.getItem("activeItem");
+    return saved || "home";
+  });
+  
+  const [contentParams, setContentParams] = useState(() => {
+    const saved = sessionStorage.getItem("contentParams");
+    return saved ? JSON.parse(saved) : null;
+  });
+  
   const [user, setUser] = useState(null);
   const [authScreen, setAuthScreen] = useState("login");
   const [loading, setLoading] = useState(true);
 
-  const toggleSidebar = () => setIsOpen(!isOpen);
-  const toggleLightMode = () => setIsLightMode(!isLightMode);
+  const toggleSidebar = () => {
+    const newIsOpen = !isOpen;
+    setIsOpen(newIsOpen);
+    sessionStorage.setItem("sidebarOpen", JSON.stringify(newIsOpen));
+  };
+  
+  const toggleLightMode = () => {
+    const newLightMode = !isLightMode;
+    setIsLightMode(newLightMode);
+    sessionStorage.setItem("lightMode", JSON.stringify(newLightMode));
+  };
 
   // Método para cambiar contenido del MainContent
   // para utilizarlo se necesita el useNavegation del NavigationContext (pero solo funciona dentro de los componentes de NavigationProvider)
@@ -25,6 +51,10 @@ const App = () => {
     console.log("navigateToContent called:", { contentId, params });
     setActiveItem(contentId);
     setContentParams(params);
+    
+    // Guardar en sessionStorage
+    sessionStorage.setItem("activeItem", contentId);
+    sessionStorage.setItem("contentParams", JSON.stringify(params));
   };
 
   // pagina principal por rol de usuario
@@ -52,6 +82,9 @@ const App = () => {
     const defaultItem = getDefaultActiveItem(loggedUser.role);
     setActiveItem(defaultItem);
     setContentParams(null);
+    
+    sessionStorage.setItem("activeItem", defaultItem);
+    sessionStorage.setItem("contentParams", JSON.stringify(null));
   };
 
   const handleRegister = async (data) => {
@@ -66,20 +99,43 @@ const App = () => {
     setAuthScreen("login");
     setActiveItem("home"); 
     setContentParams(null);
+    
+    sessionStorage.removeItem("activeItem");
+    sessionStorage.removeItem("contentParams");
   };
 
   useEffect(() => {
     const verifySession = async () => {
       try {
         const token = sessionStorage.getItem("token");
-        if (!token) return;
+        if (!token) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        
         const u = await AuthController.checkSession(token);
         setUser(u);
         
-        setActiveItem(getDefaultActiveItem(u.role));
+        const savedActiveItem = sessionStorage.getItem("activeItem");
+        if (savedActiveItem) {
+          setActiveItem(savedActiveItem);
+        } else {
+          const defaultItem = getDefaultActiveItem(u.role);
+          setActiveItem(defaultItem);
+          sessionStorage.setItem("activeItem", defaultItem);
+        }
 
       } catch (err) {
+        console.log("Session verification failed:", err);
+
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("activeItem");
+        sessionStorage.removeItem("contentParams");
+        
         setUser(null);
+        setActiveItem("home");
+        setContentParams(null);
       } finally {
         setLoading(false);
       }

@@ -10,6 +10,10 @@ export const AuthAPI = {
                 role: "client",
                 profileImage:
                     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
+                suscription: "Client",
+                phone: "+1234567890",
+                location: "Buenos Aires, Argentina",
+                joinedDate: new Date().toISOString(),
                 token: "fake-jwt-token",
             };
         }
@@ -21,12 +25,17 @@ export const AuthAPI = {
         console.log("Simulando llamada API register:", data);
 
         return {
-            id: 2,
-            name: data.name,
-            email: data.email,
+            id: 3,
+            name: "John Doe",
+            email: "asd@gmail.com",
             role: "client",
-            profileImage: null,
-            token: "fake-jwt-token-new",
+            profileImage:
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
+            suscription: "Client",
+            phone: "+1234567890",
+            location: "Buenos Aires, Argentina",
+            joinedDate: new Date().toISOString(),
+            token: "fake-jwt-token",
         };
     },
 
@@ -42,6 +51,11 @@ export const AuthAPI = {
                 role: "client",
                 profileImage:
                     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
+                suscription: "Client",
+                phone: "+1234567890",
+                location: "Buenos Aires, Argentina",
+                joinedDate: new Date().toISOString(),
+                token: "fake-jwt-token",
             };
         }
 
