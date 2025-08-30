@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useUser } from "../../../BackEnd/Context/UserContext";
 import { WalksController } from "../../../BackEnd/Controllers/WalksController"
 import { PetsController } from "../../../BackEnd/Controllers/PetsController";
+import { ReviewsController } from "../../../BackEnd/Controllers/ReviewsController";
 import { UserController } from "../../../BackEnd/Controllers/UserController";
 import { useNavigation } from "../../../BackEnd/Context/NavigationContext";
 import HeaderComponent from "../Components/ProfileComponents/HeaderComponent";
@@ -20,6 +21,13 @@ const MyProfile = () => {
     const [pets, setPets] = useState([]);
     const [loadingPets, setLoadingPets] = useState(true);
     const [petsError, setPetsError] = useState(null);
+    
+    // Estados para reviews
+    const [reviewsData, setReviewsData] = useState({ reviews: [], pagination: {} });
+    const [loadingReviews, setLoadingReviews] = useState(true);
+    const [reviewsError, setReviewsError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
     
     const [userProfileData, setUserProfileData] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -45,7 +53,6 @@ const MyProfile = () => {
             });
         } catch (error) {
             console.error("Error loading user profile:", error);
-
             setUserProfileData({
                 name: user?.fullName || "X",
                 email: user?.email || "sin-email@example.com",
@@ -62,8 +69,6 @@ const MyProfile = () => {
     useEffect(() => {
         loadUserProfile();
     }, [user, refreshTrigger, loadUserProfile]);
-
-    const reviews = [];
 
     const buttonBase = "px-4 py-2 rounded-lg font-semibold transition-all duration-200 shadow-sm";
     const buttonActive = "bg-primary text-white shadow-md";
@@ -99,6 +104,21 @@ const MyProfile = () => {
         }
     }, [user?.id]);
 
+    const loadReviews = useCallback(async (page = 1, search = "") => {
+        try {
+            setLoadingReviews(true);
+            setReviewsError(null);
+            if (!user?.id) return;
+            const data = await ReviewsController.fetchReviewsByUser(user.id, page, 6, search);
+            setReviewsData(data);
+        } catch (err) {
+            console.error(err);
+            setReviewsError("Error al cargar las reseñas.");
+        } finally {
+            setLoadingReviews(false);
+        }
+    }, [user?.id]);
+
     useEffect(() => {
         loadTrips();
     }, [loadTrips, refreshTrigger]);
@@ -106,6 +126,10 @@ const MyProfile = () => {
     useEffect(() => {
         loadPets();
     }, [loadPets, refreshTrigger]);
+
+    useEffect(() => {
+        loadReviews(currentPage, searchTerm);
+    }, [loadReviews, refreshTrigger, currentPage, searchTerm]);
 
     const handleCancelTrip = async (tripId) => {
         try {
@@ -164,8 +188,27 @@ const MyProfile = () => {
             alert("Mascota eliminada correctamente");
         } catch (error) {
             console.error("Error al eliminar mascota:", error);
-            alert(`Error al eliminar la mascota: ${error.message}`);
         }
+    };
+
+    const handleEditReview = async (reviewId, reviewData) => {
+        try {
+            await ReviewsController.updateReview(reviewId, reviewData);
+            setRefreshTrigger(prev => prev + 1);
+            alert("Reseña actualizada correctamente");
+        } catch (error) {
+            console.error("Error al actualizar reseña:", error);
+            alert(`Error al actualizar la reseña: ${error.message}`);
+        }
+    };
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
+    const handleSearch = (search) => {
+        setSearchTerm(search);
+        setCurrentPage(1);
     };
 
     return (
@@ -220,7 +263,16 @@ const MyProfile = () => {
                     error={petsError}
                 />
             )}
-            {activeTab === "reviews" && <ReviewsComponent reviews={reviews} />}
+            {activeTab === "reviews" && (
+                <ReviewsComponent 
+                    reviewsData={reviewsData}
+                    onEditReview={handleEditReview}
+                    onPageChange={handlePageChange}
+                    onSearch={handleSearch}
+                    isLoading={loadingReviews}
+                    error={reviewsError}
+                />
+            )}
         </div>
     );
 };

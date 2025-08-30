@@ -1,0 +1,19 @@
+import { ReviewsService } from "../Services/ReviewsService.js";
+
+export const ReviewsController = {
+    async fetchReviewsByUser(userId, page = 1, limit = 6, searchTerm = "") {
+        return await ReviewsService.getReviewsByUser(userId, page, limit, searchTerm);
+    },
+
+    async fetchReviewDetails(reviewId) {
+        return await ReviewsService.getReviewDetails(reviewId);
+    },
+
+    async updateReview(reviewId, reviewData) {
+        return await ReviewsService.updateReview(reviewId, reviewData);
+    },
+
+    async deleteReview(reviewId) {
+        return await ReviewsService.deleteReview(reviewId);
+    }
+};

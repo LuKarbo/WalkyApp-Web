@@ -1,0 +1,23 @@
+import { ReviewsAPI } from "../API/ReviewsAPI.js";
+
+export const ReviewsDataAccess = {
+    async getAllReviews() {
+        return await ReviewsAPI.getAllReviews();
+    },
+
+    async getReviewById(id) {
+        return await ReviewsAPI.getReviewById(id);
+    },
+
+    async getReviewsByUser(userId) {
+        return await ReviewsAPI.getReviewsByUser(userId);
+    },
+
+    async updateReview(id, reviewData) {
+        return await ReviewsAPI.updateReview(id, reviewData);
+    },
+
+    async deleteReview(id) {
+        return await ReviewsAPI.deleteReview(id);
+    }
+};
