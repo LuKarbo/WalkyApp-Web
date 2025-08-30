@@ -1,22 +1,38 @@
+import { useState } from "react";
 import { AiOutlineStar } from "react-icons/ai";
+import { MdVerified, MdOutlineCancel } from "react-icons/md";
 import { useNavigation } from "../../../../BackEnd/Context/NavigationContext";
+import GetServiceModal from "../../Modals/GetServiceModal";
 
 const WalkerCardComponent = ({ walkers }) => {
     
     const { navigateToContent } = useNavigation();
     
-    // ver perfil del paseador seleccionado
+    // Estado para manejar el modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedWalker, setSelectedWalker] = useState(null);
+    
     const handleViewProfile = (walkerId) => {
         console.log('navigateToContent');
         navigateToContent('walker-profile', { walkerId });
     };
 
-    // solicitar paseo al paseador seleccionado
-    const handleRequestWalk = (walkerId) => {
-        navigateToContent('request-walk', { walkerId });
+    const handleRequestWalk = (walker) => {
+        setSelectedWalker(walker);
+        setIsModalOpen(true);
     };
 
-    // formulario de joinTous
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedWalker(null);
+    };
+
+    const handleRequestSent = () => {
+        // Aquí puedes agregar lógica adicional cuando se envíe la solicitud
+        console.log('Solicitud de paseo enviada exitosamente');
+        // Opcional: mostrar una notificación de éxito
+    };
+
     const handleJoinToUs = () => {
         console.log();
         navigateToContent('join-to-us');
@@ -37,7 +53,7 @@ const WalkerCardComponent = ({ walkers }) => {
                                 : 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent shadow-lg border border-primary/20'
                         }`}
                     >
-                        {/* Image with overlay gradient */}
+                        
                         <div className="relative h-48 overflow-hidden">
                             <img
                                 src={walker.image}
@@ -48,18 +64,36 @@ const WalkerCardComponent = ({ walkers }) => {
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             )}
                             
-                            {/* Rating badge - only for real walkers */}
                             {!walker.isPlaceholder && (
-                                <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1">
-                                    <AiOutlineStar className="text-yellow-red text-sm" />
-                                    <span className="text-sm font-semibold text-foreground dark:text-white">
+                                <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1">
+                                    <AiOutlineStar className="text-yellow-400 text-sm" />
+                                    <span className="text-sm font-semibold text-white">
                                         {walker.rating}
                                     </span>
                                 </div>
                             )}
+
+                            {!walker.isPlaceholder && (
+                                <div className="absolute top-3 left-3">
+                                    {walker.verified ? (
+                                        <div className="bg-green-500/90 backdrop-blur-sm rounded-full p-1.5 tooltip-container">
+                                            <MdVerified className="text-white w-4 h-4" />
+                                            <div className="tooltip absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                                                Verificado
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-gray-500/90 backdrop-blur-sm rounded-full p-1.5 tooltip-container">
+                                            <MdOutlineCancel className="text-white w-4 h-4" />
+                                            <div className="tooltip absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                                                No verificado
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
-                        {/* Content */}
                         <div className="p-5">
                             {walker.isPlaceholder ? (
                                 <div className="text-center space-y-4">
@@ -82,11 +116,21 @@ const WalkerCardComponent = ({ walkers }) => {
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    {/* Walker info */}
+                                    
                                     <div className="space-y-2">
-                                        <h3 className="font-bold text-lg text-foreground dark:text-background leading-tight">
-                                            {walker.name}
-                                        </h3>
+                                        <div className="flex items-start justify-between">
+                                            <h3 className="font-bold text-lg text-foreground dark:text-background leading-tight flex-1">
+                                                {walker.name}
+                                            </h3>
+                                            
+                                            <div className="ml-2 flex items-center">
+                                                {walker.verified ? (
+                                                    <MdVerified className="text-green-500 w-5 h-5" />
+                                                ) : (
+                                                    <MdOutlineCancel className="text-gray-400 w-5 h-5" />
+                                                )}
+                                            </div>
+                                        </div>
                                         <div className="flex items-center justify-between text-sm">
                                             <span className="text-accent dark:text-muted font-medium">
                                                 {walker.experience}
@@ -97,10 +141,9 @@ const WalkerCardComponent = ({ walkers }) => {
                                         </p>
                                     </div>
 
-                                    {/* Action buttons */}
                                     <div className="flex flex-col gap-2 pt-2">
                                         <button 
-                                            onClick={() => handleRequestWalk(walker.id)}
+                                            onClick={() => handleRequestWalk(walker)}
                                             className="w-full bg-background dark:bg-foreground border border-primary text-primary hover:bg-primary hover:text-white py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
                                         >
                                             Solicitar Paseo
@@ -116,7 +159,6 @@ const WalkerCardComponent = ({ walkers }) => {
                             )}
                         </div>
 
-                        {/* Decorative elements for placeholder card */}
                         {walker.isPlaceholder && (
                             <>
                                 <div className="absolute top-4 left-4 w-8 h-8 bg-primary/20 rounded-full animate-pulse" />
@@ -127,6 +169,13 @@ const WalkerCardComponent = ({ walkers }) => {
                     </div>
                 ))}
             </div>
+
+            <GetServiceModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                walker={selectedWalker}
+                onRequestSent={handleRequestSent}
+            />
         </div>
     );
 };

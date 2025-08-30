@@ -12,7 +12,6 @@ export const WalksService = {
             status: walk.status
         }));
 
-        // Filtrar solo los más relevantes para el home
         const relevantStatuses = ['Active', 'Scheduled', 'Completed'];
         return walksDTO.filter(walk => relevantStatuses.includes(walk.status));
     },
@@ -24,7 +23,6 @@ export const WalksService = {
             throw new Error("Walk not found");
         }
 
-        // Transformar los datos para vista detallada
         const walkDetailsDTO = {
             id: walk.id,
             dogName: walk.dogName,
@@ -93,38 +91,87 @@ export const WalksService = {
     },
 
     async getWalksByOwner(ownerId) {
-    if (!ownerId) {
-        throw new Error("Owner ID is required");
+        if (!ownerId) {
+            throw new Error("Owner ID is required");
+        }
+
+        const walks = await WalksDataAccess.getWalkByOwner(ownerId);
+
+        if (!walks) {
+            return [];
+        }
+
+        return Array.isArray(walks) ? walks.map(walk => ({
+            id: walk.id,
+            dogName: walk.dogName,
+            walker: walk.walkerName,
+            startTime: walk.startTime,
+            endTime: walk.endTime,
+            status: walk.status,
+            duration: walk.duration,
+            distance: walk.distance,
+            notes: walk.notes
+        })) : [{
+            id: walks.id,
+            dogName: walks.dogName,
+            walker: walks.walkerName,
+            startTime: walks.startTime,
+            endTime: walks.endTime,
+            status: walks.status,
+            duration: walks.duration,
+            distance: walks.distance,
+            notes: walks.notes
+        }];
+    },
+
+    async createWalkRequest(walkRequestData) {
+        if (!walkRequestData.walkerId) {
+            throw new Error("Walker ID is required");
+        }
+        if (!walkRequestData.ownerId) {
+            throw new Error("Owner ID is required");
+        }
+        if (!walkRequestData.petIds || walkRequestData.petIds.length === 0) {
+            throw new Error("At least one pet must be selected");
+        }
+        if (!walkRequestData.scheduledDateTime) {
+            throw new Error("Scheduled date and time is required");
+        }
+
+        const newWalkRequest = await WalksDataAccess.createWalkRequest(walkRequestData);
+        
+        return {
+            id: newWalkRequest.id,
+            walkerId: newWalkRequest.walkerId,
+            ownerId: newWalkRequest.ownerId,
+            petIds: newWalkRequest.petIds,
+            scheduledDateTime: newWalkRequest.scheduledDateTime,
+            description: newWalkRequest.description,
+            totalPrice: newWalkRequest.totalPrice,
+            status: newWalkRequest.status,
+            createdAt: newWalkRequest.createdAt
+        };
+    },
+
+    async updateWalkStatus(walkId, status) {
+        if (!walkId) {
+            throw new Error("Walk ID is required");
+        }
+        if (!status) {
+            throw new Error("Status is required");
+        }
+
+        const validStatuses = ['Pending', 'Accepted', 'Rejected', 'Active', 'Completed', 'Cancelled'];
+        if (!validStatuses.includes(status)) {
+            throw new Error("Invalid status");
+        }
+
+        const updatedWalk = await WalksDataAccess.updateWalkStatus(walkId, status);
+        
+        return {
+            id: updatedWalk.id,
+            status: updatedWalk.status,
+            updatedAt: updatedWalk.updatedAt
+        };
     }
-
-    const walks = await WalksDataAccess.getWalkByOwner(ownerId);
-
-    if (!walks) {
-        return [];
-    }
-
-    // Normalizamos la salida
-    return Array.isArray(walks) ? walks.map(walk => ({
-        id: walk.id,
-        dogName: walk.dogName,
-        walker: walk.walkerName,
-        startTime: walk.startTime,
-        endTime: walk.endTime,
-        status: walk.status,
-        duration: walk.duration,
-        distance: walk.distance,
-        notes: walk.notes
-    })) : [{
-        id: walks.id,
-        dogName: walks.dogName,
-        walker: walks.walkerName,
-        startTime: walks.startTime,
-        endTime: walks.endTime,
-        status: walks.status,
-        duration: walks.duration,
-        distance: walks.distance,
-        notes: walks.notes
-    }];
-}
-
 };

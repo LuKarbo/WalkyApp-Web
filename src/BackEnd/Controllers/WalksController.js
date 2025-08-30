@@ -23,6 +23,13 @@ export const WalksController = {
 
     async fetchWalksByOwner(ownerId) {
         return await WalksService.getWalksByOwner(ownerId);
-    }
+    },
 
+    async createWalkRequest(walkRequestData) {
+        return await WalksService.createWalkRequest(walkRequestData);
+    },
+
+    async updateWalkStatus(walkId, status) {
+        return await WalksService.updateWalkStatus(walkId, status);
+    }
 };

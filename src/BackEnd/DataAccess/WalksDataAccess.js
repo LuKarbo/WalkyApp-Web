@@ -20,4 +20,12 @@ export const WalksDataAccess = {
     async getWalkByOwner(ownerId) {
         return await WalksAPI.getWalkByOwner(ownerId);
     },
+
+    async createWalkRequest(walkRequestData) {
+        return await WalksAPI.createWalkRequest(walkRequestData);
+    },
+
+    async updateWalkStatus(walkId, status) {
+        return await WalksAPI.updateWalkStatus(walkId, status);
+    }
 };

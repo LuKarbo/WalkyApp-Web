@@ -1,7 +1,5 @@
 export const WalksAPI = {
     async getAllWalks() {
-        //// Se Simula la llamada a la API
-
         return [
             {
                 id: "W001",
@@ -72,30 +70,59 @@ export const WalksAPI = {
     },
 
     async getWalkById(id) {
-        //// Se Simula la llamada a la API
-
         const walks = await this.getAllWalks();
         return walks.find(walk => walk.id === id);
     },
 
     async getWalksByStatus(status) {
-        //// Se Simula la llamada a la API
-
         const walks = await this.getAllWalks();
         return walks.filter(walk => walk.status.toLowerCase() === status.toLowerCase());
     },
 
     async getWalksByWalkerId(walkerId) {
-        //// Se Simula la llamada a la API
-
         const walks = await this.getAllWalks();
         return walks.filter(walk => walk.walkerId === parseInt(walkerId));
     },
 
     async getWalkByOwner(id) {
-        //// Se Simula la llamada a la API
-
         const walks = await this.getAllWalks();
         return walks.filter(walk => walk.ownerId === id);
     },
+
+    async createWalkRequest(walkRequestData) {
+        console.log('Creating walk request:', walkRequestData);
+        
+        const newId = `WR${String(Date.now()).slice(-6)}`;
+        
+        const newWalkRequest = {
+            id: newId,
+            walkerId: walkRequestData.walkerId,
+            ownerId: walkRequestData.ownerId,
+            petIds: walkRequestData.petIds,
+            scheduledDateTime: walkRequestData.scheduledDateTime,
+            description: walkRequestData.description || '',
+            totalPrice: walkRequestData.totalPrice,
+            status: walkRequestData.status || 'Pending',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        console.log('Walk request created:', newWalkRequest);
+        
+        return newWalkRequest;
+    },
+
+    async updateWalkStatus(walkId, status) {
+        console.log(`Updating walk ${walkId} status to: ${status}`);
+        
+        const updatedWalk = {
+            id: walkId,
+            status: status,
+            updatedAt: new Date().toISOString()
+        };
+
+        console.log('Walk status updated:', updatedWalk);
+        
+        return updatedWalk;
+    }
 };

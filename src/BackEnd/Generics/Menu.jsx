@@ -1,6 +1,7 @@
 import HomeComponent from '../../Pages/User/Home';
 import MyProfile from '../../Pages/User/Client/MyProfile';
 import MapChat from '../../Pages/Common/Chat-map';
+import SearchWalker from '../../Pages/User/SearchWalker';
 
 import {
     FiHome,
@@ -54,6 +55,7 @@ const Trip = ({ contentParams }) => {
 
 const UserProfile = () => <MyProfile/>;
 const MapChatView  = () => <MapChat/>;
+const SearchWalkerView = () => <SearchWalker/>;
 
 const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
 const MyWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Historial de paseos programados</p></div>;
@@ -68,7 +70,6 @@ const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl f
 const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
-const SearchWalker = () => <div className="p-6"><h2 className="text-xl font-bold">Buscar Paseador</h2><p>Encuentra el paseador perfecto</p></div>;
 const MyPets = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Mascotas</h2><p>Gestión de tus mascotas</p></div>;
 const MyAccountPerms = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitar Permisos</h2><p>Solicitudes de permisos especiales</p></div>;
 const Tickets = () => <div className="p-6"><h2 className="text-xl font-bold">Consultas</h2><p>Mis consultas al soporte</p></div>;
@@ -95,7 +96,7 @@ export const menuComponents = {
     
     // Cliente
     'home': Home,
-    'search-walker': SearchWalker,
+    'search-walker': SearchWalkerView,
     'my-walks': MyWalks,
     'my-pets': MyPets,
     'my-account-perms': MyAccountPerms,
@@ -174,6 +175,7 @@ const menuTitles = {
     'walker-profile': 'Perfil Del Paseador',
     'trip': 'Info de Paseo',
     'join-to-us': 'Queres ser un Paseador?',
+    'search-walker': 'Buscar Paseador',
 
     'statistics': 'Estadísticas',
     'users': 'Usuarios',
@@ -182,7 +184,6 @@ const menuTitles = {
     'registration-requests': 'Solicitudes de Alta',
     'tickets-general': 'Consultas',
     'promotions': 'Promociones',
-    'search-walker': 'Buscar Paseador',
     'my-walks': 'Mis Paseos',
     'my-pets': 'Mis Mascotas',
     'my-account-perms': 'Ser Paseador',
