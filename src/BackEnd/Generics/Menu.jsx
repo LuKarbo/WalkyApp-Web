@@ -39,6 +39,18 @@ const WalkerProfile = ({ contentParams }) => {
     );
 };
 
+const WalkerReviews = ({ contentParams }) => {
+    const { walkerId } = contentParams || {}; 
+    return (
+        <div className="p-6">
+            <h2 className="text-xl font-bold">
+                Reviews del Paseador: {walkerId}
+            </h2>
+            <p>Reviews del paseador seleccionado</p>
+        </div>
+    );
+};
+
 const Trip = ({ contentParams }) => {
     const { tripId } = contentParams || {}; 
     return (
@@ -113,6 +125,7 @@ export const menuComponents = {
     
     // General
     'walker-profile': WalkerProfile,
+    'reviews-by-walker': WalkerReviews,
     'trip': Trip,
     'mapchat': MapChatView,
 
@@ -173,6 +186,7 @@ export const commonMenuItems = [
 const menuTitles = {
     'home': 'Home',
     'walker-profile': 'Perfil Del Paseador',
+    'reviews-by-walker': 'Reviews Del paseador',
     'trip': 'Info de Paseo',
     'join-to-us': 'Queres ser un Paseador?',
     'search-walker': 'Buscar Paseador',
