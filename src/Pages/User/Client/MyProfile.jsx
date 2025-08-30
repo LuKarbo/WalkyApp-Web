@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useUser } from "../../../BackEnd/Context/UserContext";
 import { WalksController } from "../../../BackEnd/Controllers/WalksController"
+import { PetsController } from "../../../BackEnd/Controllers/PetsController";
 import { UserController } from "../../../BackEnd/Controllers/UserController";
 import { useNavigation } from "../../../BackEnd/Context/NavigationContext";
 import HeaderComponent from "../Components/ProfileComponents/HeaderComponent";
@@ -14,18 +15,22 @@ const MyProfile = () => {
     const [trips, setTrips] = useState([]);
     const [loadingTrips, setLoadingTrips] = useState(true);
     const [tripsError, setTripsError] = useState(null);
+    
+    // Estados para mascotas
+    const [pets, setPets] = useState([]);
+    const [loadingPets, setLoadingPets] = useState(true);
+    const [petsError, setPetsError] = useState(null);
+    
     const [userProfileData, setUserProfileData] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const { navigateToContent } = useNavigation();
     const user = useUser();
 
-    // Función para cargar datos completos del usuario
     const loadUserProfile = useCallback(async () => {
         try {
             if (!user?.id) return;
             
-            // Cargar datos completos del perfil desde la API
             const fullProfile = await UserController.fetchUserProfile(user.id);
             
             setUserProfileData({
@@ -40,7 +45,7 @@ const MyProfile = () => {
             });
         } catch (error) {
             console.error("Error loading user profile:", error);
-            // Fallback a datos básicos del contexto
+
             setUserProfileData({
                 name: user?.fullName || "X",
                 email: user?.email || "sin-email@example.com",
@@ -54,19 +59,16 @@ const MyProfile = () => {
         }
     }, [user]);
 
-    // Cargar datos del usuario cuando cambie el user o refreshTrigger
     useEffect(() => {
         loadUserProfile();
     }, [user, refreshTrigger, loadUserProfile]);
 
-    const pets = [];
     const reviews = [];
 
     const buttonBase = "px-4 py-2 rounded-lg font-semibold transition-all duration-200 shadow-sm";
     const buttonActive = "bg-primary text-white shadow-md";
     const buttonInactive = "bg-background dark:bg-foreground border border-primary text-primary hover:bg-primary hover:text-white hover:shadow-md";
 
-    // Función para cargar trips
     const loadTrips = useCallback(async () => {
         try {
             setLoadingTrips(true);
@@ -82,10 +84,28 @@ const MyProfile = () => {
         }
     }, [user?.id]);
 
-    // Cargar los trips al montar el componente y cuando se actualice el trigger
+    const loadPets = useCallback(async () => {
+        try {
+            setLoadingPets(true);
+            setPetsError(null);
+            if (!user?.id) return;
+            const data = await PetsController.fetchPetsByOwner(user.id);
+            setPets(data);
+        } catch (err) {
+            console.error(err);
+            setPetsError("Error al cargar las mascotas.");
+        } finally {
+            setLoadingPets(false);
+        }
+    }, [user?.id]);
+
     useEffect(() => {
         loadTrips();
     }, [loadTrips, refreshTrigger]);
+
+    useEffect(() => {
+        loadPets();
+    }, [loadPets, refreshTrigger]);
 
     const handleCancelTrip = async (tripId) => {
         try {
@@ -112,6 +132,39 @@ const MyProfile = () => {
         } catch (error) {
             console.error("Error al actualizar perfil:", error);
             alert(`Error al actualizar el perfil: ${error.message}`);
+        }
+    };
+
+    const handleAddPet = async (petData) => {
+        try {
+            await PetsController.createPet(user.id, petData);
+            setRefreshTrigger(prev => prev + 1);
+            alert("Mascota agregada correctamente");
+        } catch (error) {
+            console.error("Error al agregar mascota:", error);
+            alert(`Error al agregar la mascota: ${error.message}`);
+        }
+    };
+
+    const handleEditPet = async (petId, petData) => {
+        try {
+            await PetsController.updatePet(petId, petData);
+            setRefreshTrigger(prev => prev + 1);
+            alert("Mascota actualizada correctamente");
+        } catch (error) {
+            console.error("Error al actualizar mascota:", error);
+            alert(`Error al actualizar la mascota: ${error.message}`);
+        }
+    };
+
+    const handleDeletePet = async (petId) => {
+        try {
+            await PetsController.deletePet(petId);
+            setRefreshTrigger(prev => prev + 1);
+            alert("Mascota eliminada correctamente");
+        } catch (error) {
+            console.error("Error al eliminar mascota:", error);
+            alert(`Error al eliminar la mascota: ${error.message}`);
         }
     };
 
@@ -156,7 +209,17 @@ const MyProfile = () => {
                     tripsLoading={loadingTrips}
                 />
             )}
-            {activeTab === "pets" && <PetsComponent pets={pets} addButtonClass={`${buttonBase} ${buttonInactive}`} />}
+            {activeTab === "pets" && (
+                <PetsComponent 
+                    pets={pets}
+                    addButtonClass={`${buttonBase} ${buttonInactive}`}
+                    onAddPet={handleAddPet}
+                    onEditPet={handleEditPet}
+                    onDeletePet={handleDeletePet}
+                    isLoading={loadingPets}
+                    error={petsError}
+                />
+            )}
             {activeTab === "reviews" && <ReviewsComponent reviews={reviews} />}
         </div>
     );

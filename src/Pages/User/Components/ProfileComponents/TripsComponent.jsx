@@ -45,8 +45,13 @@ const TripsComponent = ({ trips, onCancel, onView, tripsError, tripsLoading }) =
     }
 
     return (
-        <div>
-            {/* Table */}
+        <div className="bg-foreground-userProfile p-6 rounded-lg shadow-lg mb-6">
+            <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-foreground dark:text-background">
+                    Mis Paseos
+                </h3>
+            </div>
+            
             <div className="bg-background dark:bg-foreground rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
