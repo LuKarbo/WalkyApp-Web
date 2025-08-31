@@ -6,8 +6,7 @@ import GetServiceModal from "../../Modals/GetServiceModal";
 
 const WalkerCard = ({ 
     walker, 
-    onViewProfile, 
-    onViewReviews 
+    onViewProfile
 }) => {
     
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,25 +80,19 @@ const WalkerCard = ({
                             )}
                         </div>
 
-                        <div className="flex flex-col gap-2 pt-2">
-                            <button 
-                                onClick={handleRequestWalk}
-                                className="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md"
-                            >
-                                Solicitar Paseo
-                            </button>
+                        <div className="flex flex-col gap-2 pt-2">                            
                             <div className="grid grid-cols-2 gap-2">
+                                <button 
+                                    onClick={handleRequestWalk}
+                                    className="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md"
+                                >
+                                    Solicitar Paseo
+                                </button>
                                 <button 
                                     onClick={() => onViewProfile(walker.id)}
                                     className="w-full bg-background dark:bg-foreground border border-primary text-primary hover:bg-primary hover:text-white py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md text-sm"
                                 >
                                     Ver Perfil
-                                </button>
-                                <button 
-                                    onClick={() => onViewReviews(walker.id)}
-                                    className="w-full bg-background dark:bg-foreground border border-primary text-primary hover:bg-primary hover:text-white py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md text-sm"
-                                >
-                                    Reviews
                                 </button>
                             </div>
                         </div>

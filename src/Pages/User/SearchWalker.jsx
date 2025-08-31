@@ -54,10 +54,6 @@ const SearchWalker = () => {
         navigateToContent('walker-profile', { walkerId });
     };
 
-    const handleViewReviews = (walkerId) => {
-        navigateToContent('reviews-by-walker', { walkerId });
-    };
-
     const clearFilters = () => {
         setSearch("");
         setLocation("");
@@ -130,7 +126,6 @@ const SearchWalker = () => {
                                     key={walker.id}
                                     walker={walker}
                                     onViewProfile={handleViewProfile}
-                                    onViewReviews={handleViewReviews}
                                 />
                             ))}
                         </div>
