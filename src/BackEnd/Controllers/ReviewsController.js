@@ -5,6 +5,10 @@ export const ReviewsController = {
         return await ReviewsService.getReviewsByUser(userId, page, limit, searchTerm);
     },
 
+    async fetchReviewsByWalker(walkerId, page = 1, limit = 6, searchTerm = "") {
+        return await ReviewsService.getReviewsByWalker(walkerId, page, limit, searchTerm);
+    },
+
     async fetchReviewDetails(reviewId) {
         return await ReviewsService.getReviewDetails(reviewId);
     },

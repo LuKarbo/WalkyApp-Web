@@ -51,6 +51,52 @@ export const ReviewsService = {
         };
     },
 
+    async getReviewsByWalker(walkerId, page = 1, limit = 6, searchTerm = "") {
+        if (!walkerId) {
+            throw new Error("Walker ID is required");
+        }
+
+        const reviews = await ReviewsDataAccess.getReviewsByWalker(walkerId);
+        
+        let filteredReviews = reviews;
+        if (searchTerm) {
+            const searchLower = searchTerm.toLowerCase();
+            filteredReviews = reviews.filter(review => 
+                review.ownerName.toLowerCase().includes(searchLower) ||
+                review.content.toLowerCase().includes(searchLower) ||
+                review.petName.toLowerCase().includes(searchLower)
+            );
+        }
+
+        filteredReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedReviews = filteredReviews.slice(startIndex, endIndex);
+
+        const reviewsDTO = paginatedReviews.map(review => ({
+            id: review.id,
+            ownerName: review.ownerName,
+            ownerImage: review.ownerImage,
+            rating: review.rating,
+            content: review.content,
+            date: review.date,
+            petName: review.petName,
+            walkId: review.walkId
+        }));
+
+        return {
+            reviews: reviewsDTO,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(filteredReviews.length / limit),
+                totalItems: filteredReviews.length,
+                hasNext: endIndex < filteredReviews.length,
+                hasPrev: page > 1
+            }
+        };
+    },
+
     async getReviewDetails(reviewId) {
         if (!reviewId) {
             throw new Error("Review ID is required");

@@ -7,6 +7,8 @@ export const ReviewsAPI = {
                 walkerId: 1,
                 walkerName: "Sarah Johnson",
                 walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+                ownerName: "María González",
+                ownerImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
                 walkId: "W001",
                 rating: 5,
                 content: "Excelente servicio! Sarah cuidó muy bien a Max, regresó súper feliz y cansado. Definitivamente la recomiendo para futuros paseos.",
@@ -15,10 +17,12 @@ export const ReviewsAPI = {
             },
             {
                 id: "R002",
-                userId: 1,
+                userId: 2,
                 walkerId: 2,
                 walkerName: "Mike Wilson",
                 walkerImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                ownerName: "Carlos Rodríguez",
+                ownerImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
                 walkId: "W002",
                 rating: 4,
                 content: "Muy buen paseador, puntual y responsable. A Bella le gustó mucho el paseo por el parque. Solo le faltó un poco más de tiempo de juego.",
@@ -27,10 +31,12 @@ export const ReviewsAPI = {
             },
             {
                 id: "R003",
-                userId: 2,
-                walkerId: 3,
-                walkerName: "Emma Davis",
-                walkerImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face",
+                userId: 3,
+                walkerId: 1,
+                walkerName: "Sarah Johnson",
+                walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+                ownerName: "Ana López",
+                ownerImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
                 walkId: "W003",
                 rating: 5,
                 content: "Emma es fantástica! Se nota que realmente ama a los animales. Charlie regresó muy feliz y bien ejercitado. Las fotos que envió durante el paseo fueron un detalle genial.",
@@ -39,10 +45,12 @@ export const ReviewsAPI = {
             },
             {
                 id: "R004",
-                userId: 3,
-                walkerId: 1,
-                walkerName: "Sarah Johnson",
-                walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+                userId: 1,
+                walkerId: 3,
+                walkerName: "Emma Davis",
+                walkerImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face",
+                ownerName: "María González",
+                ownerImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
                 walkId: "W004",
                 rating: 3,
                 content: "El servicio fue bueno pero esperaba un poco más. El paseo fue corto y no recibí muchas actualizaciones durante el tiempo que estuvo con Rocky.",
@@ -55,6 +63,8 @@ export const ReviewsAPI = {
                 walkerId: 4,
                 walkerName: "John Smith",
                 walkerImage: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face",
+                ownerName: "Carlos Rodríguez",
+                ownerImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
                 walkId: "W005",
                 rating: 5,
                 content: "John es increíble! Muy profesional y cariñoso con Luna. El reporte detallado que me envió al final del paseo fue muy completo. Definitivamente lo contrataré de nuevo.",
@@ -63,22 +73,26 @@ export const ReviewsAPI = {
             },
             {
                 id: "R006",
-                userId: 1,
-                walkerId: 3,
-                walkerName: "Emma Davis",
-                walkerImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face",
+                userId: 3,
+                walkerId: 1,
+                walkerName: "Sarah Johnson",
+                walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+                ownerName: "Ana López",
+                ownerImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
                 walkId: "W006",
                 rating: 4,
-                content: "Segunda vez que contraté a Emma y como siempre, excelente trabajo. Max la adora y siempre regresa feliz. Solo me gustaría que los paseos fueran un poco más largos.",
+                content: "Segunda vez que contraté a Sarah y como siempre, excelente trabajo. Max la adora y siempre regresa feliz. Solo me gustaría que los paseos fueran un poco más largos.",
                 date: "2024-01-15T11:30:00",
                 petName: "Max"
             },
             {
                 id: "R007",
-                userId: 3,
+                userId: 1,
                 walkerId: 2,
                 walkerName: "Mike Wilson",
                 walkerImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                ownerName: "María González",
+                ownerImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
                 walkId: "W007",
                 rating: 5,
                 content: "Mike superó todas mis expectativas. Rocky puede ser difícil con extraños, pero Mike logró conectar con él inmediatamente. Excelente comunicación durante todo el proceso.",
@@ -87,15 +101,45 @@ export const ReviewsAPI = {
             },
             {
                 id: "R008",
-                userId: 2,
+                userId: 4,
                 walkerId: 1,
                 walkerName: "Sarah Johnson",
                 walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+                ownerName: "Laura Martín",
+                ownerImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
                 walkId: "W008",
                 rating: 4,
                 content: "Sarah es muy confiable y puntual. Luna disfrutó mucho el paseo. Me gustó que me enviara fotos durante el recorrido. Una experiencia muy positiva en general.",
                 date: "2024-01-13T14:45:00",
                 petName: "Luna"
+            },
+            {
+                id: "R009",
+                userId: 5,
+                walkerId: 2,
+                walkerName: "Mike Wilson",
+                walkerImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                ownerName: "Pedro Sánchez",
+                ownerImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                walkId: "W009",
+                rating: 5,
+                content: "Mike es excepcional con los perros grandes. Took great care of my German Shepherd and even helped with some training tips. Highly recommended!",
+                date: "2024-01-12T16:20:00",
+                petName: "Thor"
+            },
+            {
+                id: "R010",
+                userId: 6,
+                walkerId: 5,
+                walkerName: "Lisa Rodriguez",
+                walkerImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+                ownerName: "Carmen Torres",
+                ownerImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
+                walkId: "W010",
+                rating: 4,
+                content: "Lisa es muy profesional y tiene mucha experiencia. Mi golden retriever regresó feliz y bien ejercitado. El precio es justo por el servicio que ofrece.",
+                date: "2024-01-11T10:30:00",
+                petName: "Golden"
             }
         ];
     },
@@ -108,6 +152,11 @@ export const ReviewsAPI = {
     async getReviewsByUser(userId) {
         const reviews = await this.getAllReviews();
         return reviews.filter(review => review.userId === parseInt(userId));
+    },
+
+    async getReviewsByWalker(walkerId) {
+        const reviews = await this.getAllReviews();
+        return reviews.filter(review => review.walkerId === parseInt(walkerId));
     },
 
     async updateReview(id, reviewData) {

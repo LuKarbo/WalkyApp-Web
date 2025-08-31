@@ -13,6 +13,10 @@ export const ReviewsDataAccess = {
         return await ReviewsAPI.getReviewsByUser(userId);
     },
 
+    async getReviewsByWalker(walkerId) {
+        return await ReviewsAPI.getReviewsByWalker(walkerId);
+    },
+
     async updateReview(id, reviewData) {
         return await ReviewsAPI.updateReview(id, reviewData);
     },

@@ -2,6 +2,7 @@ import HomeComponent from '../../Pages/User/Home';
 import MyProfile from '../../Pages/User/Client/MyProfile';
 import MapChat from '../../Pages/Common/Chat-map';
 import SearchWalker from '../../Pages/User/SearchWalker';
+import WalkerProfile from '../../Pages/User/Walker/WalkerProfile';
 
 import {
     FiHome,
@@ -27,16 +28,8 @@ import {
 // Componentes En uso 
 const Home = () => <HomeComponent/>;
 
-const WalkerProfile = ({ contentParams }) => {
-    const { walkerId } = contentParams || {}; 
-    return (
-        <div className="p-6">
-            <h2 className="text-xl font-bold">
-                Perfil del Paseador: {walkerId}
-            </h2>
-            <p>Información personal del paseador seleccionado</p>
-        </div>
-    );
+const WalkerProfileView = ({ contentParams }) => {
+    return <WalkerProfile id={contentParams} />;
 };
 
 const WalkerReviews = ({ contentParams }) => {
@@ -124,7 +117,7 @@ export const menuComponents = {
     'active-walks': ActiveWalks,
     
     // General
-    'walker-profile': WalkerProfile,
+    'walker-profile': WalkerProfileView,
     'reviews-by-walker': WalkerReviews,
     'trip': Trip,
     'mapchat': MapChatView,
