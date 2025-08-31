@@ -212,7 +212,7 @@ const MyProfile = () => {
     };
 
     return (
-        <div className="w-full h-full p-6 bg-background dark:bg-foreground">
+        <div className="w-full min-h-screen p-6 bg-background dark:bg-foreground">
             <HeaderComponent 
                 userData={userProfileData} 
                 buttonBase={buttonBase} 

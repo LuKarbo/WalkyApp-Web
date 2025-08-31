@@ -3,6 +3,7 @@ import MyProfile from '../../Pages/User/Client/MyProfile';
 import MapChat from '../../Pages/Common/Chat-map';
 import SearchWalker from '../../Pages/User/SearchWalker';
 import WalkerProfile from '../../Pages/User/Walker/WalkerProfile';
+import MyTrips from '../../Pages/User/Client/MyTrips';
 
 import {
     FiHome,
@@ -32,17 +33,7 @@ const WalkerProfileView = ({ contentParams }) => {
     return <WalkerProfile id={contentParams} />;
 };
 
-const WalkerReviews = ({ contentParams }) => {
-    const { walkerId } = contentParams || {}; 
-    return (
-        <div className="p-6">
-            <h2 className="text-xl font-bold">
-                Reviews del Paseador: {walkerId}
-            </h2>
-            <p>Reviews del paseador seleccionado</p>
-        </div>
-    );
-};
+const MyTripsView = () => <MyTrips/>;
 
 const Trip = ({ contentParams }) => {
     const { tripId } = contentParams || {}; 
@@ -63,7 +54,6 @@ const MapChatView  = () => <MapChat/>;
 const SearchWalkerView = () => <SearchWalker/>;
 
 const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
-const MyWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Historial de paseos programados</p></div>;
 
 
 // Componentes Ejemplo
@@ -102,7 +92,7 @@ export const menuComponents = {
     // Cliente
     'home': Home,
     'search-walker': SearchWalkerView,
-    'my-walks': MyWalks,
+    'my-walks': MyTripsView,
     'my-pets': MyPets,
     'my-account-perms': MyAccountPerms,
     'tickets': Tickets,
@@ -118,7 +108,6 @@ export const menuComponents = {
     
     // General
     'walker-profile': WalkerProfileView,
-    'reviews-by-walker': WalkerReviews,
     'trip': Trip,
     'mapchat': MapChatView,
 
@@ -179,7 +168,6 @@ export const commonMenuItems = [
 const menuTitles = {
     'home': 'Home',
     'walker-profile': 'Perfil Del Paseador',
-    'reviews-by-walker': 'Reviews Del paseador',
     'trip': 'Info de Paseo',
     'join-to-us': 'Queres ser un Paseador?',
     'search-walker': 'Buscar Paseador',

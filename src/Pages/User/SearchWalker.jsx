@@ -82,7 +82,7 @@ const SearchWalker = () => {
     }
 
     return (
-        <div className="bg-background dark:bg-foreground p-4 md:p-8">
+        <div className="min-h-screen bg-background dark:bg-foreground p-4 md:p-8">
             <div className=" mx-auto">
                 <WalkerSearchFilter
                     search={search}
