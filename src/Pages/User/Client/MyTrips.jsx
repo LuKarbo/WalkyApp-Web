@@ -9,6 +9,7 @@ import { useNavigation } from '../../../BackEnd/Context/NavigationContext';
 import MyTripsHeaderComponent from '../Components/MyTripsComponents/MyTripsHeaderComponent';
 import MyTripsCardComponent from '../Components/MyTripsComponents/MyTripsCardComponent';
 import MyTripsFilter from '../Filters/MyTrips/MyTripsFilter';
+import CancelWalkModal from '../Modals/MyTrips/CancelWalkModal';
 import GetServiceModal_Client from '../Modals/MyTrips/GetServiceModal_Client';
 
 const MyTrips = () => {
@@ -29,6 +30,10 @@ const MyTrips = () => {
     const [loadingModal, setLoadingModal] = useState(false);
     const [loadingWalkers, setLoadingWalkers] = useState(false);
     const [loadingPets, setLoadingPets] = useState(false);
+
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [tripToCancel, setTripToCancel] = useState(null);
+    const [cancelLoading, setCancelLoading] = useState(false);
 
     const user = useUser();
     const userId = user?.id;
@@ -60,6 +65,32 @@ const MyTrips = () => {
             loadModalData();
         }
     }, [showCreateForm, userId]);
+
+    const handleCancelTrip = (trip) => {
+        setTripToCancel(trip);
+        setShowCancelModal(true);
+    };
+
+    const handleConfirmCancel = async () => {
+        if (!tripToCancel) return;
+        
+        try {
+            setCancelLoading(true);
+            await WalksController.updateWalkStatus(tripToCancel.id, 'Cancelled');
+            setTrips(trips.filter((trip) => trip.id !== tripToCancel.id));
+            setShowCancelModal(false);
+            setTripToCancel(null);
+        } catch (err) {
+            setError('Error cancelling trip: ' + err.message);
+        } finally {
+            setCancelLoading(false);
+        }
+    };
+
+    const handleCloseCancelModal = () => {
+        setShowCancelModal(false);
+        setTripToCancel(null);
+    };
 
     const loadModalData = async () => {
         try {
@@ -209,7 +240,7 @@ const MyTrips = () => {
     }
 
     return (
-        <div className="min-h-screen p-6 bg-gradient-to-br from-background via-background to-primary/5 dark:from-foreground dark:via-foreground dark:to-primary/10">
+        <div className="min-h-screen p-6 bg-background dark:bg-foreground">
             <div className="max-w-7xl mx-auto">
                 
                 <MyTripsHeaderComponent 
@@ -246,7 +277,7 @@ const MyTrips = () => {
                                 key={trip.id}
                                 trip={trip}
                                 onViewTrip={handleViewTrip}
-                                onDeleteTrip={handleDeleteTrip}
+                                onCancelTrip={handleCancelTrip}
                             />
                         ))}
                     </div>
@@ -272,6 +303,14 @@ const MyTrips = () => {
                     loadingModal={loadingModal}
                     loadingWalkers={loadingWalkers}
                     loadingPets={loadingPets}
+                />
+
+                <CancelWalkModal 
+                    isOpen={showCancelModal}
+                    onClose={handleCloseCancelModal}
+                    onConfirm={handleConfirmCancel}
+                    tripData={tripToCancel}
+                    isLoading={cancelLoading}
                 />
             </div>
         </div>

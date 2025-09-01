@@ -1,8 +1,8 @@
 import React from "react";
 import { format } from "date-fns";
-import { FiCalendar, FiMapPin, FiClock, FiTrash2, FiEye } from "react-icons/fi";
+import { FiCalendar, FiMapPin, FiClock, FiXCircle, FiEye } from "react-icons/fi";
 
-const MyTripsCardComponent = ({ trip, onViewTrip, onDeleteTrip }) => {
+const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip }) => {
     const getStatusColor = (status) => {
         switch (status) {
             case "Waiting":
@@ -28,18 +28,16 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onDeleteTrip }) => {
 
     return (
         <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-primary/10 h-full flex flex-col">
-            {/* Status Badge */}
+
             <div className="absolute top-4 right-4 z-10">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-lg ${getStatusColor(trip.status)}`}>
                     {trip.status}
                 </span>
             </div>
 
-            {/* Gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-success/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
             <div className="relative p-4 flex flex-col flex-1">
-                {/* Header Section */}
                 <div className="flex items-center mb-4">
                     <div className="w-10 h-10 bg-gradient-to-br from-primary to-success rounded-full flex items-center justify-center mr-3 shadow-lg flex-shrink-0">
                         <span className="text-white font-bold text-sm">{trip.dogName?.[0] || 'P'}</span>
@@ -55,9 +53,7 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onDeleteTrip }) => {
                     </div>
                 </div>
 
-                {/* Trip Details */}
                 <div className="space-y-2 mb-4 flex-1">
-                    {/* Date */}
                     <div className="flex items-center p-2 bg-primary/10 rounded-lg">
                         <FiCalendar className="mr-2 text-primary flex-shrink-0" size={14} />
                         <span className="text-xs font-semibold text-foreground dark:text-background truncate">
@@ -65,7 +61,6 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onDeleteTrip }) => {
                         </span>
                     </div>
 
-                    {/* Time */}
                     <div className="flex items-center p-2 bg-success/10 rounded-lg">
                         <FiClock className="mr-2 text-success flex-shrink-0" size={14} />
                         <span className="text-xs font-semibold text-foreground dark:text-background truncate">
@@ -74,7 +69,6 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onDeleteTrip }) => {
                         </span>
                     </div>
 
-                    {/* Duration & Distance */}
                     {(trip.duration || trip.distance) && (
                         <div className="flex items-center p-2 bg-info/10 rounded-lg">
                             <FiMapPin className="mr-2 text-info flex-shrink-0" size={14} />
@@ -86,7 +80,6 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onDeleteTrip }) => {
                         </div>
                     )}
 
-                    {/* Notes */}
                     {trip.notes && (
                         <div className="p-2 bg-accent/10 rounded-lg">
                             <p className="text-xs text-accent dark:text-muted italic line-clamp-2">
@@ -96,7 +89,6 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onDeleteTrip }) => {
                     )}
                 </div>
 
-                {/* Actions */}
                 <div className="flex items-center gap-2 mt-auto">
                     <button
                         onClick={() => onViewTrip(trip.id)}
@@ -107,10 +99,11 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onDeleteTrip }) => {
                     </button>
                     {(trip.status === "Waiting" || trip.status === "Scheduled") && (
                         <button
-                            onClick={() => onDeleteTrip(trip.id)}
-                            className="p-2 text-xs font-semibold rounded-lg border-2 border-danger text-danger hover:bg-danger hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                            onClick={() => onCancelTrip(trip)}
+                            className="px-3 py-2 text-xs font-semibold rounded-lg border-2 border-danger text-danger hover:bg-danger hover:text-white transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
                         >
-                            <FiTrash2 size={12} />
+                            <FiXCircle size={12} className="mr-1" />
+                            Cancelar Paseo
                         </button>
                     )}
                 </div>
