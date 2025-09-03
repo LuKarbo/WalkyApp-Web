@@ -19,7 +19,7 @@ const ChatMap = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8 h-[80vh] grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="mx-auto px-4 py-8 h-[80vh] grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Chat Interface */}
             <div className="bg-card rounded-lg shadow-md  flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto mb-4">
