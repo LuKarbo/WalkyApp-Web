@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
     FiSend,
 } from "react-icons/fi";
+import Map from "./ChatMapComponents/Map"
 
 const ChatMap = () => {
     const [messages, setMessages] = useState([]);
@@ -55,12 +56,7 @@ const ChatMap = () => {
 
             {/* Map Placeholder */}
             <div className="md:col-span-2 bg-card rounded-lg shadow-md overflow-hidden h-full">
-                <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-center text-accent">
-                        <p className="text-xl mb-2">Map View</p>
-                        <p>Interactive map will be displayed here</p>
-                    </div>
-                </div>
+                <Map />
             </div>
         </div>
     );
