@@ -5,6 +5,7 @@ import SearchWalker from '../../Pages/User/SearchWalker';
 import WalkerProfile from '../../Pages/User/Walker/WalkerProfile';
 import MyTrips from '../../Pages/User/Client/MyTrips';
 import MyPets from '../../Pages/User/Client/MyPets';
+import Tickets from '../../Pages/User/Tickets'
 
 import {
     FiHome,
@@ -54,6 +55,7 @@ const UserProfile = () => <MyProfile/>;
 const MapChatView  = () => <MapChat/>;
 const SearchWalkerView = () => <SearchWalker/>;
 const MyPetsView = () => <MyPets/>;
+const TicketsView = () => <Tickets/>;
 
 const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
 
@@ -64,11 +66,10 @@ const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gesti
 const PetsByUser = () => <div className="p-6"><h2 className="text-xl font-bold">Mascotas por Usuario</h2><p>Vista de mascotas registradas</p></div>;
 const WalksByUser = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos por Usuario</h2><p>Historial de paseos</p></div>;
 const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitudes de Alta</h2><p>Solicitudes pendientes de aprobación</p></div>;
-const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
+const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
 const MyAccountPerms = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitar Permisos</h2><p>Solicitudes de permisos especiales</p></div>;
-const Tickets = () => <div className="p-6"><h2 className="text-xl font-bold">Consultas</h2><p>Mis consultas al soporte</p></div>;
 
 const MyReviews = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Reseñas</h2><p>Reseñas recibidas</p></div>;
 const Groups = () => <div className="p-6"><h2 className="text-xl font-bold">Grupos</h2><p>Grupos de paseo disponibles</p></div>;
@@ -96,7 +97,7 @@ export const menuComponents = {
     'my-walks': MyTripsView,
     'my-pets': MyPetsView,
     'my-account-perms': MyAccountPerms,
-    'tickets': Tickets,
+    'tickets': TicketsView,
     'join-to-us': JoinToUs,
 
     // Paseador
