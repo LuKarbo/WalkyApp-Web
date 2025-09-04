@@ -20,21 +20,19 @@ const ChatMap = () => {
   return (
     <div className="mx-auto px-4 py-8 min-h-[80vh] grid grid-cols-1 md:grid-cols-3 gap-8">
       {/* Chat */}
-      <div className="bg-foreground rounded-2xl shadow-md flex flex-col h-full border border-border">
+      <div className="bg-foreground rounded-2xl shadow-md flex flex-col h-full border border-border mx-auto">
         <div className="flex-1 overflow-y-auto mb-4 p-3">
           {messages.map((message, index) => (
             <div
               key={index}
-              className={`mb-2 ${
-                message.sender === "user" ? "text-right" : "text-left"
-              }`}
+              className={`mb-2 ${message.sender === "user" ? "text-right" : "text-left"
+                }`}
             >
               <div
-                className={`inline-block px-4 py-2 rounded-lg text-body ${
-                  message.sender === "user"
+                className={`inline-block px-4 py-2 rounded-lg text-body ${message.sender === "user"
                     ? "bg-primary text-black"
                     : "bg-muted text-foreground"
-                }`}
+                  }`}
               >
                 {message.text}
               </div>
@@ -67,16 +65,10 @@ const ChatMap = () => {
 
       {/* Map + registro */}
       <div className="md:col-span-2 flex flex-col gap-4 h-full">
-        <div className="flex-grow">
+        <div className="flex">
           <Map />
         </div>
-        <div className="bg-foreground rounded-2xl shadow-md p-4 border border-border text-black">
-          <p>Acá irá el registro de los paseos.</p>
-          <p>Seguimiento minuto a minuto.</p>
-          <p>Acá irá el registro de los paseos.</p>
-          <p>Seguimiento minuto a minuto.</p>
-          <p>Acá irá el registro de los paseos.</p>
-          <p>Seguimiento minuto a minuto.</p>
+        <div className="bg-foreground rounded-2xl shadow-md p-4 border border-border text-black flex-grow">
           <p>Acá irá el registro de los paseos.</p>
           <p>Seguimiento minuto a minuto.</p>
         </div>
