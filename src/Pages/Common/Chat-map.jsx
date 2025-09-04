@@ -18,7 +18,7 @@ const ChatMap = () => {
   };
 
   return (
-    <div className="mx-auto px-4 py-8 h-[80vh] grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="mx-auto px-4 py-8 min-h-[80vh] grid grid-cols-1 md:grid-cols-3 gap-8">
       {/* Chat */}
       <div className="bg-foreground rounded-2xl shadow-md flex flex-col h-full border border-border">
         <div className="flex-1 overflow-y-auto mb-4 p-3">
@@ -67,11 +67,18 @@ const ChatMap = () => {
 
       {/* Map + registro */}
       <div className="md:col-span-2 flex flex-col gap-4 h-full">
-        <div className="h-3/4">
+        <div className="flex-grow">
           <Map />
         </div>
-        <div className="bg-foreground rounded-2xl shadow-md p-4 border border-border h-1/4">
-          <p className="text-black">Acá irá el registro de los paseos.</p>
+        <div className="bg-foreground rounded-2xl shadow-md p-4 border border-border text-black">
+          <p>Acá irá el registro de los paseos.</p>
+          <p>Seguimiento minuto a minuto.</p>
+          <p>Acá irá el registro de los paseos.</p>
+          <p>Seguimiento minuto a minuto.</p>
+          <p>Acá irá el registro de los paseos.</p>
+          <p>Seguimiento minuto a minuto.</p>
+          <p>Acá irá el registro de los paseos.</p>
+          <p>Seguimiento minuto a minuto.</p>
         </div>
       </div>
     </div>
