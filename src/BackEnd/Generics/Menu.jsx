@@ -5,7 +5,8 @@ import SearchWalker from '../../Pages/User/SearchWalker';
 import WalkerProfile from '../../Pages/User/Walker/WalkerProfile';
 import MyTrips from '../../Pages/User/Client/MyTrips';
 import MyPets from '../../Pages/User/Client/MyPets';
-import Tickets from '../../Pages/User/Tickets'
+import Tickets from '../../Pages/User/Tickets';
+import Settings from '../../Pages/User/Client/Settings';
 
 import {
     FiHome,
@@ -56,6 +57,7 @@ const MapChatView  = () => <MapChat/>;
 const SearchWalkerView = () => <SearchWalker/>;
 const MyPetsView = () => <MyPets/>;
 const TicketsView = () => <Tickets/>;
+const SettingsView = () => <Settings/>;
 
 const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
 
@@ -78,7 +80,6 @@ const MyGroups = () => <div className="p-6"><h2 className="text-xl font-bold">Mi
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
 const Notifications = () => <div className="p-6"><h2 className="text-xl font-bold">Notificaciones</h2><p>Centro de notificaciones</p></div>;
-const Settings = () => <div className="p-6"><h2 className="text-xl font-bold">Ajustes</h2><p>Configuración de la aplicación</p></div>;
 
 // Mapeo de componentes
 export const menuComponents = {
@@ -115,7 +116,7 @@ export const menuComponents = {
 
     'notifications': Notifications,
     'profile': UserProfile,
-    'settings': Settings,
+    'settings': SettingsView,
 };
 
 // Configuración de menús por rol
