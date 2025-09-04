@@ -4,7 +4,7 @@ export const AuthAPI = {
 
         if (credentials.email === "asd@gmail.com" && credentials.password === "12345678") {
             return {
-                id: 3,
+                id: 2,
                 name: "John Doe",
                 email: "asd@gmail.com",
                 role: "client",
@@ -25,7 +25,7 @@ export const AuthAPI = {
         console.log("Simulando llamada API register:", data);
 
         return {
-            id: 3,
+            id: 2,
             name: "John Doe",
             email: "asd@gmail.com",
             role: "client",
@@ -45,7 +45,7 @@ export const AuthAPI = {
 
         if (token === "fake-jwt-token" || token === "fake-jwt-token-new") {
             return {
-                id: 3,
+                id: 2,
                 name: "John Doe",
                 email: "asd@gmail.com",
                 role: "client",

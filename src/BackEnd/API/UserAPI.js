@@ -7,7 +7,7 @@ export const UserAPI = {
         // return await res.json();
 
         return {
-            id: 3,
+            id: 2,
             name: "John Doe",
             email: "asd@gmail.com",
             role: "client",
