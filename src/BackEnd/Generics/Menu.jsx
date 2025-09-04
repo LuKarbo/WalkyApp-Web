@@ -7,6 +7,7 @@ import MyTrips from '../../Pages/User/Client/MyTrips';
 import MyPets from '../../Pages/User/Client/MyPets';
 import Tickets from '../../Pages/User/Tickets';
 import Settings from '../../Pages/User/Client/Settings';
+import JoinToUsFrom from '../../Pages/User/JoinToUs';
 
 import {
     FiHome,
@@ -58,8 +59,7 @@ const SearchWalkerView = () => <SearchWalker/>;
 const MyPetsView = () => <MyPets/>;
 const TicketsView = () => <Tickets/>;
 const SettingsView = () => <Settings/>;
-
-const JoinToUs = () => <div className="p-6"><h2 className="text-xl font-bold">Formulario para ser Paseador </h2><p>asdasdasdads</p></div>;
+const JoinToUs = () => <JoinToUsFrom/>;
 
 
 // Componentes Ejemplo
@@ -74,8 +74,6 @@ const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bo
 const MyAccountPerms = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitar Permisos</h2><p>Solicitudes de permisos especiales</p></div>;
 
 const MyReviews = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Reseñas</h2><p>Reseñas recibidas</p></div>;
-const Groups = () => <div className="p-6"><h2 className="text-xl font-bold">Grupos</h2><p>Grupos de paseo disponibles</p></div>;
-const MyGroups = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Grupos</h2><p>Grupos que administras</p></div>;
 
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
@@ -103,8 +101,6 @@ export const menuComponents = {
 
     // Paseador
     'my-reviews': MyReviews,
-    'groups': Groups,
-    'my-groups': MyGroups,
     
     // Soporte
     'active-walks': ActiveWalks,
@@ -162,8 +158,6 @@ export const menuItems = {
 export const commonMenuItems = [
     { icon: FiEdit, label: "Mi Perfil", id: "profile" },
     { icon: FiBell, label: "Notificaciones", id: "notifications" },
-    { icon: FiUsers, label: "Grupos", id: "groups" },
-    { icon: FiBookOpen, label: "Mis Grupos", id: "my-groups" },
     { icon: FiSettings, label: "Ajustes", id: "settings" },
     { icon: FiLogOut, label: "Logout", id: "logout" },
 ];
@@ -187,8 +181,6 @@ const menuTitles = {
     'my-account-perms': 'Ser Paseador',
     'tickets': 'Consultas',
     'my-reviews': 'Mis Reseñas',
-    'groups': 'Grupos',
-    'my-groups': 'Mis Grupos',
     'active-walks': 'Paseos Activos',
     'notifications': 'Notificaciones',
     'profile': 'Mi Perfil',
