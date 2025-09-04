@@ -28,7 +28,7 @@ export default function Map() {
 
   //generamos el componente pero falta que google nos habilite la API para que funcione correctamente
   return (
-    <LoadScript googleMapsApiKey="TU_API_KEY">
+    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}

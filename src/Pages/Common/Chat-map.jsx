@@ -20,7 +20,7 @@ const ChatMap = () => {
   return (
     <div className="mx-auto px-4 py-8 h-[80vh] grid grid-cols-1 md:grid-cols-3 gap-8">
       {/* Chat */}
-      <div className="bg-card rounded-2xl shadow-md flex flex-col h-full border border-border">
+      <div className="bg-foreground rounded-2xl shadow-md flex flex-col h-full border border-border">
         <div className="flex-1 overflow-y-auto mb-4 p-3">
           {messages.map((message, index) => (
             <div
@@ -32,7 +32,7 @@ const ChatMap = () => {
               <div
                 className={`inline-block px-4 py-2 rounded-lg text-body ${
                   message.sender === "user"
-                    ? "bg-primary text-white"
+                    ? "bg-primary text-black"
                     : "bg-muted text-foreground"
                 }`}
               >
@@ -51,8 +51,8 @@ const ChatMap = () => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Escribe tu mensaje..."
-            className="flex-1 px-4 py-2 rounded-md border border-input 
-                       bg-background text-foreground 
+            className="flex-1 px-4 py-2 rounded-md border border-primary 
+                       bg-foreground text-black 
                        placeholder:text-neutral 
                        focus:outline-none focus:ring-2 focus:ring-primary"
           />
