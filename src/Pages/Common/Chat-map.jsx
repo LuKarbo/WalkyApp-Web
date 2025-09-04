@@ -67,11 +67,11 @@ const ChatMap = () => {
 
       {/* Map + registro */}
       <div className="md:col-span-2 flex flex-col gap-4 h-full">
-        <div className="bg-card rounded-2xl shadow-md overflow-hidden h-3/4 border border-border">
+        <div className="h-3/4">
           <Map />
         </div>
-        <div className="bg-card2 rounded-2xl shadow-md p-4 border border-border h-1/4">
-          <p className="text-body">Acá irá el registro de los paseos.</p>
+        <div className="bg-foreground rounded-2xl shadow-md p-4 border border-border h-1/4">
+          <p className="text-black">Acá irá el registro de los paseos.</p>
         </div>
       </div>
     </div>
