@@ -1,5 +1,5 @@
-//la idea es 1) que est ecomponente abarque todo el fondo gris, 2) arreglar los color modo oscuro/claro
-//3)que cargue el mapa; 4) poder guardar una marca en el mapa (local storage); 5) unir los puntos mediante lineas en el mapa
+//la idea es 1) que este componente abarque todo el fondo gris, 2) arreglar color modo oscuro/claro
+//3)que cargue el mapa; 4)poder guardar una marca en el mapa (local storage); 5) unir los puntos mediante lineas en el mapa
 //ver acceso a la api de google
 import { useState } from "react";
 import { FiSend } from "react-icons/fi";
