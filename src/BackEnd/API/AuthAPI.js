@@ -7,7 +7,7 @@ export const AuthAPI = {
                 id: 2,
                 name: "John Doe",
                 email: "asd@gmail.com",
-                role: "client",
+                role: "walker",
                 profileImage:
                     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
                 suscription: "Client",
@@ -28,7 +28,7 @@ export const AuthAPI = {
             id: 2,
             name: "John Doe",
             email: "asd@gmail.com",
-            role: "client",
+            role: "walker",
             profileImage:
                 "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
             suscription: "Client",
@@ -48,7 +48,7 @@ export const AuthAPI = {
                 id: 2,
                 name: "John Doe",
                 email: "asd@gmail.com",
-                role: "client",
+                role: "walker",
                 profileImage:
                     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
                 suscription: "Client",

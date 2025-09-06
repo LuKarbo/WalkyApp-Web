@@ -61,6 +61,7 @@ export const WalkerAPI = {
         //// Se Simula la llamada a la API
 
         const walkers = await this.getAllWalkers();
+        console.log(id);
         return walkers.find(walker => walker.id === parseInt(id));
     }
 };
