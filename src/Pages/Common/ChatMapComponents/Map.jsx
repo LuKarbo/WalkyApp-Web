@@ -1,4 +1,4 @@
-import { GoogleMap, LoadScript, Polygon, Marker } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, DirectionsService, DirectionsRenderer, Marker } from "@react-google-maps/api";
 import { useState } from "react";
 
 const containerStyle = {
@@ -13,29 +13,46 @@ const defaultCenter = {
 
 export default function Map() {
   const [path, setPath] = useState(() => {
-    const saved = localStorage.getItem("zona");
+    const saved = localStorage.getItem("ruta");
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Calcular el centro de la zona si existe
-  const mapCenter = path.length
-    ? {
-        lat: path.reduce((sum, p) => sum + p.lat, 0) / path.length,
-        lng: path.reduce((sum, p) => sum + p.lng, 0) / path.length,
-      }
-    : defaultCenter;
+  const [directions, setDirections] = useState(null);
 
   const handleClick = (event) => {
-    if (path.length >= 4) return; // máximo 4 puntos
     const newPoint = { lat: event.latLng.lat(), lng: event.latLng.lng() };
     const newPath = [...path, newPoint];
     setPath(newPath);
-    localStorage.setItem("zona", JSON.stringify(newPath));
+    setDirections(null); // reset al agregar un punto
+    localStorage.setItem("ruta", JSON.stringify(newPath));
   };
 
   const clearPath = () => {
     setPath([]);
-    localStorage.removeItem("zona");
+    setDirections(null);
+    localStorage.removeItem("ruta");
+  };
+
+  // si tengo puntos guardados, centrar en el primero
+  const center = path.length > 0 ? path[0] : defaultCenter;
+
+  // íconos personalizados (círculos SVG)
+  const inicioIcon = {
+    path: "M 0,0 m -10,0 a 10,10 0 1,0 20,0 a 10,10 0 1,0 -20,0", // círculo
+    fillColor: "black",
+    fillOpacity: 1,
+    strokeWeight: 2,
+    strokeColor: "#00ff00", // borde verde
+    scale: 2,
+  };
+
+  const finIcon = {
+    path: "M 0,0 m -10,0 a 10,10 0 1,0 20,0 a 10,10 0 1,0 -20,0",
+    fillColor: "black",
+    fillOpacity: 1,
+    strokeWeight: 2,
+    strokeColor: "#ff0000", // borde rojo
+    scale: 2,
   };
 
   return (
@@ -53,38 +70,68 @@ export default function Map() {
       <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={mapCenter} // 👈 aquí usamos el centro calculado
+          center={center}
           zoom={13}
           onClick={handleClick}
         >
-          <Polygon
-            paths={path}
-            options={{
-              fillColor: "#f87171d",
-              fillOpacity: 0.2,
-              strokeColor: "#00000",
-              strokeOpacity: 0.7,
-              strokeWeight: 5,
-              clickable: false,
-              draggable: false,
-              editable: false,
-              geodesic: false,
-            }}
-          />
-
-          {/* Marcadores numerados */}
-          {path.map((point, index) => (
-            <Marker
-              key={index}
-              position={point}
-              label={{
-                text: `${index + 1}`, // número del punto
-                color: "white",
-                fontSize: "14px",
-                fontWeight: "bold",
+          {path.length >= 2 && !directions && (
+            <DirectionsService
+              options={{
+                origin: path[0],
+                destination: path[path.length - 1],
+                waypoints: path.slice(1, -1).map((p) => ({
+                  location: p,
+                  stopover: true,
+                })),
+                travelMode: "WALKING",
+              }}
+              callback={(res) => {
+                if (res !== null && res.status === "OK") {
+                  setDirections(res);
+                }
               }}
             />
-          ))}
+          )}
+
+          {directions && (
+            <DirectionsRenderer
+              options={{
+                directions: directions,
+                suppressMarkers: true,
+                polylineOptions: {
+                  strokeColor: "#000000",
+                  strokeWeight: 5,
+                },
+              }}
+            />
+          )}
+
+          {/* 📍 Marcador de inicio */}
+          {path.length > 0 && (
+            <Marker
+              position={path[0]}
+              label={{
+                text: "Inicio",
+                color: "#ffffff",
+                fontWeight: "bold",
+              }}
+              icon={inicioIcon}
+            />
+          )}
+
+          {/* 📍 Marcador de destino */}
+          {path.length > 1 && (
+            <Marker
+              position={path[path.length - 1]}
+              label={{
+                text: "Fin",
+                color: "#ffffff",
+                fontWeight: "bold",
+              }}
+              icon={finIcon}
+            />
+          )}
+
         </GoogleMap>
       </LoadScript>
     </div>
