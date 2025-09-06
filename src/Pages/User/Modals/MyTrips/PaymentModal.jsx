@@ -1,44 +1,15 @@
 import { format } from "date-fns";
-import { FiX, FiXCircle, FiCalendar, FiMapPin, FiClock } from "react-icons/fi";
+import { FiX, FiCreditCard, FiCalendar, FiMapPin, FiClock, FiCheck, FiDollarSign } from "react-icons/fi";
 
-const CancelWalkModal = ({ isOpen, onClose, onConfirm, tripData, isLoading }) => {
+const PaymentModal = ({ isOpen, onClose, onConfirm, tripData, isLoading }) => {
     if (!isOpen) return null;
 
     const getStatusColor = (status) => {
         switch (status) {
-            case "Solicitado":
-                return "bg-blue-500/70 text-white";
             case "Esperando pago":
                 return "bg-orange-500/70 text-white";
-            case "Agendado":
-                return "bg-yellow-500/70 text-black";
-            case "Activo":
-                return "bg-green-500/70 text-white";
-            case "Finalizado":
-                return "bg-gray-500/70 text-white";
-            case "Rechazado":
-                return "bg-red-500/70 text-white";
             default:
                 return "bg-neutral/70 text-black";
-        }
-    };
-
-    const getStatusText = (status) => {
-        switch (status) {
-            case "Solicitado":
-                return "Solicitado";
-            case "Esperando pago":
-                return "Esperando Pago";
-            case "Agendado":
-                return "Agendado";
-            case "Activo":
-                return "En Progreso";
-            case "Finalizado":
-                return "Finalizado";
-            case "Rechazado":
-                return "Rechazado";
-            default:
-                return status;
         }
     };
 
@@ -49,20 +20,13 @@ const CancelWalkModal = ({ isOpen, onClose, onConfirm, tripData, isLoading }) =>
             `${distance} m`;
     };
 
-    const getCancelMessage = (status) => {
-        switch (status) {
-            case "Solicitado":
-                return "Al cancelar esta solicitud, el paseador no podrá aceptarla.";
-            case "Esperando pago":
-                return "Al cancelar ahora, perderás la aceptación del paseador y deberás crear una nueva solicitud.";
-            default:
-                return "Una vez cancelado, deberás crear un nuevo paseo si deseas programar otro servicio.";
-        }
-    };
+    const totalPrice = tripData?.totalPrice || 0;
+    const mercadoPagoFee = Math.round(totalPrice * 0.035); 
+    const finalTotal = totalPrice + mercadoPagoFee;
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl border border-primary/10 max-w-md w-full mx-4">
+            <div className="relative overflow-hidden rounded-3xl bg-white/90 dark:bg-foreground/90 backdrop-blur-sm shadow-xl border border-primary/10 max-w-md w-full mx-4">
                 
                 <div className="absolute top-4 right-4 z-10">
                     <button
@@ -76,15 +40,15 @@ const CancelWalkModal = ({ isOpen, onClose, onConfirm, tripData, isLoading }) =>
 
                 <div className="relative p-6">
                     <div className="flex items-center mb-6">
-                        <div className="w-12 h-12 bg-gradient-to-br from-danger to-warning rounded-full flex items-center justify-center mr-4 shadow-lg flex-shrink-0">
-                            <FiXCircle className="text-white text-xl" />
+                        <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mr-4 shadow-lg flex-shrink-0">
+                            <FiCreditCard className="text-white text-xl" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <h3 className="text-xl font-bold text-foreground dark:text-background mb-1">
-                                Cancelar Paseo
+                                Confirmar Pago
                             </h3>
                             <p className="text-sm text-accent dark:text-muted">
-                                Esta acción no se puede deshacer
+                                Completa el pago para confirmar tu paseo
                             </p>
                         </div>
                     </div>
@@ -94,7 +58,7 @@ const CancelWalkModal = ({ isOpen, onClose, onConfirm, tripData, isLoading }) =>
                             
                             <div className="absolute top-3 right-3 z-10">
                                 <span className={`px-2 py-1 rounded-full text-xs font-bold shadow-lg ${getStatusColor(tripData.status)}`}>
-                                    {getStatusText(tripData.status)}
+                                    {tripData.status}
                                 </span>
                             </div>
 
@@ -115,7 +79,6 @@ const CancelWalkModal = ({ isOpen, onClose, onConfirm, tripData, isLoading }) =>
                                 </div>
 
                                 <div className="space-y-2">
-                                    
                                     <div className="flex items-center p-2 bg-primary/10 rounded-lg">
                                         <FiCalendar className="mr-2 text-primary flex-shrink-0" size={12} />
                                         <span className="text-xs font-semibold text-foreground dark:text-background truncate">
@@ -154,37 +117,50 @@ const CancelWalkModal = ({ isOpen, onClose, onConfirm, tripData, isLoading }) =>
                         </div>
                     )}
 
-                    <div className="mb-6">
-                        <p className="text-center text-foreground dark:text-background mb-2">
-                            ¿Estás seguro de que deseas cancelar este paseo?
-                        </p>
-                        <p className="text-sm text-center text-accent dark:text-muted">
-                            {getCancelMessage(tripData?.status)}
-                        </p>
+                    <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-2xl p-4 border border-orange-200 dark:border-orange-800 mb-6">
+                        <div className="flex items-center mb-3">
+                            <FiDollarSign className="text-orange-600 mr-2" size={18} />
+                            <h4 className="text-lg font-bold text-orange-800 dark:text-orange-200">
+                                Resumen de Pago
+                            </h4>
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-foreground dark:text-background">Servicio de paseo:</span>
+                                <span className="font-semibold text-foreground dark:text-background">${totalPrice.toLocaleString()}</span>
+                            </div>
+                            <div className="border-t border-orange-200 dark:border-orange-700 pt-2 mt-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-lg font-bold text-orange-800 dark:text-orange-200">Total a Pagar:</span>
+                                    <span className="text-xl font-bold text-orange-600 dark:text-orange-400">${finalTotal.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <button
                             onClick={onClose}
                             disabled={isLoading}
-                            className="flex-1 flex items-center justify-center px-4 py-3 text-sm font-semibold rounded-xl border-2 border-info text-info hover:bg-info hover:text-white transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-2 text-xs font-semibold rounded-lg border-2 border-danger text-danger hover:bg-danger hover:text-white transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
                         >
-                            Mantener Paseo
+                            Cancelar
                         </button>
                         <button
                             onClick={onConfirm}
                             disabled={isLoading}
-                            className="flex-1 flex items-center justify-center px-4 py-3 text-sm font-semibold rounded-xl border-2 border-danger text-danger hover:bg-danger hover:text-white transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 flex items-center justify-center px-4 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
                         >
                             {isLoading ? (
                                 <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                                    Cancelando...
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    Procesando...
                                 </>
                             ) : (
                                 <>
-                                    <FiXCircle size={14} className="mr-1" />
-                                    Cancelar Paseo
+                                    <FiCheck size={14} className="mr-2" />
+                                    Pagar con MercadoPago
                                 </>
                             )}
                         </button>
@@ -195,4 +171,4 @@ const CancelWalkModal = ({ isOpen, onClose, onConfirm, tripData, isLoading }) =>
     );
 };
 
-export default CancelWalkModal;
+export default PaymentModal;

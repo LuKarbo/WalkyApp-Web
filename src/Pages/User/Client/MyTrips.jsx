@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FiCalendar } from "react-icons/fi";
 import { WalksController } from '../../../BackEnd/Controllers/WalksController';
 import { WalkerController } from '../../../BackEnd/Controllers/WalkerController';
@@ -11,6 +11,7 @@ import MyTripsCardComponent from '../Components/MyTripsComponents/MyTripsCardCom
 import MyTripsFilter from '../Filters/MyTrips/MyTripsFilter';
 import CancelWalkModal from '../Modals/MyTrips/CancelWalkModal';
 import GetServiceModal_Client from '../Modals/MyTrips/GetServiceModal_Client';
+import PaymentModal from '../Modals/MyTrips/PaymentModal';
 
 const MyTrips = () => {
     const [trips, setTrips] = useState([]);
@@ -34,6 +35,10 @@ const MyTrips = () => {
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [tripToCancel, setTripToCancel] = useState(null);
     const [cancelLoading, setCancelLoading] = useState(false);
+
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [tripToPay, setTripToPay] = useState(null);
+    const [paymentLoading, setPaymentLoading] = useState(false);
 
     const user = useUser();
     const userId = user?.id;
@@ -76,8 +81,12 @@ const MyTrips = () => {
         
         try {
             setCancelLoading(true);
-            await WalksController.updateWalkStatus(tripToCancel.id, 'Cancelled');
-            setTrips(trips.filter((trip) => trip.id !== tripToCancel.id));
+            await WalksController.changeWalkStatus(tripToCancel.id, 'Rechazado');
+            setTrips(trips.map(trip => 
+                trip.id === tripToCancel.id 
+                    ? { ...trip, status: 'Rechazado' }
+                    : trip
+            ));
             setShowCancelModal(false);
             setTripToCancel(null);
         } catch (err) {
@@ -90,6 +99,36 @@ const MyTrips = () => {
     const handleCloseCancelModal = () => {
         setShowCancelModal(false);
         setTripToCancel(null);
+    };
+
+    const handlePayTrip = (trip) => {
+        setTripToPay(trip);
+        setShowPaymentModal(true);
+    };
+
+    const handleConfirmPayment = async () => {
+        if (!tripToPay) return;
+        
+        try {
+            setPaymentLoading(true);
+            await WalksController.changeWalkStatus(tripToPay.id, 'Agendado');
+            setTrips(trips.map(trip => 
+                trip.id === tripToPay.id 
+                    ? { ...trip, status: 'Agendado' }
+                    : trip
+            ));
+            setShowPaymentModal(false);
+            setTripToPay(null);
+        } catch (err) {
+            setError('Error processing payment: ' + err.message);
+        } finally {
+            setPaymentLoading(false);
+        }
+    };
+
+    const handleClosePaymentModal = () => {
+        setShowPaymentModal(false);
+        setTripToPay(null);
     };
 
     const loadModalData = async () => {
@@ -142,7 +181,6 @@ const MyTrips = () => {
                 scheduledDateTime: `${walkDate}T${walkTime}`,
                 description: description,
                 totalPrice: selectedPets.length * (selectedWalker.pricePerPet || 15000),
-                status: 'Waiting'
             };
 
             const createdTrip = await WalksController.createWalkRequest(walkRequest);
@@ -153,10 +191,11 @@ const MyTrips = () => {
                 walker: selectedWalker.name,
                 startTime: walkRequest.scheduledDateTime,
                 endTime: null,
-                status: 'Waiting',
+                status: 'Solicitado',
                 duration: null,
                 distance: null,
-                notes: description
+                notes: description,
+                totalPrice: walkRequest.totalPrice
             };
             
             setTrips([newTrip, ...trips]);
@@ -180,8 +219,12 @@ const MyTrips = () => {
 
     const handleDeleteTrip = async (tripId) => {
         try {
-            await WalksController.updateWalkStatus(tripId, 'Cancelled');
-            setTrips(trips.filter((trip) => trip.id !== tripId));
+            await WalksController.changeWalkStatus(tripId, 'Rechazado');
+            setTrips(trips.map(trip => 
+                trip.id === tripId 
+                    ? { ...trip, status: 'Rechazado' }
+                    : trip
+            ));
         } catch (err) {
             setError('Error cancelling trip: ' + err.message);
         }
@@ -201,8 +244,8 @@ const MyTrips = () => {
 
     const filteredTrips = trips.filter((trip) => {
         const isActive = activeTab === "active" ?
-            ["Waiting", "Scheduled", "Active"].includes(trip.status) :
-            ["Cancelled", "Completed"].includes(trip.status);
+            ["Solicitado", "Esperando pago", "Agendado", "Activo"].includes(trip.status) :
+            ["Rechazado", "Finalizado"].includes(trip.status);
 
         const matchesSearch = trip.dogName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                                 trip.walker?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -211,11 +254,11 @@ const MyTrips = () => {
     });
 
     const activeTripsCount = trips.filter(trip => 
-        ["Waiting", "Scheduled", "Active"].includes(trip.status)
+        ["Solicitado", "Esperando pago", "Agendado", "Activo"].includes(trip.status)
     ).length;
 
     const completedTripsCount = trips.filter(trip => 
-        ["Cancelled", "Completed"].includes(trip.status)
+        ["Rechazado", "Finalizado"].includes(trip.status)
     ).length;
 
     if (loading) {
@@ -278,6 +321,7 @@ const MyTrips = () => {
                                 trip={trip}
                                 onViewTrip={handleViewTrip}
                                 onCancelTrip={handleCancelTrip}
+                                onPayTrip={handlePayTrip}
                             />
                         ))}
                     </div>
@@ -311,6 +355,14 @@ const MyTrips = () => {
                     onConfirm={handleConfirmCancel}
                     tripData={tripToCancel}
                     isLoading={cancelLoading}
+                />
+
+                <PaymentModal 
+                    isOpen={showPaymentModal}
+                    onClose={handleClosePaymentModal}
+                    onConfirm={handleConfirmPayment}
+                    tripData={tripToPay}
+                    isLoading={paymentLoading}
                 />
             </div>
         </div>

@@ -17,6 +17,14 @@ export const WalksController = {
         return await WalksService.getScheduledWalks();
     },
 
+    async fetchWalksAwaitingPayment() {
+        return await WalksService.getWalksAwaitingPayment();
+    },
+
+    async fetchRequestedWalks() {
+        return await WalksService.getRequestedWalks();
+    },
+
     async fetchWalksByWalker(walkerId) {
         return await WalksService.getWalksByWalker(walkerId);
     },
@@ -31,5 +39,29 @@ export const WalksController = {
 
     async updateWalkStatus(walkId, status) {
         return await WalksService.updateWalkStatus(walkId, status);
+    },
+
+    async changeWalkStatus(walkId, newStatus) {
+        return await WalksService.changeWalkStatus(walkId, newStatus);
+    },
+
+    async acceptWalkRequest(walkId) {
+        return await WalksService.changeWalkStatus(walkId, 'Esperando pago');
+    },
+
+    async rejectWalkRequest(walkId) {
+        return await WalksService.changeWalkStatus(walkId, 'Rechazado');
+    },
+
+    async confirmPayment(walkId) {
+        return await WalksService.changeWalkStatus(walkId, 'Agendado');
+    },
+
+    async startWalk(walkId) {
+        return await WalksService.changeWalkStatus(walkId, 'Activo');
+    },
+
+    async finishWalk(walkId) {
+        return await WalksService.changeWalkStatus(walkId, 'Finalizado');
     }
 };
