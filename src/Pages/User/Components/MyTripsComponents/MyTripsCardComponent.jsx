@@ -1,21 +1,42 @@
-import React from "react";
 import { format } from "date-fns";
-import { FiCalendar, FiMapPin, FiClock, FiXCircle, FiEye } from "react-icons/fi";
+import { FiCalendar, FiMapPin, FiClock, FiXCircle, FiEye, FiCreditCard } from "react-icons/fi";
 
-const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip }) => {
+const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => {
     const getStatusColor = (status) => {
         switch (status) {
-            case "Waiting":
-            case "Scheduled":
-                return "bg-warning/70 text-black";
-            case "Active":
-                return "bg-success/70 text-black";
-            case "Completed":
-                return "bg-info/70 text-black";
-            case "Cancelled":
-                return "bg-danger/70 text-black";
+            case "Solicitado":
+                return "bg-blue-500/70 text-white";
+            case "Esperando pago":
+                return "bg-orange-500/70 text-white";
+            case "Agendado":
+                return "bg-yellow-500/70 text-black";
+            case "Activo":
+                return "bg-green-500/70 text-white";
+            case "Finalizado":
+                return "bg-gray-500/70 text-white";
+            case "Rechazado":
+                return "bg-red-500/70 text-white";
             default:
                 return "bg-neutral/70 text-black";
+        }
+    };
+
+    const getStatusText = (status) => {
+        switch (status) {
+            case "Solicitado":
+                return "Solicitado";
+            case "Esperando pago":
+                return "Esperando Pago";
+            case "Agendado":
+                return "Agendado";
+            case "Activo":
+                return "En Progreso";
+            case "Finalizado":
+                return "Finalizado";
+            case "Rechazado":
+                return "Rechazado";
+            default:
+                return status;
         }
     };
 
@@ -26,12 +47,24 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip }) => {
             `${distance} m`;
     };
 
+    const canCancel = (status) => {
+        return ["Solicitado", "Esperando pago"].includes(status);
+    };
+
+    const needsPayment = (status) => {
+        return status === "Esperando pago";
+    };
+
+    const viewTrip = (status) => {
+        return ["Agendado", "Activo", "Finalizado"].includes(status);
+    };
+
     return (
-        <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-primary/10 h-full flex flex-col">
+        <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-primary/10 h-full flex flex-col min-w-[325px]">
 
             <div className="absolute top-4 right-4 z-10">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-lg ${getStatusColor(trip.status)}`}>
-                    {trip.status}
+                    {getStatusText(trip.status)}
                 </span>
             </div>
 
@@ -53,7 +86,7 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip }) => {
                     </div>
                 </div>
 
-                <div className="space-y-2 mb-4 flex-1">
+                <div className="space-y-3 mb-6 flex-1">
                     <div className="flex items-center p-2 bg-primary/10 rounded-lg">
                         <FiCalendar className="mr-2 text-primary flex-shrink-0" size={14} />
                         <span className="text-xs font-semibold text-foreground dark:text-background truncate">
@@ -80,6 +113,15 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip }) => {
                         </div>
                     )}
 
+                    {trip.totalPrice && needsPayment(trip.status) && (
+                        <div className="flex items-center p-2 bg-orange-100 rounded-lg border border-orange-200">
+                            <FiCreditCard className="mr-2 text-orange-600 flex-shrink-0" size={14} />
+                            <span className="text-xs font-semibold text-orange-800 truncate">
+                                Total: ${trip.totalPrice.toLocaleString()}
+                            </span>
+                        </div>
+                    )}
+
                     {trip.notes && (
                         <div className="p-2 bg-accent/10 rounded-lg">
                             <p className="text-xs text-accent dark:text-muted italic line-clamp-2">
@@ -90,20 +132,33 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip }) => {
                 </div>
 
                 <div className="flex items-center gap-2 mt-auto">
-                    <button
-                        onClick={() => onViewTrip(trip.id)}
-                        className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-info text-info hover:bg-info hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
-                    >
-                        <FiEye className="mr-1" size={12} />
-                        Ver
-                    </button>
-                    {(trip.status === "Waiting" || trip.status === "Scheduled") && (
+                    { viewTrip(trip.status) && (
+                        <button
+                            onClick={() => onViewTrip(trip.id)}
+                            className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-info text-info hover:bg-info hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                            <FiEye className="mr-1" size={12} />
+                            Ver
+                        </button>
+                    )}
+                    
+                    {needsPayment(trip.status) && (
+                        <button
+                            onClick={() => onPayTrip(trip)}
+                            className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                            <FiCreditCard className="mr-1" size={12} />
+                            Pagar
+                        </button>
+                    )}
+                    
+                    {canCancel(trip.status) && (
                         <button
                             onClick={() => onCancelTrip(trip)}
                             className="px-3 py-2 text-xs font-semibold rounded-lg border-2 border-danger text-danger hover:bg-danger hover:text-white transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
                         >
                             <FiXCircle size={12} className="mr-1" />
-                            Cancelar Paseo
+                            Cancelar
                         </button>
                     )}
                 </div>

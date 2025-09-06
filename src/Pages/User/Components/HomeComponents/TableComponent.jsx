@@ -1,7 +1,8 @@
 import { format } from "date-fns";
 import { useNavigation } from "../../../../BackEnd/Context/NavigationContext";
+import { FiEye, FiXCircle, FiCreditCard } from "react-icons/fi";
 
-const TableComponent = ({ trips }) => {
+const TableComponent = ({ trips, onCancelTrip, onPayTrip }) => {
     const { navigateToContent } = useNavigation();
 
     const handleViewTrip = (tripId) => {
@@ -12,9 +13,59 @@ const TableComponent = ({ trips }) => {
         navigateToContent('my-walks');
     };
 
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "Solicitado":
+                return "bg-blue-500/70 text-white";
+            case "Esperando pago":
+                return "bg-orange-500/70 text-white";
+            case "Agendado":
+                return "bg-yellow-500/70 text-black";
+            case "Activo":
+                return "bg-green-500/70 text-white";
+            case "Finalizado":
+                return "bg-gray-500/70 text-white";
+            case "Rechazado":
+                return "bg-red-500/70 text-white";
+            default:
+                return "bg-neutral/70 text-black";
+        }
+    };
+
+    const getStatusText = (status) => {
+        switch (status) {
+            case "Solicitado":
+                return "Solicitado";
+            case "Esperando pago":
+                return "Esperando Pago";
+            case "Agendado":
+                return "Agendado";
+            case "Activo":
+                return "En Progreso";
+            case "Finalizado":
+                return "Finalizado";
+            case "Rechazado":
+                return "Rechazado";
+            default:
+                return status;
+        }
+    };
+
+    const canCancel = (status) => {
+        return ["Solicitado", "Esperando pago"].includes(status);
+    };
+
+    const needsPayment = (status) => {
+        return status === "Esperando pago";
+    };
+
+    const canView = (status) => {
+        return ["Agendado", "Activo", "Finalizado"].includes(status);
+    };
+
     return (
         <div>
-            {/* Header */}
+            
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-foreground dark:text-background">
                     Mis paseos activos
@@ -30,7 +81,6 @@ const TableComponent = ({ trips }) => {
                 </button>
             </div>
 
-            {/* Table */}
             <div className="bg-background dark:bg-foreground rounded-xl shadow-xl overflow-hidden border border-border dark:border-muted">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -52,12 +102,11 @@ const TableComponent = ({ trips }) => {
                                 key={trip.id}
                                 className={`transition-colors duration-200 bg-background dark:bg-foreground hover:bg-muted/30 dark:hover:bg-accent/30`}
                             >
-                            {/* Trip ID */}
+
                             <td className="px-6 py-4 font-medium text-foreground dark:text-background">
                                 {trip.id}
                             </td>
 
-                            {/* Dog Name */}
                             <td className="px-6 py-4">
                                 <div className="flex items-center">
                                     <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
@@ -69,53 +118,56 @@ const TableComponent = ({ trips }) => {
                                 </div>
                             </td>
 
-                            {/* Walker */}
                             <td className="px-6 py-4 text-foreground dark:text-background">
                                 {trip.walker}
                             </td>
 
-                            {/* Start Time */}
                             <td className="px-6 py-4 text-foreground dark:text-background">
                                 {format(new Date(trip.startTime), "MMM d, yyyy h:mm a")}
                             </td>
 
-                            {/* Status */}
                             <td className="px-6 py-4">
-                                <span
-                                    className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                                        trip.status === "Active"
-                                        ? "bg-success/70 text-black"
-                                        : trip.status === "Completed"
-                                        ? "bg-info/70 text-black"
-                                        : trip.status === "Waiting" || trip.status === "Scheduled"
-                                        ? "bg-warning/70 text-black"
-                                        : trip.status === "Cancelled"
-                                        ? "bg-danger/70 text-black"
-                                        : "bg-neutral/70 text-black"
-                                    }`}
-                                >
-                                {trip.status}
+                                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(trip.status)}`}>
+                                    {getStatusText(trip.status)}
                                 </span>
                             </td>
 
-                            {/* Actions */}
-                                <td className="px-6 py-4">
-                                    <div className="flex space-x-3">
+                            <td className="px-6 py-4">
+                                <div className="flex space-x-2">
+                                    {canView(trip.status) && (
                                         <button
                                             onClick={() => handleViewTrip(trip.id)}
-                                            className="px-3 py-1 text-sm rounded-lg border border-info text-info hover:bg-info hover:text-black transition-colors duration-200"
+                                            className="flex items-center px-3 py-1 text-xs rounded-lg border border-info text-info hover:bg-info hover:text-white transition-colors duration-200"
+                                            title="Ver detalles del paseo"
                                         >
+                                            <FiEye className="mr-1" size={12} />
                                             Ver
                                         </button>
-                                        {(trip.status === "Waiting" || trip.status === "Scheduled") && (
-                                            <button
-                                                className="px-3 py-1 text-sm rounded-lg border border-danger text-danger hover:bg-danger hover:text-black transition-colors duration-200"
-                                            >
-                                                Cancelar
-                                            </button>
-                                        )}
-                                    </div>
-                                </td>
+                                    )}
+                                    
+                                    {needsPayment(trip.status) && onPayTrip && (
+                                        <button
+                                            onClick={() => onPayTrip(trip)}
+                                            className="flex items-center px-3 py-1 text-xs rounded-lg border border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-colors duration-200"
+                                            title={`Pagar $${trip.totalPrice?.toLocaleString() || 0}`}
+                                        >
+                                            <FiCreditCard className="mr-1" size={12} />
+                                            Pagar
+                                        </button>
+                                    )}
+                                    
+                                    {canCancel(trip.status) && onCancelTrip && (
+                                        <button
+                                            onClick={() => onCancelTrip(trip)}
+                                            className="flex items-center px-3 py-1 text-xs rounded-lg border border-danger text-danger hover:bg-danger hover:text-white transition-colors duration-200"
+                                            title="Cancelar paseo"
+                                        >
+                                            <FiXCircle className="mr-1" size={12} />
+                                            Cancelar
+                                        </button>
+                                    )}
+                                </div>
+                            </td>
                             </tr>
                         ))}
                         </tbody>

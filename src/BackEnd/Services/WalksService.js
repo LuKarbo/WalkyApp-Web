@@ -12,7 +12,7 @@ export const WalksService = {
             status: walk.status
         }));
 
-        const relevantStatuses = ['Active', 'Scheduled', 'Completed'];
+        const relevantStatuses = ['Activo', 'Agendado', 'Finalizado', 'Esperando pago'];
         return walksDTO.filter(walk => relevantStatuses.includes(walk.status));
     },
 
@@ -47,7 +47,7 @@ export const WalksService = {
     },
 
     async getActiveWalks() {
-        const activeWalks = await WalksDataAccess.getWalksByStatus('Active');
+        const activeWalks = await WalksDataAccess.getWalksByStatus('Activo');
         
         return activeWalks.map(walk => ({
             id: walk.id,
@@ -60,13 +60,37 @@ export const WalksService = {
     },
 
     async getScheduledWalks() {
-        const scheduledWalks = await WalksDataAccess.getWalksByStatus('Scheduled');
+        const scheduledWalks = await WalksDataAccess.getWalksByStatus('Agendado');
         
         return scheduledWalks.map(walk => ({
             id: walk.id,
             dogName: walk.dogName,
             walker: walk.walkerName,
             scheduledTime: walk.startTime,
+            status: walk.status
+        }));
+    },
+
+    async getWalksAwaitingPayment() {
+        const walksAwaitingPayment = await WalksDataAccess.getWalksByStatus('Esperando pago');
+        
+        return walksAwaitingPayment.map(walk => ({
+            id: walk.id,
+            dogName: walk.dogName,
+            walker: walk.walkerName,
+            scheduledTime: walk.startTime,
+            status: walk.status
+        }));
+    },
+
+    async getRequestedWalks() {
+        const requestedWalks = await WalksDataAccess.getWalksByStatus('Solicitado');
+        
+        return requestedWalks.map(walk => ({
+            id: walk.id,
+            dogName: walk.dogName,
+            walker: walk.walkerName,
+            requestedTime: walk.startTime,
             status: walk.status
         }));
     },
@@ -138,6 +162,8 @@ export const WalksService = {
             throw new Error("Scheduled date and time is required");
         }
 
+        walkRequestData.status = 'Solicitado';
+
         const newWalkRequest = await WalksDataAccess.createWalkRequest(walkRequestData);
         
         return {
@@ -161,9 +187,9 @@ export const WalksService = {
             throw new Error("Status is required");
         }
 
-        const validStatuses = ['Pending', 'Accepted', 'Rejected', 'Active', 'Completed', 'Cancelled'];
+        const validStatuses = ['Solicitado', 'Esperando pago', 'Agendado', 'Activo', 'Finalizado', 'Rechazado'];
         if (!validStatuses.includes(status)) {
-            throw new Error("Invalid status");
+            throw new Error("Invalid status. Valid statuses: " + validStatuses.join(', '));
         }
 
         const updatedWalk = await WalksDataAccess.updateWalkStatus(walkId, status);
@@ -173,5 +199,33 @@ export const WalksService = {
             status: updatedWalk.status,
             updatedAt: updatedWalk.updatedAt
         };
+    },
+
+    async validateStatusTransition(walkId, newStatus) {
+        const walk = await WalksDataAccess.getWalkById(walkId);
+        if (!walk) {
+            throw new Error("Walk not found");
+        }
+
+        const currentStatus = walk.status;
+        const validTransitions = {
+            'Solicitado': ['Esperando pago', 'Rechazado'],
+            'Esperando pago': ['Agendado'],
+            'Agendado': ['Activo'],
+            'Activo': ['Finalizado'],
+            'Finalizado': [], // Estado final
+            'Rechazado': [] // Estado final
+        };
+
+        if (!validTransitions[currentStatus] || !validTransitions[currentStatus].includes(newStatus)) {
+            throw new Error(`Invalid status transition from '${currentStatus}' to '${newStatus}'`);
+        }
+
+        return true;
+    },
+
+    async changeWalkStatus(walkId, newStatus) {
+        await this.validateStatusTransition(walkId, newStatus);
+        return await this.updateWalkStatus(walkId, newStatus);
     }
 };
