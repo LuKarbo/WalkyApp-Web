@@ -8,6 +8,7 @@ import MyPets from '../../Pages/User/Client/MyPets';
 import Tickets from '../../Pages/User/Tickets';
 import Settings from '../../Pages/User/Client/Settings';
 import JoinToUsFrom from '../../Pages/User/JoinToUs';
+import Notifications from '../../Pages/User/Client/MyNotifications'
 
 import {
     FiHome,
@@ -39,6 +40,8 @@ const WalkerProfileView = ({ contentParams }) => {
 
 const MyTripsView = () => <MyTrips/>;
 
+const MyWalksWalker = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Se podran ver: Nuevas solicitudes, paseos activos, paseos agendados, etc</p></div>;
+
 const Trip = ({ contentParams }) => {
     const { tripId } = contentParams || {}; 
     return (
@@ -60,6 +63,7 @@ const MyPetsView = () => <MyPets/>;
 const TicketsView = () => <Tickets/>;
 const SettingsView = () => <Settings/>;
 const JoinToUs = () => <JoinToUsFrom/>;
+const NotificationsView = () => <Notifications/>;
 
 
 // Componentes Ejemplo
@@ -77,7 +81,6 @@ const MyReviews = () => <div className="p-6"><h2 className="text-xl font-bold">M
 
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
-const Notifications = () => <div className="p-6"><h2 className="text-xl font-bold">Notificaciones</h2><p>Centro de notificaciones</p></div>;
 
 // Mapeo de componentes
 export const menuComponents = {
@@ -101,6 +104,7 @@ export const menuComponents = {
 
     // Paseador
     'my-reviews': MyReviews,
+    'my-walks-walker': MyWalksWalker,
     
     // Soporte
     'active-walks': ActiveWalks,
@@ -110,7 +114,7 @@ export const menuComponents = {
     'trip': Trip,
     'mapchat': MapChatView,
 
-    'notifications': Notifications,
+    'notifications': NotificationsView,
     'profile': UserProfile,
     'settings': SettingsView,
 };
@@ -141,8 +145,7 @@ export const menuItems = {
     
     // Menú para Paseador
     walker: [
-        { icon: FiHome, label: "Home", id: "home" },
-        { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
+        { icon: FiClock, label: "Mis Paseos", id: "my-walks-walker" },
         { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
         { icon: FiTrendingUp, label: "Estadísticas", id: "statistics" },
         { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
@@ -157,7 +160,7 @@ export const menuItems = {
 
 export const commonMenuItems = [
     { icon: FiEdit, label: "Mi Perfil", id: "profile" },
-    { icon: FiBell, label: "Notificaciones", id: "notifications" },
+    { icon: FiBell, label: "Alertas", id: "notifications" },
     { icon: FiSettings, label: "Ajustes", id: "settings" },
     { icon: FiLogOut, label: "Logout", id: "logout" },
 ];
@@ -177,12 +180,13 @@ const menuTitles = {
     'tickets-general': 'Consultas',
     'promotions': 'Promociones',
     'my-walks': 'Mis Paseos',
+    'my-walks-walker': 'Mis Paseos',
     'my-pets': 'Mis Mascotas',
     'my-account-perms': 'Ser Paseador',
     'tickets': 'Consultas',
     'my-reviews': 'Mis Reseñas',
     'active-walks': 'Paseos Activos',
-    'notifications': 'Notificaciones',
+    'notifications': 'Mis Alertas',
     'profile': 'Mi Perfil',
     'settings': 'Ajustes',
 };

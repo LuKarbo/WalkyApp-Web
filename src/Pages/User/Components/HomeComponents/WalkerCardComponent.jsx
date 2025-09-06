@@ -13,7 +13,6 @@ const WalkerCardComponent = ({ walkers }) => {
     const [selectedWalker, setSelectedWalker] = useState(null);
     
     const handleViewProfile = (walkerId) => {
-        console.log('navigateToContent');
         navigateToContent('walker-profile', { walkerId });
     };
 

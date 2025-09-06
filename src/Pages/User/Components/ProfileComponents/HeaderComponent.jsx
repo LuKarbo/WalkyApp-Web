@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { FiSettings, FiLock } from "react-icons/fi";
+import { FiSettings, FiLock, FiUser } from "react-icons/fi";
 import { UserController } from "../../../../BackEnd/Controllers/UserController";
+import { useNavigation } from "../../../../BackEnd/Context/NavigationContext";
 import EditProfileModal from "../../Modals/ProfileModals/EditProfileModal";
 import ChangePassModal from "../../Modals/ProfileModals/ChangePassModal";
 
 const HeaderComponent = ({ userData, buttonBase, buttonInactive, onUpdateProfile, userId }) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isChangePassModalOpen, setIsChangePassModalOpen] = useState(false);
+
+    const { navigateToContent } = useNavigation();
 
     const handleSaveProfile = async (updatedData) => {
         try {
@@ -26,6 +29,11 @@ const HeaderComponent = ({ userData, buttonBase, buttonInactive, onUpdateProfile
             console.error("Error al cambiar contraseña:", error);
             alert(`Error al cambiar contraseña: ${error.message}`);
         }
+    };
+
+    const handleViewWalkerProfile = () => {
+        const walkerId = userData.id
+        navigateToContent('walker-profile', {walkerId});
     };
 
     return (
@@ -56,6 +64,14 @@ const HeaderComponent = ({ userData, buttonBase, buttonInactive, onUpdateProfile
                         >
                             <FiLock className="mr-2" /> Cambiar Contraseña
                         </button>
+                        {userData?.rol === 'walker' && (
+                            <button 
+                                onClick={handleViewWalkerProfile}
+                                className={`${buttonBase} ${buttonInactive} flex items-center`}
+                            >
+                                <FiUser className="mr-2" /> Ver Mi Perfil de Paseador
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

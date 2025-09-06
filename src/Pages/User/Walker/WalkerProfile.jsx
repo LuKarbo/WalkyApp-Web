@@ -7,7 +7,9 @@ import WalkerReviewsComponent from "../Components/WalkerProfileComponents/Walker
 import GetServiceModal from "../Modals/GetServiceModal";
 
 const WalkerProfile = ({ id }) => {
+    console.log(id);
     const { walkerId } = id || {};
+    console.log(walkerId);
     const { navigateToContent } = useNavigation();
     
     const [walkerData, setWalkerData] = useState(null);

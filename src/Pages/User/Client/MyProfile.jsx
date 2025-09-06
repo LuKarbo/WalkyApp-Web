@@ -42,6 +42,7 @@ const MyProfile = () => {
             const fullProfile = await UserController.fetchUserProfile(user.id);
             
             setUserProfileData({
+                id: fullProfile.id,
                 name: fullProfile.fullName || "X",
                 email: fullProfile.email || "sin-email@example.com",
                 avatar: fullProfile.profileImage || "X",
@@ -54,6 +55,7 @@ const MyProfile = () => {
         } catch (error) {
             console.error("Error loading user profile:", error);
             setUserProfileData({
+                id: user?.id,
                 name: user?.fullName || "X",
                 email: user?.email || "sin-email@example.com",
                 avatar: user?.profileImage || "X",

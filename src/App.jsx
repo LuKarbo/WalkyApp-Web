@@ -65,7 +65,7 @@ const App = () => {
       case 'client':
         return 'home';
       case 'walker':
-        return 'home';
+        return 'my-walks-walker';
       case 'support':
         return 'tickets-general';
       default:
