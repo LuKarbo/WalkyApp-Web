@@ -9,6 +9,7 @@ import Tickets from '../../Pages/User/Tickets';
 import Settings from '../../Pages/User/Client/Settings';
 import JoinToUsFrom from '../../Pages/User/JoinToUs';
 import Notifications from '../../Pages/User/Client/MyNotifications'
+import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
 
 import {
     FiHome,
@@ -40,7 +41,7 @@ const WalkerProfileView = ({ contentParams }) => {
 
 const MyTripsView = () => <MyTrips/>;
 
-const MyWalksWalker = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Se podran ver: Nuevas solicitudes, paseos activos, paseos agendados, etc</p></div>;
+const MyWalksWalker = () => <WalkerWalks/>;
 
 const Trip = ({ contentParams }) => {
     const { tripId } = contentParams || {}; 
@@ -65,7 +66,6 @@ const SettingsView = () => <Settings/>;
 const JoinToUs = () => <JoinToUsFrom/>;
 const NotificationsView = () => <Notifications/>;
 
-
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
 const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gestión de Usuarios</h2><p>Lista y administración de usuarios</p></div>;
@@ -75,7 +75,6 @@ const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl f
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
 const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
-const MyAccountPerms = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitar Permisos</h2><p>Solicitudes de permisos especiales</p></div>;
 
 const MyReviews = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Reseñas</h2><p>Reseñas recibidas</p></div>;
 
@@ -98,7 +97,6 @@ export const menuComponents = {
     'search-walker': SearchWalkerView,
     'my-walks': MyTripsView,
     'my-pets': MyPetsView,
-    'my-account-perms': MyAccountPerms,
     'tickets': TicketsView,
     'join-to-us': JoinToUs,
 
