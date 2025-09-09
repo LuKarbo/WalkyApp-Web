@@ -36,25 +36,6 @@ export default function Map() {
   // si tengo puntos guardados, centrar en el primero
   const center = path.length > 0 ? path[0] : defaultCenter;
 
-  // íconos personalizados (círculos SVG)
-  const inicioIcon = {
-    path: "M 0,0 m -10,0 a 10,10 0 1,0 20,0 a 10,10 0 1,0 -20,0", // círculo
-    fillColor: "black",
-    fillOpacity: 1,
-    strokeWeight: 2,
-    strokeColor: "#00ff00", // borde verde
-    scale: 2,
-  };
-
-  const finIcon = {
-    path: "M 0,0 m -10,0 a 10,10 0 1,0 20,0 a 10,10 0 1,0 -20,0",
-    fillColor: "black",
-    fillOpacity: 1,
-    strokeWeight: 2,
-    strokeColor: "#ff0000", // borde rojo
-    scale: 2,
-  };
-
   return (
     <div className="w-full">
       {/* Botón para limpiar */}
@@ -97,40 +78,31 @@ export default function Map() {
             <DirectionsRenderer
               options={{
                 directions: directions,
-                suppressMarkers: true,
                 polylineOptions: {
-                  strokeColor: "#000000",
+                  strokeColor: "#4ade80",
                   strokeWeight: 5,
                 },
               }}
             />
           )}
 
-          {/* 📍 Marcador de inicio */}
+          {/* Marcador de inicio 
           {path.length > 0 && (
             <Marker
               position={path[0]}
-              label={{
-                text: "Inicio",
-                color: "#ffffff",
-                fontWeight: "bold",
-              }}
-              icon={inicioIcon}
+              label={{text: "Inicio", color: "#ffffff",fontWeight: "bold",}}
+              icon="http://maps.google.com/mapfiles/ms/icons/green-dot.png"
             />
           )}
 
-          {/* 📍 Marcador de destino */}
+          {/*Marcador de destino
           {path.length > 1 && (
             <Marker
               position={path[path.length - 1]}
-              label={{
-                text: "Fin",
-                color: "#ffffff",
-                fontWeight: "bold",
-              }}
-              icon={finIcon}
+              label={{text: "Destino",color: "#ffffff",fontWeight: "bold",}}
+              icon="http://maps.google.com/mapfiles/ms/icons/red-dot.png"
             />
-          )}
+          )}*/}
 
         </GoogleMap>
       </LoadScript>
