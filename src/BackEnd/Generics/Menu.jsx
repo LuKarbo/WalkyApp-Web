@@ -5,6 +5,7 @@ import SearchWalker from '../../Pages/User/SearchWalker';
 import WalkerProfile from '../../Pages/User/Walker/WalkerProfile';
 import MyTrips from '../../Pages/User/Client/MyTrips';
 import MyPets from '../../Pages/User/Client/MyPets';
+import MyReviews from '../../Pages/User/Client/MyReviews';
 import Tickets from '../../Pages/User/Tickets';
 import Settings from '../../Pages/User/Client/Settings';
 import JoinToUsFrom from '../../Pages/User/JoinToUs';
@@ -66,6 +67,8 @@ const SettingsView = () => <Settings/>;
 const JoinToUs = () => <JoinToUsFrom/>;
 const NotificationsView = () => <Notifications/>;
 
+const WalkerServiceView = () => <div className="p-6"><h2 className="text-xl font-bold">Mi Servicio</h2><p>Estadísticas y Configuración</p></div>;
+
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
 const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gestión de Usuarios</h2><p>Lista y administración de usuarios</p></div>;
@@ -76,7 +79,8 @@ const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">
 
 const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
 
-const MyReviews = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Reseñas</h2><p>Reseñas recibidas</p></div>;
+const MyReviewsView = () => <MyReviews/>;
+const WalkerReviews = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Reseñas</h2><p>Reseñas recibidas</p></div>;
 
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
@@ -99,10 +103,12 @@ export const menuComponents = {
     'my-pets': MyPetsView,
     'tickets': TicketsView,
     'join-to-us': JoinToUs,
-
+    'my-reviews': MyReviewsView,
+    
     // Paseador
-    'my-reviews': MyReviews,
+    'walker-reviews': WalkerReviews,
     'my-walks-walker': MyWalksWalker,
+    'walker-service': WalkerServiceView,
     
     // Soporte
     'active-walks': ActiveWalks,
@@ -136,6 +142,7 @@ export const menuItems = {
         { icon: FiSearch, label: "Buscar Paseador", id: "search-walker" },
         { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
         { icon: FiHeart, label: "Mis Mascotas", id: "my-pets" },
+        { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
         { icon: FiSend, label: "Ser Paseador", id: "join-to-us" },
         { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
         { icon: FiMessageSquare, label: "MapChat", id: "mapchat" },
@@ -143,9 +150,9 @@ export const menuItems = {
     
     // Menú para Paseador
     walker: [
+        { icon: FiTrendingUp, label: "Mi Servicio", id: "walker-service" },
         { icon: FiClock, label: "Mis Paseos", id: "my-walks-walker" },
-        { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
-        { icon: FiTrendingUp, label: "Estadísticas", id: "statistics" },
+        { icon: FiStar, label: "Mis Reseñas", id: "walker-reviews" },
         { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
     ],
     
@@ -171,6 +178,7 @@ const menuTitles = {
     'search-walker': 'Buscar Paseador',
 
     'statistics': 'Estadísticas',
+    'walker-service': 'Mi Servicio',
     'users': 'Usuarios',
     'pets-by-user': 'Mascotas por Usuario',
     'walks-by-user': 'Paseos por Usuario',
@@ -183,6 +191,7 @@ const menuTitles = {
     'my-account-perms': 'Ser Paseador',
     'tickets': 'Consultas',
     'my-reviews': 'Mis Reseñas',
+    'walker-reviews': 'Mis Reseñas',
     'active-walks': 'Paseos Activos',
     'notifications': 'Mis Alertas',
     'profile': 'Mi Perfil',
