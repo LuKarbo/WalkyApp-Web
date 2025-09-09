@@ -11,7 +11,7 @@ const defaultCenter = {
   lng: -58.3816,
 };
 
-export default function Map() {
+export default function Map({ onPointAdded, onClear }) {
   const [path, setPath] = useState(() => {
     const saved = localStorage.getItem("ruta");
     return saved ? JSON.parse(saved) : [];
@@ -25,12 +25,26 @@ export default function Map() {
     setPath(newPath);
     setDirections(null); // reset al agregar un punto
     localStorage.setItem("ruta", JSON.stringify(newPath));
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: newPoint }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const address = results[0].formatted_address;
+        const record = {
+          time: new Date().toLocaleTimeString(),
+          address,
+          lat: newPoint.lat,
+          lng: newPoint.lng,
+        };
+        onPointAdded?.(record); //ejecuta callback si existe
+      }
+    });
   };
 
   const clearPath = () => {
     setPath([]);
     setDirections(null);
     localStorage.removeItem("ruta");
+    onClear?.(); //limpia lista de registros del paseo en chat map
   };
 
   // si tengo puntos guardados, centrar en el primero
@@ -44,7 +58,7 @@ export default function Map() {
           onClick={clearPath}
           className="bg-danger text-black px-3 py-1 rounded-md hover:bg-foreground"
         >
-          Borrar zona
+          Borrar Ruta
         </button>
       </div>
 
@@ -86,11 +100,10 @@ export default function Map() {
             />
           )}
 
-          {/* Marcador de inicio 
+          {/* Marcador de inicio */}
           {path.length > 0 && (
             <Marker
               position={path[0]}
-              label={{text: "Inicio", color: "#ffffff",fontWeight: "bold",}}
               icon="http://maps.google.com/mapfiles/ms/icons/green-dot.png"
             />
           )}
