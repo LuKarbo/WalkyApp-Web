@@ -90,8 +90,10 @@ const ChatMap = () => {
           {records.length === 0 ? (
             <p>No hay registros todavía.</p>
           ) : (
-            <ul className="space-y-2">
-              {records.map((r, i) => (
+            <ul className="space-y-2 max-h-50 overflow-y-auto">
+              {[...records]
+              .sort((a, b) => new Date(b.timeFull) - new Date(a.timeFull))  //le doy orden descendente a los registros de paseo
+              .map((r, i) => (
                 <li key={i} className="border-b pb-2">
                   <p className="text-sm text-gray-700">{r.time}</p>
                   <p className="text-base">{r.address}</p>

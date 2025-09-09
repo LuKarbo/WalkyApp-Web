@@ -31,6 +31,7 @@ export default function Map({ onPointAdded, onClear }) {
         const address = results[0].formatted_address;
         const record = {
           time: new Date().toLocaleTimeString(),
+          timeFull: new Date().toISOString(),
           address,
           lat: newPoint.lat,
           lng: newPoint.lng,
@@ -46,6 +47,8 @@ export default function Map({ onPointAdded, onClear }) {
     localStorage.removeItem("ruta");
     onClear?.(); //limpia lista de registros del paseo en chat map
   };
+
+
 
   // si tengo puntos guardados, centrar en el primero
   const center = path.length > 0 ? path[0] : defaultCenter;
