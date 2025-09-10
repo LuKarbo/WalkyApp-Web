@@ -11,6 +11,7 @@ import Settings from '../../Pages/User/Client/Settings';
 import JoinToUsFrom from '../../Pages/User/JoinToUs';
 import Notifications from '../../Pages/User/Client/MyNotifications'
 import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
+import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
 
 import {
     FiHome,
@@ -68,6 +69,7 @@ const JoinToUs = () => <JoinToUsFrom/>;
 const NotificationsView = () => <Notifications/>;
 
 const WalkerServiceView = () => <div className="p-6"><h2 className="text-xl font-bold">Mi Servicio</h2><p>Estadísticas y Configuración</p></div>;
+const WalkerReviewsView = () => <WalkerReviews/>;
 
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
@@ -80,7 +82,6 @@ const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">
 const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
 
 const MyReviewsView = () => <MyReviews/>;
-const WalkerReviews = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Reseñas</h2><p>Reseñas recibidas</p></div>;
 
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
@@ -106,7 +107,7 @@ export const menuComponents = {
     'my-reviews': MyReviewsView,
     
     // Paseador
-    'walker-reviews': WalkerReviews,
+    'walker-reviews': WalkerReviewsView,
     'my-walks-walker': MyWalksWalker,
     'walker-service': WalkerServiceView,
     
