@@ -12,6 +12,7 @@ import JoinToUsFrom from '../../Pages/User/JoinToUs';
 import Notifications from '../../Pages/User/Client/MyNotifications'
 import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
 import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
+import WalkerServic from '../../Pages/User/Walker/WalkerService' 
 
 import {
     FiHome,
@@ -68,7 +69,7 @@ const SettingsView = () => <Settings/>;
 const JoinToUs = () => <JoinToUsFrom/>;
 const NotificationsView = () => <Notifications/>;
 
-const WalkerServiceView = () => <div className="p-6"><h2 className="text-xl font-bold">Mi Servicio</h2><p>Estadísticas y Configuración</p></div>;
+const WalkerServiceView = () => <WalkerServic/>;
 const WalkerReviewsView = () => <WalkerReviews/>;
 
 // Componentes Ejemplo
