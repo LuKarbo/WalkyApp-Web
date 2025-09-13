@@ -1,4 +1,3 @@
-// WalkerDataAccess.js
 import { WalkerAPI } from "../API/WalkerAPI.js";
 
 export const WalkerDataAccess = {
@@ -8,5 +7,13 @@ export const WalkerDataAccess = {
 
     async getWalkerById(id) {
         return await WalkerAPI.getWalkerById(id);
+    },
+
+    async getWalkerSettings(walkerId) {
+        return await WalkerAPI.getWalkerSettings(walkerId);
+    },
+
+    async updateWalkerSettings(walkerId, settings) {
+        return await WalkerAPI.updateWalkerSettings(walkerId, settings);
     }
 };

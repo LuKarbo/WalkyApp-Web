@@ -5,10 +5,14 @@ import SearchWalker from '../../Pages/User/SearchWalker';
 import WalkerProfile from '../../Pages/User/Walker/WalkerProfile';
 import MyTrips from '../../Pages/User/Client/MyTrips';
 import MyPets from '../../Pages/User/Client/MyPets';
+import MyReviews from '../../Pages/User/Client/MyReviews';
 import Tickets from '../../Pages/User/Tickets';
 import Settings from '../../Pages/User/Client/Settings';
 import JoinToUsFrom from '../../Pages/User/JoinToUs';
 import Notifications from '../../Pages/User/Client/MyNotifications'
+import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
+import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
+import WalkerServic from '../../Pages/User/Walker/WalkerService' 
 
 import {
     FiHome,
@@ -40,7 +44,7 @@ const WalkerProfileView = ({ contentParams }) => {
 
 const MyTripsView = () => <MyTrips/>;
 
-const MyWalksWalker = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Paseos</h2><p>Se podran ver: Nuevas solicitudes, paseos activos, paseos agendados, etc</p></div>;
+const MyWalksWalker = () => <WalkerWalks/>;
 
 const Trip = ({ contentParams }) => {
     const { tripId } = contentParams || {}; 
@@ -65,6 +69,8 @@ const SettingsView = () => <Settings/>;
 const JoinToUs = () => <JoinToUsFrom/>;
 const NotificationsView = () => <Notifications/>;
 
+const WalkerServiceView = () => <WalkerServic/>;
+const WalkerReviewsView = () => <WalkerReviews/>;
 
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
@@ -75,9 +81,8 @@ const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl f
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
 const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
-const MyAccountPerms = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitar Permisos</h2><p>Solicitudes de permisos especiales</p></div>;
 
-const MyReviews = () => <div className="p-6"><h2 className="text-xl font-bold">Mis Reseñas</h2><p>Reseñas recibidas</p></div>;
+const MyReviewsView = () => <MyReviews/>;
 
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
@@ -98,13 +103,14 @@ export const menuComponents = {
     'search-walker': SearchWalkerView,
     'my-walks': MyTripsView,
     'my-pets': MyPetsView,
-    'my-account-perms': MyAccountPerms,
     'tickets': TicketsView,
     'join-to-us': JoinToUs,
-
+    'my-reviews': MyReviewsView,
+    
     // Paseador
-    'my-reviews': MyReviews,
+    'walker-reviews': WalkerReviewsView,
     'my-walks-walker': MyWalksWalker,
+    'walker-service': WalkerServiceView,
     
     // Soporte
     'active-walks': ActiveWalks,
@@ -138,6 +144,7 @@ export const menuItems = {
         { icon: FiSearch, label: "Buscar Paseador", id: "search-walker" },
         { icon: FiClock, label: "Mis Paseos", id: "my-walks" },
         { icon: FiHeart, label: "Mis Mascotas", id: "my-pets" },
+        { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
         { icon: FiSend, label: "Ser Paseador", id: "join-to-us" },
         { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
         { icon: FiMessageSquare, label: "MapChat", id: "mapchat" },
@@ -145,9 +152,9 @@ export const menuItems = {
     
     // Menú para Paseador
     walker: [
+        { icon: FiTrendingUp, label: "Mi Servicio", id: "walker-service" },
         { icon: FiClock, label: "Mis Paseos", id: "my-walks-walker" },
-        { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
-        { icon: FiTrendingUp, label: "Estadísticas", id: "statistics" },
+        { icon: FiStar, label: "Mis Reseñas", id: "walker-reviews" },
         { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
     ],
     
@@ -173,6 +180,7 @@ const menuTitles = {
     'search-walker': 'Buscar Paseador',
 
     'statistics': 'Estadísticas',
+    'walker-service': 'Mi Servicio',
     'users': 'Usuarios',
     'pets-by-user': 'Mascotas por Usuario',
     'walks-by-user': 'Paseos por Usuario',
@@ -185,6 +193,7 @@ const menuTitles = {
     'my-account-perms': 'Ser Paseador',
     'tickets': 'Consultas',
     'my-reviews': 'Mis Reseñas',
+    'walker-reviews': 'Mis Reseñas',
     'active-walks': 'Paseos Activos',
     'notifications': 'Mis Alertas',
     'profile': 'Mi Perfil',

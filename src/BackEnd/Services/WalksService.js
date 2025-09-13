@@ -213,8 +213,8 @@ export const WalksService = {
             'Esperando pago': ['Agendado'],
             'Agendado': ['Activo'],
             'Activo': ['Finalizado'],
-            'Finalizado': [], // Estado final
-            'Rechazado': [] // Estado final
+            'Finalizado': ['Finalizado'],
+            'Rechazado': ['Rechazado']
         };
 
         if (!validTransitions[currentStatus] || !validTransitions[currentStatus].includes(newStatus)) {
