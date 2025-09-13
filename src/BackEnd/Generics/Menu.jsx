@@ -14,6 +14,7 @@ import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
 import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
 import WalkerServic from '../../Pages/User/Walker/WalkerService' 
 import WalkView from '../../Pages/User/WalkView/View/WalkView' 
+import AdminWalksView from '../../Pages/Admin/WalksView/AdminWalksView'
 
 import {
     FiHome,
@@ -63,6 +64,7 @@ const NotificationsView = () => <Notifications/>;
 
 const WalkerServiceView = () => <WalkerServic/>;
 const WalkerReviewsView = () => <WalkerReviews/>;
+const AdminWalks = () => <AdminWalksView/>
 
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
@@ -105,7 +107,7 @@ export const menuComponents = {
     'walker-service': WalkerServiceView,
     
     // Soporte
-    'active-walks': ActiveWalks,
+    'active-walks': AdminWalks,
     
     // General
     'walker-profile': WalkerProfileView,
