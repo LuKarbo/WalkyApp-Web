@@ -212,6 +212,10 @@ export const getAllMenuItemsByRole = (role) => {
     const roleMenuItems = getMenuItemsByRole(role);
     const commonItems = getCommonMenuItems();
     
+    if(role == "support" || role == "admin"){
+        return{roleItems: roleMenuItems}
+    }
+
     return {
         roleItems: roleMenuItems,
         commonItems: commonItems
