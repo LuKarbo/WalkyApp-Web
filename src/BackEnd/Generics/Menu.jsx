@@ -15,6 +15,7 @@ import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
 import WalkerServic from '../../Pages/User/Walker/WalkerService' 
 import WalkView from '../../Pages/User/WalkView/View/WalkView' 
 import AdminWalksView from '../../Pages/Admin/WalksView/AdminWalksView'
+import TicketsAdminView from '../../Pages/Admin/TicketsView/TicketsAdminView'
 
 import {
     FiHome,
@@ -61,10 +62,11 @@ const TicketsView = () => <Tickets/>;
 const SettingsView = () => <Settings/>;
 const JoinToUs = () => <JoinToUsFrom/>;
 const NotificationsView = () => <Notifications/>;
-
 const WalkerServiceView = () => <WalkerServic/>;
 const WalkerReviewsView = () => <WalkerReviews/>;
 const AdminWalks = () => <AdminWalksView/>
+const TicketsGeneral = () => <TicketsAdminView/>;
+const MyReviewsView = () => <MyReviews/>;
 
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
@@ -74,9 +76,6 @@ const WalksByUser = () => <div className="p-6"><h2 className="text-xl font-bold"
 const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitudes de Alta</h2><p>Solicitudes pendientes de aprobación</p></div>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
-const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
-
-const MyReviewsView = () => <MyReviews/>;
 
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 

@@ -127,6 +127,18 @@ export const TicketAPI = {
         return tickets.filter(ticket => ticket.userId === userId);
     },
 
+    async getAllTickets() {
+        const allTickets = [];
+        const userIds = [1, 2, 3, 4, 5];
+        
+        for (const userId of userIds) {
+            const userTickets = await this.getTicketsByUser(userId);
+            allTickets.push(...userTickets);
+        }
+        
+        return allTickets;
+    },
+
     async createTicket(ticketData) {
         
         const newTicket = {
@@ -142,5 +154,108 @@ export const TicketAPI = {
 
         
         return newTicket;
+    },
+
+    async respondToTicket(ticketId, responseData) {
+        try {
+            
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            if (!ticketId) {
+                throw new Error("Ticket ID is required");
+            }
+
+            if (!responseData.content || !responseData.content.trim()) {
+                throw new Error("Response content is required");
+            }
+
+            if (!responseData.agentName || !responseData.agentName.trim()) {
+                throw new Error("Agent name is required");
+            }
+
+            if (!responseData.status) {
+                throw new Error("Status is required");
+            }
+
+            const updatedTicket = {
+                id: ticketId,
+                status: responseData.status,
+                updatedAt: new Date().toISOString(),
+                response: {
+                    agentName: responseData.agentName.trim(),
+                    date: new Date().toISOString(),
+                    content: responseData.content.trim()
+                }
+            };
+
+            if (responseData.status === "Cancelada") {
+                updatedTicket.cancellationReason = responseData.content.trim();
+            }
+
+            console.log("Ticket response simulated successfully:", {
+                ticketId,
+                status: responseData.status,
+                agentName: responseData.agentName,
+                contentLength: responseData.content.length,
+                timestamp: new Date().toISOString()
+            });
+
+            return {
+                success: true,
+                message: "Response sent successfully",
+                ticket: updatedTicket,
+                timestamp: new Date().toISOString()
+            };
+
+        } catch (error) {
+            console.error("Error responding to ticket:", error);
+            throw new Error(`Failed to respond to ticket: ${error.message}`);
+        }
+    },
+
+    async getTicketStatistics() {
+        try {
+            const allTickets = await this.getAllTickets();
+            
+            const stats = {
+                total: allTickets.length,
+                pending: allTickets.filter(t => t.status === "En Espera").length,
+                resolved: allTickets.filter(t => t.status === "Resuelto").length,
+                cancelled: allTickets.filter(t => t.status === "Cancelada").length,
+                byCategory: {},
+                averageResponseTime: 0
+            };
+
+            allTickets.forEach(ticket => {
+                const category = ticket.category;
+                if (!stats.byCategory[category]) {
+                    stats.byCategory[category] = {
+                        total: 0,
+                        pending: 0,
+                        resolved: 0,
+                        cancelled: 0
+                    };
+                }
+                stats.byCategory[category].total++;
+                stats.byCategory[category][ticket.status.toLowerCase() === "en espera" ? "pending" : 
+                                            ticket.status.toLowerCase() === "resuelto" ? "resolved" : "cancelled"]++;
+            });
+
+            const resolvedTickets = allTickets.filter(t => t.status === "Resuelto" && t.response);
+            if (resolvedTickets.length > 0) {
+                const totalResponseTime = resolvedTickets.reduce((acc, ticket) => {
+                    const created = new Date(ticket.createdAt);
+                    const resolved = new Date(ticket.updatedAt);
+                    return acc + (resolved - created) / (1000 * 60 * 60); // en horas
+                }, 0);
+                stats.averageResponseTime = Math.round(totalResponseTime / resolvedTickets.length);
+            }
+
+            return stats;
+
+        } catch (error) {
+            console.error("Error getting ticket statistics:", error);
+            throw new Error("Failed to get ticket statistics");
+        }
     }
 };
