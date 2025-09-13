@@ -7,10 +7,10 @@ export const UserAPI = {
         // return await res.json();
 
         return {
-            id: 2,
+            id: 1,
             name: "John Doe",
             email: "asd@gmail.com",
-            role: "walker",
+            role: "client",
             profileImage:
                 "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
             suscription: "Client",
@@ -28,7 +28,7 @@ export const UserAPI = {
             id,
             name: profileData.name,
             email: "asd@gmail.com",
-            role: "walker",
+            role: "client",
             profileImage: profileData.avatar,
             phone: profileData.phone,
             location: profileData.location,

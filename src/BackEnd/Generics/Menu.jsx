@@ -13,6 +13,7 @@ import Notifications from '../../Pages/User/Client/MyNotifications'
 import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
 import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
 import WalkerServic from '../../Pages/User/Walker/WalkerService' 
+import WalkView from '../../Pages/User/WalkView/View/WalkView' 
 
 import {
     FiHome,
@@ -46,18 +47,9 @@ const MyTripsView = () => <MyTrips/>;
 
 const MyWalksWalker = () => <WalkerWalks/>;
 
-const Trip = ({ contentParams }) => {
-    const { tripId } = contentParams || {}; 
-    return (
-        <div className="p-6">
-            <h2 className="text-xl font-bold">
-                Info del Paseo {tripId}
-            </h2>
-            <p>
-                asdasdasdads
-            </p>
-        </div>
-    );
+const WalkViewComplete = ({ contentParams }) => {
+    console.log({ contentParams })
+    return <WalkView id={contentParams} />
 };
 
 const UserProfile = () => <MyProfile/>;
@@ -117,7 +109,7 @@ export const menuComponents = {
     
     // General
     'walker-profile': WalkerProfileView,
-    'trip': Trip,
+    'trip': WalkViewComplete,
     'mapchat': MapChatView,
 
     'notifications': NotificationsView,

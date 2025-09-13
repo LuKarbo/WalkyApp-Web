@@ -4,10 +4,10 @@ export const AuthAPI = {
 
         if (credentials.email === "asd@gmail.com" && credentials.password === "12345678") {
             return {
-                id: 2,
+                id: 1,
                 name: "John Doe",
                 email: "asd@gmail.com",
-                role: "walker",
+                role: "client",
                 profileImage:
                     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
                 suscription: "Client",
@@ -25,10 +25,10 @@ export const AuthAPI = {
         console.log("Simulando llamada API register:", data);
 
         return {
-            id: 2,
+            id: 1,
             name: "John Doe",
             email: "asd@gmail.com",
-            role: "walker",
+            role: "client",
             profileImage:
                 "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
             suscription: "Client",
@@ -45,10 +45,10 @@ export const AuthAPI = {
 
         if (token === "fake-jwt-token" || token === "fake-jwt-token-new") {
             return {
-                id: 2,
+                id: 1,
                 name: "John Doe",
                 email: "asd@gmail.com",
-                role: "walker",
+                role: "client",
                 profileImage:
                     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
                 suscription: "Client",
