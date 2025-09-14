@@ -1,53 +1,55 @@
-// EJEMPLO
+import { AuthAPI } from './AuthAPI.js';
+
 export const UserAPI = {
+    async getAllUsers() {
+        console.log("UsersAPI - Obteniendo todos los usuarios");
+        return await AuthAPI.getAllUsers();
+    },
+
     async getUserById(id) {
-        //// Se Simula la llamda a la API
-        // const res = await fetch(`/api/users/${id}`);
-        // if (!res.ok) throw new Error("Error fetching user");
-        // return await res.json();
-
-        return {
-            id: 1,
-            name: "John Doe",
-            email: "asd@gmail.com",
-            role: "admin",
-            profileImage:
-                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-            suscription: "Client",
-            phone: "+1234567890",
-            location: "Buenos Aires, Argentina",
-            joinedDate: new Date().toISOString(),
-            token: "fake-jwt-token",
-        };
-    },
-
-    async updateUserProfile(id, profileData) {
-        console.log("UserAPI - Actualizando perfil:", { id, profileData });
-
-        return {
-            id,
-            name: profileData.name,
-            email: "asd@gmail.com",
-            role: "admin",
-            profileImage: profileData.avatar,
-            phone: profileData.phone,
-            location: profileData.location,
-            updatedAt: new Date().toISOString()
-        };
-    },
-
-    async changeUserPassword(id, passwordData) {
-
-        console.log("UserAPI - Cambiando contraseña:", { id, passwordData });
-
-        if (passwordData.currentPassword !== "12345678") {
-            throw new Error("Contraseña actual incorrecta");
+        console.log("UsersAPI - Obteniendo usuario por ID:", id);
+        const users = await AuthAPI.getAllUsers();
+        const user = users.find(u => u.id === id);
+        
+        if (!user) {
+            throw new Error("Usuario no encontrado");
         }
         
-        return {
-            success: true,
-            message: "Contraseña actualizada correctamente",
-            updatedAt: new Date().toISOString()
+        return user;
+    },
+
+    async updateUser(id, userData) {
+        console.log("UsersAPI - Actualizando usuario:", { id, userData });
+        return await AuthAPI.updateUser(id, userData);
+    },
+
+    async deleteUser(id) {
+        console.log("UsersAPI - Eliminando usuario:", id);
+        return await AuthAPI.deleteUser(id);
+    },
+
+    async getUserStats() {
+        console.log("UsersAPI - Obteniendo estadísticas de usuarios");
+        const users = await AuthAPI.getAllUsers();
+        
+        const stats = {
+            total: users.length,
+            active: users.filter(u => u.status === 'active').length,
+            inactive: users.filter(u => u.status === 'inactive').length,
+            byRole: {
+                admin: users.filter(u => u.role === 'admin').length,
+                client: users.filter(u => u.role === 'client').length,
+                walker: users.filter(u => u.role === 'walker').length,
+                support: users.filter(u => u.role === 'support').length
+            },
+            recentJoins: users.filter(u => {
+                const joinDate = new Date(u.joinedDate);
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                return joinDate > thirtyDaysAgo;
+            }).length
         };
+
+        return stats;
     }
 };

@@ -1,17 +1,23 @@
-// EJEMPLO
-// Simplemente es el pasamanos entre el Front y el Service
 import { UserService } from "../Services/UserService.js";
 
 export const UserController = {
-    async fetchUserProfile(id) {
-        return await UserService.getUserProfile(id);
+    async fetchAllUsers() {
+        return await UserService.getAllUsers();
     },
 
-    async updateUserProfile(id, profileData) {
-        return await UserService.updateUserProfile(id, profileData);
+    async fetchUserById(id) {
+        return await UserService.getUserById(id);
     },
 
-    async changeUserPassword(id, passwordData) {
-        return await UserService.changeUserPassword(id, passwordData);
+    async updateUser(id, userData) {
+        return await UserService.updateUser(id, userData);
+    },
+
+    async deleteUser(id) {
+        return await UserService.deleteUser(id);
+    },
+
+    async fetchUserStats() {
+        return await UserService.getUserStats();
     }
 };

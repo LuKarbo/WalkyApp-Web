@@ -18,6 +18,7 @@ import SupportWalksView from '../../Pages/Admin/WalksView/AdminWalksView'
 import TicketsAdminView from '../../Pages/Admin/TicketsView/TicketsAdminView'
 import AdminWalks from '../../Pages/Admin/AdminWalks/AdminWalks'
 import AdminPet from '../../Pages/Admin/AdminPet/AdminPet'
+import AdminUsers from '../../Pages/Admin/AdminUsers/AdminUsers'
 
 import {
     FiHome,
@@ -71,22 +72,20 @@ const TicketsGeneral = () => <TicketsAdminView/>;
 const MyReviewsView = () => <MyReviews/>;
 const AdminWalksView = () => <AdminWalks/>
 const AdminPetView = () => <AdminPet/>;
+const AdminUserView = () => <AdminUsers/>;
 
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
-const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gestión de Usuarios</h2><p>Lista y administración de usuarios</p></div>;
 const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitudes de Alta</h2><p>Solicitudes pendientes de aprobación</p></div>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
-
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
-
 
 // Mapeo de componentes
 export const menuComponents = {
     // Admin
     'statistics': Statistics,
-    'users': Users,
+    'users': AdminUserView,
     'admin-pet': AdminPetView,
     'admin-walks': AdminWalksView,
     'registration-requests': RegistrationRequests,
@@ -108,7 +107,6 @@ export const menuComponents = {
     'walker-service': WalkerServiceView,
     
     // Soporte
-    'active-walks': ActiveWalks,
     'active-walks': SupportWalks,
     
     // General
@@ -161,12 +159,33 @@ export const menuItems = {
     ],
 };
 
-export const commonMenuItems = [
-    { icon: FiEdit, label: "Mi Perfil", id: "profile" },
-    { icon: FiBell, label: "Alertas", id: "notifications" },
-    { icon: FiSettings, label: "Ajustes", id: "settings" },
-    { icon: FiLogOut, label: "Logout", id: "logout" },
-];
+// Elementos comunes por rol (diferentes según necesidades)
+export const commonMenuItemsByRole = {
+    admin: [
+        { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+        { icon: FiBell, label: "Alertas", id: "notifications" },
+        { icon: FiSettings, label: "Ajustes", id: "settings" },
+        { icon: FiLogOut, label: "Logout", id: "logout" },
+    ],
+    support: [
+        { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+        { icon: FiBell, label: "Alertas", id: "notifications" },
+        { icon: FiSettings, label: "Ajustes", id: "settings" },
+        { icon: FiLogOut, label: "Logout", id: "logout" },
+    ],
+    client: [
+        { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+        { icon: FiBell, label: "Alertas", id: "notifications" },
+        { icon: FiSettings, label: "Ajustes", id: "settings" },
+        { icon: FiLogOut, label: "Logout", id: "logout" },
+    ],
+    walker: [
+        { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+        { icon: FiBell, label: "Alertas", id: "notifications" },
+        { icon: FiSettings, label: "Ajustes", id: "settings" },
+        { icon: FiLogOut, label: "Logout", id: "logout" },
+    ],
+};
 
 const menuTitles = {
     'home': 'Home',
@@ -208,16 +227,17 @@ export const getMenuItemsByRole = (role) => {
     return menuItems[role] || menuItems.client;
 };
 
-export const getCommonMenuItems = () => {
-    return commonMenuItems;
+export const getCommonMenuItems = (role) => {
+    return commonMenuItemsByRole[role] || commonMenuItemsByRole.client;
 };
 
 export const getAllMenuItemsByRole = (role) => {
     const roleMenuItems = getMenuItemsByRole(role);
     const commonItems = getCommonMenuItems();
     
-    if(role == "support" || role == "admin"){
-        return{roleItems: roleMenuItems}
+    if(role === "support" || role === "admin"){
+        const extras = commonItems.filter(item => item.id === "logout" || item.id === "profile");
+        return {roleItems: roleMenuItems, commonItems: extras}
     }
 
     return {

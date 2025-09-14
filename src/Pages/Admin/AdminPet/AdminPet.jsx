@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FiUsers, FiHeart } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
 import { PetsController } from '../../../BackEnd/Controllers/PetsController';
+import { UserController } from '../../../BackEnd/Controllers/UserController';
 
 import AdminPetsHeaderComponent from '../Components/AdminPetsComponents/AdminPetsHeaderComponent';
 import AdminPetsCardComponent from '../Components/AdminPetsComponents/AdminPetsCardComponent';
@@ -22,38 +23,44 @@ const AdminPets = () => {
     const [selectedPet, setSelectedPet] = useState(null);
 
     useEffect(() => {
-        const loadAllPets = async () => {
+        const loadData = async () => {
             try {
                 setLoading(true);
                 setError(null);
                 
-                const allPets = await getAllPetsFromAllOwners();
+                // Cargar usuarios primero
+                const allUsers = await UserController.fetchAllUsers();
+                
+                // Obtener todas las mascotas de todos los usuarios
+                const allPets = await getAllPetsFromAllOwners(allUsers);
                 setPets(allPets);
             } catch (err) {
-                setError('Error loading pets: ' + err.message);
-                console.error('Error loading pets:', err);
+                setError('Error loading data: ' + err.message);
+                console.error('Error loading data:', err);
             } finally {
                 setLoading(false);
             }
         };
 
-        loadAllPets();
+        loadData();
     }, [refreshTrigger]);
 
-    const getAllPetsFromAllOwners = async () => {
+    const getAllPetsFromAllOwners = async (usersList) => {
         try {
-            // Simulo el controller para obtener los usuarios
-            const ownerIds = [1, 2, 3];
-            const allPetsPromises = ownerIds.map(async (ownerId) => {
+            const usersWithPets = usersList.filter(user => 
+                ['client', 'walker', 'admin'].includes(user.role)
+            );
+            
+            const allPetsPromises = usersWithPets.map(async (user) => {
                 try {
-                    const pets = await PetsController.fetchPetsByOwner(ownerId);
+                    const pets = await PetsController.fetchPetsByOwner(user.id);
                     return pets.map(pet => ({
                         ...pet,
-                        ownerId: ownerId,
-                        ownerName: getOwnerName(ownerId)
+                        ownerId: user.id,
+                        ownerName: user.fullName
                     }));
                 } catch (error) {
-                    console.warn(`No pets found for owner ${ownerId}`);
+                    console.warn(`No pets found for user ${user.id} (${user.fullName})`);
                     return [];
                 }
             });
@@ -61,18 +68,8 @@ const AdminPets = () => {
             const allPetsArrays = await Promise.all(allPetsPromises);
             return allPetsArrays.flat();
         } catch (error) {
-            throw new Error('Failed to fetch all pets');
+            throw new Error('Failed to fetch all pets: ' + error.message);
         }
-    };
-
-    // Simulo el controller para obtener los usuarios
-    const getOwnerName = (ownerId) => {
-        const ownerNames = {
-            1: "María González",
-            2: "Carlos Rodríguez", 
-            3: "Ana Martínez"
-        };
-        return ownerNames[ownerId] || `Usuario ${ownerId}`;
     };
 
     const handleEditPet = (pet) => {
@@ -207,7 +204,10 @@ const AdminPets = () => {
                                 No se encontraron mascotas
                             </p>
                             <p className="text-accent dark:text-muted">
-                                Ajusta los filtros para ver más resultados
+                                {pets.length === 0 
+                                    ? "No hay mascotas registradas en el sistema"
+                                    : "Ajusta los filtros para ver más resultados"
+                                }
                             </p>
                         </div>
                     </div>

@@ -43,7 +43,7 @@ export const JoinToUsAPI = {
         },
         {
             id: 'REG-1704153600000-456',
-            userId: 3,
+            userId: 6,
             fullName: 'Ana Martinez',
             phone: '1145678901',
             dni: '23456789',
