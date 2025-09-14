@@ -1,4 +1,9 @@
+import { useState } from "react";
+
 const WalkData = ({ records }) => {
+
+ 
+
   return (
     <div className="bg-foreground rounded-2xl shadow-md p-4 border border-border text-black flex-grow overflow-y-auto">
       <h3 className="font-bold mb-2">Seguimiento del paseo</h3>
