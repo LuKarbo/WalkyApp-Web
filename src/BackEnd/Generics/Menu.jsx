@@ -17,7 +17,7 @@ import WalkView from '../../Pages/User/WalkView/View/WalkView'
 import SupportWalksView from '../../Pages/Admin/WalksView/AdminWalksView'
 import TicketsAdminView from '../../Pages/Admin/TicketsView/TicketsAdminView'
 import AdminWalks from '../../Pages/Admin/AdminWalks/AdminWalks'
-import AdminPetView from '../../Pages/Admin/AdminPet/AdminPet'
+import AdminPet from '../../Pages/Admin/AdminPet/AdminPet'
 
 import {
     FiHome,
