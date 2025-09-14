@@ -103,12 +103,12 @@ const Navbar = ({
             ))}
 
             {/* Separador solo si hay elementos comunes */}
-            {commonItems.length > 0 && (
+            {commonItems?.length > 0 && (
                 <div className="border-t border-border dark:border-accent my-4"></div>
             )}
 
             {/* Elementos comunes */}
-            {commonItems.map((item) => (
+            {commonItems?.map((item) => (
             <button
                 key={item.id}
                 onClick={() => handleMenuClick(item.id)}

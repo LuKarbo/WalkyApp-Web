@@ -64,7 +64,6 @@ const TicketsView = () => <Tickets/>;
 const SettingsView = () => <Settings/>;
 const JoinToUs = () => <JoinToUsFrom/>;
 const NotificationsView = () => <Notifications/>;
-
 const WalkerServiceView = () => <WalkerServic/>;
 const WalkerReviewsView = () => <WalkerReviews/>;
 const SupportWalks = () => <SupportWalksView/>
@@ -79,9 +78,6 @@ const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gesti
 const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitudes de Alta</h2><p>Solicitudes pendientes de aprobación</p></div>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
-const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
-
-const MyReviewsView = () => <MyReviews/>;
 
 const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
@@ -220,6 +216,10 @@ export const getAllMenuItemsByRole = (role) => {
     const roleMenuItems = getMenuItemsByRole(role);
     const commonItems = getCommonMenuItems();
     
+    if(role == "support" || role == "admin"){
+        return{roleItems: roleMenuItems}
+    }
+
     return {
         roleItems: roleMenuItems,
         commonItems: commonItems
