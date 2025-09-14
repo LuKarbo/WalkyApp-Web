@@ -14,8 +14,10 @@ import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
 import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
 import WalkerServic from '../../Pages/User/Walker/WalkerService' 
 import WalkView from '../../Pages/User/WalkView/View/WalkView' 
-import AdminWalksView from '../../Pages/Admin/WalksView/AdminWalksView'
+import SupportWalksView from '../../Pages/Admin/WalksView/AdminWalksView'
 import TicketsAdminView from '../../Pages/Admin/TicketsView/TicketsAdminView'
+import AdminWalks from '../../Pages/Admin/AdminWalks/AdminWalks'
+import AdminPetView from '../../Pages/Admin/AdminPet/AdminPet'
 
 import {
     FiHome,
@@ -64,15 +66,15 @@ const JoinToUs = () => <JoinToUsFrom/>;
 const NotificationsView = () => <Notifications/>;
 const WalkerServiceView = () => <WalkerServic/>;
 const WalkerReviewsView = () => <WalkerReviews/>;
-const AdminWalks = () => <AdminWalksView/>
+const SupportWalks = () => <SupportWalksView/>
 const TicketsGeneral = () => <TicketsAdminView/>;
 const MyReviewsView = () => <MyReviews/>;
+const AdminWalksView = () => <AdminWalks/>
+const AdminPetView = () => <AdminPet/>;
 
 // Componentes Ejemplo
 const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
 const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gestión de Usuarios</h2><p>Lista y administración de usuarios</p></div>;
-const PetsByUser = () => <div className="p-6"><h2 className="text-xl font-bold">Mascotas por Usuario</h2><p>Vista de mascotas registradas</p></div>;
-const WalksByUser = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos por Usuario</h2><p>Historial de paseos</p></div>;
 const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitudes de Alta</h2><p>Solicitudes pendientes de aprobación</p></div>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
@@ -85,8 +87,8 @@ export const menuComponents = {
     // Admin
     'statistics': Statistics,
     'users': Users,
-    'pets-by-user': PetsByUser,
-    'walks-by-user': WalksByUser,
+    'admin-pet': AdminPetView,
+    'admin-walks': AdminWalksView,
     'registration-requests': RegistrationRequests,
     'tickets-general': TicketsGeneral,
     'promotions': Promotions,
@@ -106,7 +108,8 @@ export const menuComponents = {
     'walker-service': WalkerServiceView,
     
     // Soporte
-    'active-walks': AdminWalks,
+    'active-walks': ActiveWalks,
+    'active-walks': SupportWalks,
     
     // General
     'walker-profile': WalkerProfileView,
@@ -123,12 +126,12 @@ export const menuItems = {
     // Menú para Administrador
     admin: [
         { icon: FiBarChart, label: "Estadísticas", id: "statistics" },
+        { icon: FiTool, label: "Admin Menu", id: "promotions" },
         { icon: FiUsers, label: "Usuarios", id: "users" },
-        { icon: FiHeart, label: "Mascotas por usuario", id: "pets-by-user" },
-        { icon: FiClock, label: "Paseos por usuario", id: "walks-by-user" },
+        { icon: FiClock, label: "Paseos", id: "admin-walks" },
+        { icon: FiHeart, label: "Mascotas", id: "admin-pet" },
         { icon: FiUserPlus, label: "Solicitudes de Alta", id: "registration-requests" },
         { icon: FiMail, label: "Consultas", id: "tickets-general" },
-        { icon: FiTool, label: "Admin Menu", id: "promotions" },
     ],
     
     // Menú para Cliente
@@ -175,8 +178,8 @@ const menuTitles = {
     'statistics': 'Estadísticas',
     'walker-service': 'Mi Servicio',
     'users': 'Usuarios',
-    'pets-by-user': 'Mascotas por Usuario',
-    'walks-by-user': 'Paseos por Usuario',
+    'admin-pet': 'Mascotas',
+    'admin-walks': 'Paseos',
     'registration-requests': 'Solicitudes de Alta',
     'tickets-general': 'Consultas',
     'promotions': 'Promociones',
