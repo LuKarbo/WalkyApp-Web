@@ -131,7 +131,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
                                     className={`max-w-[75%] rounded-lg p-3 shadow-sm ${
                                         isCurrentUser
                                             ? "bg-primary text-black rounded-br-sm"
-                                            : "bg-white text-gray-800 rounded-bl-sm border"
+                                            : "bg-foreground text-gray-800 rounded-bl-sm border"
                                     }`}
                                 >
                                     {/* Nombre del usuario (solo para mensajes de otros) */}
@@ -142,7 +142,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
                                     )}
                                     
                                     {/* Contenido del mensaje */}
-                                    <p className="break-words text-sm leading-relaxed">
+                                    <p className="break-words text-sm leading-relaxed text-secondary">
                                         {message.text}
                                     </p>
                                     
@@ -173,8 +173,8 @@ const WalkChat = ({ tripId, walkStatus }) => {
                     placeholder={isChatEnabled ? "Escribe tu mensaje..." : "Chat no disponible"}
                     disabled={sendingMessage || !isChatEnabled}
                     className="flex-1 px-4 py-2 rounded-full border border-gray-300
-                               bg-gray-50 text-black text-sm
-                               placeholder:text-gray-500
+                               bg-gray-50 text-primary text-sm
+                               placeholder:text-primary
                                focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
                                disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200"
                 />
