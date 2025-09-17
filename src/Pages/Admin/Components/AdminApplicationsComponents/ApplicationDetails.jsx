@@ -4,15 +4,15 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
     const getStatusIcon = (status) => {
         switch (status) {
             case 'pending':
-                return <FaClock className="text-warning" />;
+                return <FaClock className="text-orange-500" />;
             case 'under_review':
-                return <FaEye className="text-info" />;
+                return <FaEye className="text-blue-500" />;
             case 'approved':
-                return <FaCheckCircle className="text-success" />;
+                return <FaCheckCircle className="text-green-500" />;
             case 'rejected':
-                return <FaTimes className="text-danger" />;
+                return <FaTimes className="text-red-500" />;
             default:
-                return <FaClock className="text-warning" />;
+                return <FaClock className="text-orange-500" />;
         }
     };
 
@@ -29,15 +29,15 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'pending':
-                return 'text-warning bg-warning/10 border-warning/20';
+                return 'bg-orange-500/70 text-white';
             case 'under_review':
-                return 'text-info bg-info/10 border-info/20';
+                return 'bg-blue-500/70 text-white';
             case 'approved':
-                return 'text-success bg-success/10 border-success/20';
+                return 'bg-green-500/70 text-white';
             case 'rejected':
-                return 'text-danger bg-danger/10 border-danger/20';
+                return 'bg-red-500/70 text-white';
             default:
-                return 'text-warning bg-warning/10 border-warning/20';
+                return 'bg-orange-500/70 text-white';
         }
     };
 
@@ -62,53 +62,64 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
     ];
 
     return (
-        <div className="bg-card dark:bg-card/10 rounded-xl border border-border dark:border-muted">
-            <div className="p-6 border-b border-border dark:border-muted">
+        <div className="bg-white/80 dark:bg-foreground/80 backdrop-blur-sm rounded-2xl border border-primary/10 shadow-lg">
+            <div className="p-6 border-b border-primary/10">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-foreground dark:text-background">
-                        Detalles de la Solicitud
-                    </h2>
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(application.status)}`}>
+                    <div className="flex items-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                            <span className="text-white font-bold text-lg">
+                                {application.fullName?.[0] || 'A'}
+                            </span>
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-foreground dark:text-background">
+                                Detalles de la Solicitud
+                            </h2>
+                            <p className="text-sm text-accent dark:text-muted">
+                                ID: {application.id}
+                            </p>
+                        </div>
+                    </div>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-lg ${getStatusColor(application.status)}`}>
                         {getStatusIcon(application.status)}
-                        <span className="ml-2">
+                        <span className="ml-1">
                             {getStatusText(application.status)}
                         </span>
                     </span>
                 </div>
-                <p className="text-sm text-accent dark:text-muted">
-                    ID: {application.id}
-                </p>
             </div>
 
             <div className="p-6 space-y-6">
                 
                 <div>
                     <h3 className="text-lg font-semibold text-foreground dark:text-background mb-4 flex items-center">
-                        <FaUser className="mr-2 text-primary" />
+                        <div className="w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center mr-3">
+                            <FaUser className="text-indigo-600" size={16} />
+                        </div>
                         Información Personal
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-background dark:bg-foreground rounded-lg p-4">
-                            <label className="text-sm text-accent dark:text-muted">Nombre Completo</label>
-                            <p className="font-medium text-foreground dark:text-background">{application.fullName}</p>
+                        <div className="p-4 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
+                            <label className="text-sm text-indigo-600 font-medium">Nombre Completo</label>
+                            <p className="font-semibold text-foreground dark:text-background mt-1">{application.fullName}</p>
                         </div>
-                        <div className="bg-background dark:bg-foreground rounded-lg p-4">
-                            <label className="text-sm text-accent dark:text-muted flex items-center">
-                                <FaPhone className="mr-1" /> Teléfono
+                        <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                            <label className="text-sm text-purple-600 font-medium flex items-center">
+                                <FaPhone className="mr-1" size={12} /> Teléfono
                             </label>
-                            <p className="font-medium text-foreground dark:text-background">{application.phone}</p>
+                            <p className="font-semibold text-foreground dark:text-background mt-1">{application.phone}</p>
                         </div>
-                        <div className="bg-background dark:bg-foreground rounded-lg p-4">
-                            <label className="text-sm text-accent dark:text-muted flex items-center">
-                                <FaIdCard className="mr-1" /> DNI
+                        <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                            <label className="text-sm text-blue-600 font-medium flex items-center">
+                                <FaIdCard className="mr-1" size={12} /> DNI
                             </label>
-                            <p className="font-medium text-foreground dark:text-background">{application.dni}</p>
+                            <p className="font-semibold text-foreground dark:text-background mt-1">{application.dni}</p>
                         </div>
-                        <div className="bg-background dark:bg-foreground rounded-lg p-4">
-                            <label className="text-sm text-accent dark:text-muted flex items-center">
-                                <FaMapMarkerAlt className="mr-1" /> Ubicación
+                        <div className="p-4 bg-teal-500/10 rounded-lg border border-teal-500/20">
+                            <label className="text-sm text-teal-600 font-medium flex items-center">
+                                <FaMapMarkerAlt className="mr-1" size={12} /> Ubicación
                             </label>
-                            <p className="font-medium text-foreground dark:text-background">
+                            <p className="font-semibold text-foreground dark:text-background mt-1">
                                 {application.city}, {application.province}
                             </p>
                         </div>
@@ -117,36 +128,38 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
 
                 <div>
                     <h3 className="text-lg font-semibold text-foreground dark:text-background mb-4 flex items-center">
-                        <FaImage className="mr-2 text-primary" />
+                        <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center mr-3">
+                            <FaImage className="text-green-600" size={16} />
+                        </div>
                         Documentación
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {imageTypes.map((imageType) => (
-                            <div key={imageType.key} className="bg-background dark:bg-foreground rounded-lg p-4">
-                                <label className="text-sm text-accent dark:text-muted mb-2 block">
+                            <div key={imageType.key} className="bg-white/50 dark:bg-foreground/50 backdrop-blur-sm rounded-lg p-4 border border-gray-200/50">
+                                <label className="text-sm text-accent dark:text-muted mb-2 block font-medium">
                                     {imageType.label}
                                 </label>
                                 {application.images[imageType.key] ? (
                                     <div className="space-y-2">
-                                        <div className="bg-success/10 border border-success/20 rounded-lg p-2 text-center">
-                                            <FaCheckCircle className="text-success mx-auto mb-1" />
-                                            <p className="text-xs text-success">Imagen cargada</p>
+                                        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-2 text-center">
+                                            <FaCheckCircle className="text-green-500 mx-auto mb-1" />
+                                            <p className="text-xs text-green-600 font-medium">Imagen cargada</p>
                                         </div>
-                                        <div className="text-xs text-accent dark:text-muted">
-                                            <p>Archivo: {application.images[imageType.key].originalName}</p>
-                                            <p>Tamaño: {(application.images[imageType.key].size / 1024 / 1024).toFixed(2)} MB</p>
+                                        <div className="text-xs text-accent dark:text-muted space-y-1">
+                                            <p><strong>Archivo:</strong> {application.images[imageType.key].originalName}</p>
+                                            <p><strong>Tamaño:</strong> {(application.images[imageType.key].size / 1024 / 1024).toFixed(2)} MB</p>
                                         </div>
                                         <button 
                                             onClick={() => window.open(application.images[imageType.key].url, '_blank')}
-                                            className="w-full text-xs bg-primary text-white py-1 px-2 rounded hover:bg-primary/80 transition-colors"
+                                            className="w-full text-xs bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-2 px-3 rounded-lg hover:shadow-lg transition-all duration-300 font-medium"
                                         >
                                             Ver Imagen
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="bg-danger/10 border border-danger/20 rounded-lg p-2 text-center">
-                                        <FaTimes className="text-danger mx-auto mb-1" />
-                                        <p className="text-xs text-danger">No cargada</p>
+                                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-2 text-center">
+                                        <FaTimes className="text-red-500 mx-auto mb-1" />
+                                        <p className="text-xs text-red-600 font-medium">No cargada</p>
                                     </div>
                                 )}
                             </div>
@@ -156,20 +169,22 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
 
                 <div>
                     <h3 className="text-lg font-semibold text-foreground dark:text-background mb-4 flex items-center">
-                        <FaClock className="mr-2 text-primary" />
+                        <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center mr-3">
+                            <FaClock className="text-orange-600" size={16} />
+                        </div>
                         Cronología
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-background dark:bg-foreground rounded-lg p-4">
-                            <label className="text-sm text-accent dark:text-muted">Enviada</label>
-                            <p className="font-medium text-foreground dark:text-background">
+                        <div className="p-4 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                            <label className="text-sm text-orange-600 font-medium">Enviada</label>
+                            <p className="font-semibold text-foreground dark:text-background mt-1">
                                 {formatDate(application.submittedAt)}
                             </p>
                         </div>
                         {application.reviewedAt && (
-                            <div className="bg-background dark:bg-foreground rounded-lg p-4">
-                                <label className="text-sm text-accent dark:text-muted">Revisada</label>
-                                <p className="font-medium text-foreground dark:text-background">
+                            <div className="p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                                <label className="text-sm text-emerald-600 font-medium">Revisada</label>
+                                <p className="font-semibold text-foreground dark:text-background mt-1">
                                     {formatDate(application.reviewedAt)}
                                 </p>
                             </div>
@@ -180,14 +195,16 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
                 {application.applicationScore && (
                     <div>
                         <h3 className="text-lg font-semibold text-foreground dark:text-background mb-4 flex items-center">
-                            <FaStar className="mr-2 text-primary" />
+                            <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center mr-3">
+                                <FaStar className="text-yellow-600" size={16} />
+                            </div>
                             Puntuación de la Aplicación
                         </h3>
-                        <div className="bg-background dark:bg-foreground rounded-lg p-4">
+                        <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg border border-yellow-500/20">
                             <div className="flex items-center justify-between">
-                                <span className="text-accent dark:text-muted">Puntuación Final</span>
+                                <span className="text-yellow-600 font-medium">Puntuación Final</span>
                                 <div className="flex items-center">
-                                    <FaStar className="text-warning mr-1" />
+                                    <FaStar className="text-yellow-500 mr-1" />
                                     <span className="font-bold text-xl text-foreground dark:text-background">
                                         {application.applicationScore}/100
                                     </span>
@@ -202,13 +219,13 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
                         <h3 className="text-lg font-semibold text-foreground dark:text-background mb-4">
                             Notas del Administrador
                         </h3>
-                        <div className={`rounded-lg p-4 border ${
+                        <div className={`rounded-lg p-4 border backdrop-blur-sm ${
                             application.status === 'approved' 
-                                ? 'bg-success/10 border-success/20' 
-                                : 'bg-danger/10 border-danger/20'
+                                ? 'bg-green-500/10 border-green-500/20' 
+                                : 'bg-red-500/10 border-red-500/20'
                         }`}>
                             <p className={`${
-                                application.status === 'approved' ? 'text-success' : 'text-danger'
+                                application.status === 'approved' ? 'text-green-600' : 'text-red-600'
                             } font-medium`}>
                                 {application.adminNotes}
                             </p>
@@ -217,7 +234,7 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
                 )}
 
                 {canReview() && (
-                    <div className="border-t border-border dark:border-muted pt-6">
+                    <div className="border-t border-primary/10 pt-6">
                         <h3 className="text-lg font-semibold text-foreground dark:text-background mb-4">
                             Acciones de Revisión
                         </h3>
@@ -225,7 +242,7 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
                             <button
                                 onClick={() => onReviewStart('approve')}
                                 disabled={reviewing}
-                                className="flex-1 bg-gradient-to-r from-success to-success/80 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transform hover:scale-105"
                             >
                                 <FaCheckCircle className="mr-2" />
                                 {reviewing ? 'Procesando...' : 'Aprobar Solicitud'}
@@ -233,7 +250,7 @@ const ApplicationDetails = ({ application, onReviewStart, reviewing }) => {
                             <button
                                 onClick={() => onReviewStart('reject')}
                                 disabled={reviewing}
-                                className="flex-1 bg-gradient-to-r from-danger to-danger/80 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                className="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transform hover:scale-105"
                             >
                                 <FaTimes className="mr-2" />
                                 {reviewing ? 'Procesando...' : 'Rechazar Solicitud'}

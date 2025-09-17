@@ -140,32 +140,50 @@ const AdminApplicationsManagement = () => {
 
     if (loading) {
         return (
-            <div className="w-full h-full p-6 bg-background dark:bg-foreground flex items-center justify-center">
-                <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
-                    <span className="text-foreground dark:text-background">Cargando solicitudes...</span>
+            <div className="w-full min-h-screen p-6 bg-background dark:bg-foreground">
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    <p className="text-lg text-foreground dark:text-background ml-4">Cargando solicitudes...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="w-full h-full p-6 bg-background dark:bg-foreground">
-            <div className="max-w-7xl mx-auto">
-                
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <h1 className="text-4xl font-bold text-foreground dark:text-background">
-                                Gestión de Solicitudes
-                            </h1>
-                            <p className="text-lg text-accent dark:text-muted mt-2">
-                                Administra las solicitudes de paseadores
-                            </p>
+        <div className="w-full min-h-screen p-6 bg-background dark:bg-foreground">
+            <div className="mx-auto">
+                <header className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 p-8">
+                    <div className="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
+                    <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center">
+                                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mr-4">
+                                    <FaUsers className="text-white text-xl" />
+                                </div>
+                                <div>
+                                    <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                                        Gestión de Solicitudes
+                                    </h1>
+                                    <p className="text-white/80 text-sm mt-1">
+                                        Administra las solicitudes de paseadores
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                                <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                                    <div className="text-white/80 text-xs">Pendientes</div>
+                                    <div className="text-white font-bold text-lg">{stats.pending + stats.under_review}</div>
+                                </div>
+                                <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                                    <div className="text-white/80 text-xs">Aprobadas</div>
+                                    <div className="text-white font-bold text-lg">{stats.approved}</div>
+                                </div>
+                            </div>
                         </div>
                         
                         <div className="flex items-center space-x-2">
-                            <FaFilter className="text-accent dark:text-muted mr-2" />
+                            <FaFilter className="text-white/80 mr-2" />
                             {[
                                 { key: 'all', label: 'Todas', icon: FaUsers },
                                 { key: 'new', label: 'Nuevas', icon: FaClock },
@@ -175,35 +193,35 @@ const AdminApplicationsManagement = () => {
                                 <button
                                     key={filter.key}
                                     onClick={() => setActiveFilter(filter.key)}
-                                    className={`flex items-center px-4 py-2 rounded-lg transition-all duration-200 ${
+                                    className={`px-4 py-2.5 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
                                         activeFilter === filter.key
-                                            ? 'bg-primary text-white'
-                                            : 'bg-card dark:bg-card/10 text-foreground dark:text-background hover:bg-primary/10'
+                                            ? 'bg-white text-indigo-600 shadow-lg transform scale-105'
+                                            : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
                                     }`}
                                 >
-                                    <filter.icon className="mr-2" />
+                                    <filter.icon size={16} />
                                     {filter.label}
                                 </button>
                             ))}
                         </div>
                     </div>
+                </header>
 
-                    <ApplicationsStats stats={stats} />
-                </div>
+                <ApplicationsStats stats={stats} />
 
                 {errors.load && (
-                    <div className="mb-6 p-4 bg-danger/10 border border-danger/30 rounded-xl text-danger">
+                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 backdrop-blur-sm">
                         {errors.load}
                     </div>
                 )}
 
                 {errors.review && (
-                    <div className="mb-6 p-4 bg-danger/10 border border-danger/30 rounded-xl text-danger">
+                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 backdrop-blur-sm">
                         {errors.review}
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
                     <div className="lg:col-span-1">
                         <ApplicationsList
@@ -214,7 +232,7 @@ const AdminApplicationsManagement = () => {
                         />
                     </div>
 
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-2">
                         {selectedApplication ? (
                             <ApplicationDetails
                                 application={selectedApplication}
@@ -222,8 +240,10 @@ const AdminApplicationsManagement = () => {
                                 reviewing={reviewing}
                             />
                         ) : (
-                            <div className="bg-card dark:bg-card/10 rounded-xl p-8 border border-border dark:border-muted text-center">
-                                <div className="text-6xl text-accent dark:text-muted mb-4">📋</div>
+                            <div className="bg-white/80 dark:bg-foreground/80 backdrop-blur-sm rounded-2xl p-8 border border-primary/10 text-center shadow-lg">
+                                <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <FaUsers className="text-4xl text-primary" />
+                                </div>
                                 <h3 className="text-xl font-semibold text-foreground dark:text-background mb-2">
                                     Selecciona una solicitud
                                 </h3>

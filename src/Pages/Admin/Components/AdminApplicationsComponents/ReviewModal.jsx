@@ -33,68 +33,83 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, action, application, loading }
 
     const isApproval = action === 'approve';
     const actionText = isApproval ? 'Aprobar' : 'Rechazar';
-    const actionColor = isApproval ? 'success' : 'danger';
     const ActionIcon = isApproval ? FaCheckCircle : FaTimes;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-card dark:bg-card/10 rounded-2xl max-w-md w-full border border-border dark:border-muted">
-                <div className="p-6 border-b border-border dark:border-muted">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white/95 dark:bg-foreground/95 backdrop-blur-sm rounded-2xl max-w-md w-full border border-primary/10 shadow-2xl">
+                <div className="p-6 border-b border-primary/10">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-foreground dark:text-background flex items-center">
-                            <ActionIcon className={`mr-3 text-${actionColor}`} />
-                            {actionText} Solicitud
-                        </h2>
+                        <div className="flex items-center">
+                            <div className={`w-12 h-12 bg-gradient-to-br ${
+                                isApproval 
+                                    ? 'from-green-500 to-emerald-500' 
+                                    : 'from-red-500 to-pink-500'
+                            } rounded-full flex items-center justify-center mr-4 shadow-lg`}>
+                                <ActionIcon className="text-white text-xl" />
+                            </div>
+                            <h2 className="text-xl font-bold text-foreground dark:text-background">
+                                {actionText} Solicitud
+                            </h2>
+                        </div>
                         <button
                             onClick={handleClose}
                             disabled={loading}
-                            className="text-accent dark:text-muted hover:text-foreground dark:hover:text-background transition-colors disabled:opacity-50"
+                            className="w-8 h-8 bg-gray-500/10 rounded-full flex items-center justify-center text-accent dark:text-muted hover:text-foreground dark:hover:text-background transition-all duration-200 disabled:opacity-50 hover:bg-gray-500/20"
                         >
-                            <FaTimes className="text-xl" />
+                            <FaTimes size={14} />
                         </button>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6">
                     <div className="mb-6">
-                        <div className={`bg-${actionColor}/10 border border-${actionColor}/20 rounded-xl p-4 mb-4`}>
+                        <div className={`p-4 rounded-xl mb-4 border ${
+                            isApproval 
+                                ? 'bg-green-500/10 border-green-500/20' 
+                                : 'bg-red-500/10 border-red-500/20'
+                        } backdrop-blur-sm`}>
                             <div className="flex items-start">
                                 {isApproval ? (
-                                    <FaCheckCircle className="text-success text-lg mr-3 mt-0.5 flex-shrink-0" />
+                                    <FaCheckCircle className="text-green-500 text-lg mr-3 mt-0.5 flex-shrink-0" />
                                 ) : (
-                                    <FaExclamationTriangle className="text-danger text-lg mr-3 mt-0.5 flex-shrink-0" />
+                                    <FaExclamationTriangle className="text-red-500 text-lg mr-3 mt-0.5 flex-shrink-0" />
                                 )}
                                 <div>
-                                    <h3 className={`font-semibold text-${actionColor} mb-2`}>
+                                    <h3 className={`font-semibold ${
+                                        isApproval ? 'text-green-600' : 'text-red-600'
+                                    } mb-2`}>
                                         {isApproval 
                                             ? '¿Confirmar aprobación?' 
                                             : '¿Confirmar rechazo?'
                                         }
                                     </h3>
-                                    <p className="text-sm text-accent dark:text-muted">
-                                        <strong>Solicitante:</strong> {application?.fullName}
-                                        <br />
-                                        <strong>DNI:</strong> {application?.dni}
-                                        <br />
-                                        <strong>ID:</strong> {application?.id}
-                                    </p>
+                                    <div className="bg-white/50 dark:bg-foreground/50 rounded-lg p-3 backdrop-blur-sm border border-primary/10">
+                                        <p className="text-sm text-accent dark:text-muted space-y-1">
+                                            <span className="block"><strong>Solicitante:</strong> {application?.fullName}</span>
+                                            <span className="block"><strong>DNI:</strong> {application?.dni}</span>
+                                            <span className="block"><strong>ID:</strong> {application?.id}</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {isApproval && (
-                            <div className="bg-info/10 border border-info/20 rounded-xl p-4 mb-4">
+                            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-4 backdrop-blur-sm">
                                 <div className="flex items-start">
-                                    <FaCheckCircle className="text-info text-lg mr-3 mt-0.5 flex-shrink-0" />
+                                    <FaCheckCircle className="text-blue-500 text-lg mr-3 mt-0.5 flex-shrink-0" />
                                     <div>
-                                        <h4 className="font-semibold text-info mb-2">
+                                        <h4 className="font-semibold text-blue-600 mb-2">
                                             Al aprobar esta solicitud:
                                         </h4>
-                                        <ul className="text-sm text-accent dark:text-muted space-y-1">
-                                            <li>• El usuario será promovido a rol de "Walker"</li>
-                                            <li>• Tendrá acceso a funciones de paseador</li>
-                                            <li>• Recibirá notificación de aprobación</li>
-                                        </ul>
+                                        <div className="bg-white/50 dark:bg-foreground/50 rounded-lg p-3 backdrop-blur-sm border border-blue-500/10">
+                                            <ul className="text-sm text-accent dark:text-muted space-y-1">
+                                                <li>• El usuario será promovido a rol de "Walker"</li>
+                                                <li>• Tendrá acceso a funciones de paseador</li>
+                                                <li>• Recibirá notificación de aprobación</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -112,15 +127,15 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, action, application, loading }
                                         ? 'Comentarios adicionales sobre la aprobación...'
                                         : 'Explica por qué se rechaza la solicitud...'
                                 }
-                                className={`w-full p-4 border-2 rounded-xl bg-background dark:bg-foreground text-foreground dark:text-background transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary resize-none ${
-                                    errors.notes ? 'border-danger' : 'border-border dark:border-muted hover:border-primary/50'
+                                className={`w-full p-4 border-2 rounded-xl bg-white/50 dark:bg-foreground/50 backdrop-blur-sm text-foreground dark:text-background transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none ${
+                                    errors.notes ? 'border-red-500' : 'border-primary/20 hover:border-primary/50'
                                 }`}
                                 rows={4}
                                 maxLength={500}
                             />
                             <div className="flex justify-between items-center mt-2">
                                 {errors.notes && (
-                                    <p className="text-sm text-danger">{errors.notes}</p>
+                                    <p className="text-sm text-red-600 font-medium">{errors.notes}</p>
                                 )}
                                 <p className="text-xs text-accent dark:text-muted ml-auto">
                                     {adminNotes.length}/500 caracteres
@@ -134,14 +149,18 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, action, application, loading }
                             type="button"
                             onClick={handleClose}
                             disabled={loading}
-                            className="flex-1 bg-card dark:bg-card/10 text-foreground dark:text-background border border-border dark:border-muted py-3 px-6 rounded-xl font-semibold hover:bg-background dark:hover:bg-foreground/5 transition-all duration-200 disabled:opacity-50"
+                            className="flex-1 bg-gray-500/10 text-foreground dark:text-background border border-gray-500/20 py-3 px-6 rounded-xl font-semibold hover:bg-gray-500/20 transition-all duration-300 disabled:opacity-50 backdrop-blur-sm"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`flex-1 bg-gradient-to-r from-${actionColor} to-${actionColor}/80 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
+                            className={`flex-1 bg-gradient-to-r ${
+                                isApproval 
+                                    ? 'from-green-500 to-emerald-500' 
+                                    : 'from-red-500 to-pink-500'
+                            } text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transform hover:scale-105`}
                         >
                             {loading ? (
                                 <div className="flex items-center">

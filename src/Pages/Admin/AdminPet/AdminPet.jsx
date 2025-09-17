@@ -166,8 +166,8 @@ const AdminPets = () => {
     }
 
     return (
-        <div className="min-h-screen p-6 bg-background dark:bg-foreground">
-            <div className="max-w-7xl mx-auto">
+        <div className="w-full min-h-screen p-6 bg-background dark:bg-foreground">
+            <div className="mx-auto">
                 
                 <AdminPetsHeaderComponent 
                     totalPets={totalPets}

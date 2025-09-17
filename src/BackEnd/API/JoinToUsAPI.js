@@ -81,6 +81,47 @@ export const JoinToUsAPI = {
             reviewedBy: 'admin-002',
             adminNotes: 'Aplicación aprobada. Documentación completa y verificada.',
             applicationScore: 95
+        },
+        {
+            id: 'REG-1704153600023-456',
+            userId: 7,
+            fullName: 'Martinez',
+            phone: '67456757',
+            dni: '22344567',
+            city: 'Córdoba',
+            province: 'Córdoba',
+            images: {
+                dniFront: {
+                    filename: 'dniFront_1704153600000_dni_front.jpg',
+                    originalName: 'dni_front.jpg',
+                    size: 1945621,
+                    type: 'image/jpeg',
+                    uploadedAt: '2024-01-02T08:00:00Z',
+                    url: 'https://storage.example.com/registrations/dniFront_1704153600000_dni_front.jpg'
+                },
+                dniBack: {
+                    filename: 'dniBack_1704153600000_dni_back.jpg',
+                    originalName: 'dni_back.jpg',
+                    size: 2023456,
+                    type: 'image/jpeg',
+                    uploadedAt: '2024-01-02T08:00:00Z',
+                    url: 'https://storage.example.com/registrations/dniBack_1704153600000_dni_back.jpg'
+                },
+                selfieWithDni: {
+                    filename: 'selfieWithDni_1704153600000_selfie.jpg',
+                    originalName: 'selfie.jpg',
+                    size: 1756789,
+                    type: 'image/jpeg',
+                    uploadedAt: '2024-01-02T08:00:00Z',
+                    url: 'https://storage.example.com/registrations/selfieWithDni_1704153600000_selfie.jpg'
+                }
+            },
+            status: 'pending',
+            submittedAt: '2024-01-02T08:00:00Z',
+            reviewedAt: '',
+            reviewedBy: '',
+            adminNotes: '',
+            applicationScore: 0
         }
     ],
 

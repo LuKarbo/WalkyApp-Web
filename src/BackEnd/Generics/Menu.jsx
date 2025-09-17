@@ -74,9 +74,9 @@ const MyReviewsView = () => <MyReviews/>;
 const AdminWalksView = () => <AdminWalks/>
 const AdminPetView = () => <AdminPet/>;
 const AdminUserView = () => <AdminUsers/>;
+const AdminApplicationsView = () => <AdminApplications/>;
 
 // Componentes Ejemplo
-const AdminApplicationsView = () => <AdminApplications/>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
 
 // Mapeo de componentes
