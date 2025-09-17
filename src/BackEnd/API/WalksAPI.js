@@ -56,7 +56,7 @@ export const WalksAPI = {
             {
                 id: "W005",
                 dogName: "Luna",
-                walkerId: 2,
+                walkerId: 3,
                 ownerId: 7,
                 walkerName: "Mike Wilson",
                 startTime: "2024-01-20T11:30:00",
@@ -69,7 +69,7 @@ export const WalksAPI = {
             {
                 id: "W006",
                 dogName: "Buddy",
-                walkerId: 1,
+                walkerId: 3,
                 ownerId: 7,
                 walkerName: "Sarah Johnson",
                 startTime: "2024-01-21T09:00:00",

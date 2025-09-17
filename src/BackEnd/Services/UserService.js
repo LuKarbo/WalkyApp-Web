@@ -100,5 +100,41 @@ export const UserService = {
 
     async getUserStats() {
         return await UserDataAccess.getUserStats();
+    },
+
+    async promoteUserToWalker(userId) {
+        if (!userId || typeof userId !== 'number') {
+            throw new Error("ID de usuario inválido");
+        }
+
+        // Obtener el usuario actual
+        const currentUser = await UserDataAccess.getUserById(userId);
+        
+        if (!currentUser) {
+            throw new Error("Usuario no encontrado");
+        }
+
+        if (currentUser.role === 'walker') {
+            throw new Error("El usuario ya tiene rol de walker");
+        }
+
+        // Actualizar el rol a walker
+        const updatedData = {
+            ...currentUser,
+            role: 'walker'
+        };
+
+        const updatedUser = await UserDataAccess.updateUser(userId, updatedData);
+
+        return {
+            success: true,
+            message: 'Usuario promovido a walker exitosamente',
+            user: {
+                id: updatedUser.id,
+                fullName: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role
+            }
+        };
     }
 };

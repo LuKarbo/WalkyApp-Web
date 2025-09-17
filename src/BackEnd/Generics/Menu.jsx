@@ -19,6 +19,7 @@ import TicketsAdminView from '../../Pages/Admin/TicketsView/TicketsAdminView'
 import AdminWalks from '../../Pages/Admin/AdminWalks/AdminWalks'
 import AdminPet from '../../Pages/Admin/AdminPet/AdminPet'
 import AdminUsers from '../../Pages/Admin/AdminUsers/AdminUsers'
+import AdminApplications from '../../Pages/Admin/AdminApplicationsManagement/AdminApplicationsManagement'
 
 import {
     FiHome,
@@ -75,20 +76,16 @@ const AdminPetView = () => <AdminPet/>;
 const AdminUserView = () => <AdminUsers/>;
 
 // Componentes Ejemplo
-const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
-const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitudes de Alta</h2><p>Solicitudes pendientes de aprobación</p></div>;
+const AdminApplicationsView = () => <AdminApplications/>;
 const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
-
-const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
 
 // Mapeo de componentes
 export const menuComponents = {
     // Admin
-    'statistics': Statistics,
     'users': AdminUserView,
     'admin-pet': AdminPetView,
     'admin-walks': AdminWalksView,
-    'registration-requests': RegistrationRequests,
+    'registration-requests': AdminApplicationsView,
     'tickets-general': TicketsGeneral,
     'promotions': Promotions,
     
@@ -123,8 +120,7 @@ export const menuComponents = {
 export const menuItems = {
     // Menú para Administrador
     admin: [
-        { icon: FiBarChart, label: "Estadísticas", id: "statistics" },
-        { icon: FiTool, label: "Admin Menu", id: "promotions" },
+        { icon: FiTool, label: "Promos & Planes", id: "promotions" },
         { icon: FiUsers, label: "Usuarios", id: "users" },
         { icon: FiClock, label: "Paseos", id: "admin-walks" },
         { icon: FiHeart, label: "Mascotas", id: "admin-pet" },
@@ -194,7 +190,6 @@ const menuTitles = {
     'join-to-us': 'Queres ser un Paseador?',
     'search-walker': 'Buscar Paseador',
 
-    'statistics': 'Estadísticas',
     'walker-service': 'Mi Servicio',
     'users': 'Usuarios',
     'admin-pet': 'Mascotas',
