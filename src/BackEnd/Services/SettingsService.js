@@ -83,7 +83,7 @@ export const SettingsService = {
             throw new Error("Plan ID is required");
         }
 
-        const availablePlans = await this.getSubscriptionPlans();
+        const availablePlans = await this.getActiveSubscriptionPlans();
         const selectedPlan = availablePlans.find(plan => plan.id === planId);
         
         if (!selectedPlan) {
@@ -126,10 +126,13 @@ export const SettingsService = {
         };
     },
 
-    async getSubscriptionPlans() {
-        const plans = await SettingsDataAccess.getSubscriptionPlans();
-        
-        // Ordenar planes por precio para mejor UX
+    async getAllSubscriptionPlans() {
+        const plans = await SettingsDataAccess.getAllSubscriptionPlans();
+        return plans.sort((a, b) => a.price - b.price);
+    },
+
+    async getActiveSubscriptionPlans() {
+        const plans = await SettingsDataAccess.getActiveSubscriptionPlans();
         return plans.sort((a, b) => a.price - b.price);
     },
 
@@ -138,14 +141,152 @@ export const SettingsService = {
             throw new Error("Plan ID is required");
         }
 
-        const plans = await this.getSubscriptionPlans();
-        const plan = plans.find(p => p.id === planId);
+        const plan = await SettingsDataAccess.getSubscriptionPlanById(planId);
         
         if (!plan) {
             throw new Error("Plan not found");
         }
 
         return plan;
+    },
+
+    async createSubscriptionPlan(planData) {
+        if (!planData.id || !planData.name || planData.price === undefined) {
+            throw new Error("ID, nombre y precio son requeridos");
+        }
+
+        if (planData.id.length < 3) {
+            throw new Error("El ID debe tener al menos 3 caracteres");
+        }
+
+        if (planData.name.length < 3) {
+            throw new Error("El nombre debe tener al menos 3 caracteres");
+        }
+
+        if (planData.price < 0) {
+            throw new Error("El precio no puede ser negativo");
+        }
+
+        if (!Array.isArray(planData.features) || planData.features.length === 0) {
+            throw new Error("Debe incluir al menos una característica");
+        }
+
+        const existingPlan = await SettingsDataAccess.getSubscriptionPlanById(planData.id);
+        if (existingPlan) {
+            throw new Error("Ya existe un plan con este ID");
+        }
+
+        if (planData.isActive) {
+            const activePlans = await SettingsDataAccess.getActiveSubscriptionPlans();
+            const activeCount = activePlans.filter(plan => plan.id !== 'free').length;
+            if (activeCount >= 3) {
+                throw new Error("Solo se pueden tener máximo 3 planes activos (además del plan gratuito)");
+            }
+        }
+
+        const newPlan = await SettingsDataAccess.createSubscriptionPlan({
+            ...planData,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+
+        return newPlan;
+    },
+
+    async updateSubscriptionPlan(planId, planData) {
+        if (!planId) {
+            throw new Error("Plan ID is required");
+        }
+
+        if (planId === 'free') {
+            throw new Error("El plan gratuito no se puede modificar");
+        }
+
+        const existingPlan = await SettingsDataAccess.getSubscriptionPlanById(planId);
+        if (!existingPlan) {
+            throw new Error("Plan no encontrado");
+        }
+
+        if (planData.name && planData.name.length < 3) {
+            throw new Error("El nombre debe tener al menos 3 caracteres");
+        }
+
+        if (planData.price !== undefined && planData.price < 0) {
+            throw new Error("El precio no puede ser negativo");
+        }
+
+        if (planData.features && (!Array.isArray(planData.features) || planData.features.length === 0)) {
+            throw new Error("Debe incluir al menos una característica");
+        }
+
+        if (planData.isActive === true && !existingPlan.isActive) {
+            const activePlans = await SettingsDataAccess.getActiveSubscriptionPlans();
+            const activeCount = activePlans.filter(plan => plan.id !== 'free').length;
+            if (activeCount >= 3) {
+                throw new Error("Solo se pueden tener máximo 3 planes activos (además del plan gratuito)");
+            }
+        }
+
+        const updatedPlan = await SettingsDataAccess.updateSubscriptionPlan(planId, {
+            ...planData,
+            updatedAt: new Date().toISOString()
+        });
+
+        return updatedPlan;
+    },
+
+    async deleteSubscriptionPlan(planId) {
+        if (!planId) {
+            throw new Error("Plan ID is required");
+        }
+
+        if (planId === 'free') {
+            throw new Error("El plan gratuito no se puede eliminar");
+        }
+
+        const existingPlan = await SettingsDataAccess.getSubscriptionPlanById(planId);
+        if (!existingPlan) {
+            throw new Error("Plan no encontrado");
+        }
+
+        const usersWithPlan = await SettingsDataAccess.getUsersWithPlan(planId);
+        if (usersWithPlan.length > 0) {
+            throw new Error("No se puede eliminar un plan que tiene usuarios suscritos");
+        }
+
+        await SettingsDataAccess.deleteSubscriptionPlan(planId);
+        
+        return { message: "Plan eliminado exitosamente" };
+    },
+
+    async togglePlanStatus(planId) {
+        if (!planId) {
+            throw new Error("Plan ID is required");
+        }
+
+        if (planId === 'free') {
+            throw new Error("El estado del plan gratuito no se puede cambiar");
+        }
+
+        const existingPlan = await SettingsDataAccess.getSubscriptionPlanById(planId);
+        if (!existingPlan) {
+            throw new Error("Plan no encontrado");
+        }
+
+        if (!existingPlan.isActive) {
+            const activePlans = await SettingsDataAccess.getActiveSubscriptionPlans();
+            const activeCount = activePlans.filter(plan => plan.id !== 'free').length;
+            if (activeCount >= 3) {
+                throw new Error("Solo se pueden tener máximo 3 planes activos (además del plan gratuito)");
+            }
+        }
+
+        const updatedPlan = await SettingsDataAccess.updateSubscriptionPlan(planId, {
+            isActive: !existingPlan.isActive,
+            updatedAt: new Date().toISOString()
+        });
+
+        return updatedPlan;
     },
 
     async validateSubscriptionUpgrade(userId, newPlanId) {

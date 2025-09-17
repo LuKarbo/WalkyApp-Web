@@ -20,6 +20,7 @@ import AdminWalks from '../../Pages/Admin/AdminWalks/AdminWalks'
 import AdminPet from '../../Pages/Admin/AdminPet/AdminPet'
 import AdminUsers from '../../Pages/Admin/AdminUsers/AdminUsers'
 import AdminApplications from '../../Pages/Admin/AdminApplicationsManagement/AdminApplicationsManagement'
+import AdminManagement from '../../Pages/Admin/AdminManagement/AdminManagement'
 
 import {
     FiHome,
@@ -75,9 +76,7 @@ const AdminWalksView = () => <AdminWalks/>
 const AdminPetView = () => <AdminPet/>;
 const AdminUserView = () => <AdminUsers/>;
 const AdminApplicationsView = () => <AdminApplications/>;
-
-// Componentes Ejemplo
-const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
+const PromotionsView = () => <AdminManagement/>;
 
 // Mapeo de componentes
 export const menuComponents = {
@@ -87,7 +86,7 @@ export const menuComponents = {
     'admin-walks': AdminWalksView,
     'registration-requests': AdminApplicationsView,
     'tickets-general': TicketsGeneral,
-    'promotions': Promotions,
+    'promotions': PromotionsView,
     
     // Cliente
     'home': Home,

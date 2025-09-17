@@ -19,5 +19,33 @@ export const SettingsDataAccess = {
 
     async getSubscriptionPlans() {
         return await SettingsAPI.getSubscriptionPlans();
+    },
+
+    async getAllSubscriptionPlans() {
+        return await SettingsAPI.getAllSubscriptionPlans();
+    },
+
+    async getActiveSubscriptionPlans() {
+        return await SettingsAPI.getActiveSubscriptionPlans();
+    },
+
+    async getSubscriptionPlanById(planId) {
+        return await SettingsAPI.getSubscriptionPlanById(planId);
+    },
+
+    async createSubscriptionPlan(planData) {
+        return await SettingsAPI.createSubscriptionPlan(planData);
+    },
+
+    async updateSubscriptionPlan(planId, planData) {
+        return await SettingsAPI.updateSubscriptionPlan(planId, planData);
+    },
+
+    async deleteSubscriptionPlan(planId) {
+        return await SettingsAPI.deleteSubscriptionPlan(planId);
+    },
+
+    async getUsersWithPlan(planId) {
+        return await SettingsAPI.getUsersWithPlan(planId);
     }
 };
