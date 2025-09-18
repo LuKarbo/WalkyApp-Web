@@ -283,8 +283,8 @@ const MyTrips = () => {
     }
 
     return (
-        <div className="min-h-screen p-6 bg-background dark:bg-foreground">
-            <div className="max-w-7xl mx-auto">
+        <div className="max-w min-h-screen p-6 bg-background dark:bg-foreground">
+            <div className="mx-auto">
                 
                 <MyTripsHeaderComponent 
                     activeTab={activeTab}
@@ -314,7 +314,7 @@ const MyTrips = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+                    <div className="grid gap-6 auto-rows-max justify-items-center" style={{gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 450px))'}}>
                         {filteredTrips.map((trip) => (
                             <MyTripsCardComponent 
                                 key={trip.id}
