@@ -29,6 +29,10 @@ const WalkerWalks = () => {
     const [selectedWalk, setSelectedWalk] = useState(null);
     const [actionLoading, setActionLoading] = useState(false);
 
+    // Límites (los cuales dependeran del Plan de suscripcion del usuario)
+    const MAX_ACCEPTED_WALKS = 5; 
+    const MAX_ACTIVE_WALKS = 2; 
+
     const user = useUser();
     const walkerId = user?.id;
     const { navigateToContent } = useNavigation();
@@ -53,13 +57,45 @@ const WalkerWalks = () => {
         loadWalks();
     }, [walkerId]);
 
+    const countAcceptedWalks = () => {
+        return walks.filter(walk => 
+            ["Esperando pago", "Agendado"].includes(walk.status)
+        ).length;
+    };
+
+    const countActiveWalks = () => {
+        return walks.filter(walk => walk.status === "Activo").length;
+    };
+
+    const canAcceptWalk = () => {
+        const acceptedCount = countAcceptedWalks();
+        return acceptedCount < MAX_ACCEPTED_WALKS;
+    };
+
+    const canStartWalk = () => {
+        const activeCount = countActiveWalks();
+        return activeCount < MAX_ACTIVE_WALKS;
+    };
+
     const handleAcceptWalk = (walk) => {
+        if (!canAcceptWalk()) {
+            setError(`No puedes aceptar más paseos. Límite máximo: ${MAX_ACCEPTED_WALKS} paseos aceptados simultáneamente.`);
+            return;
+        }
+        
         setSelectedWalk(walk);
         setShowAcceptModal(true);
     };
 
     const handleConfirmAccept = async () => {
         if (!selectedWalk) return;
+        
+        if (!canAcceptWalk()) {
+            setError(`No puedes aceptar más paseos. Límite máximo: ${MAX_ACCEPTED_WALKS} paseos aceptados simultáneamente.`);
+            setShowAcceptModal(false);
+            setSelectedWalk(null);
+            return;
+        }
         
         try {
             setActionLoading(true);
@@ -133,19 +169,30 @@ const WalkerWalks = () => {
         }
     };
 
-
     const handleShowWaitingPayment = (walk) => {
         setSelectedWalk(walk);
         setShowWaitingPaymentModal(true);
     };
 
     const handleStartWalk = (walk) => {
+        if (!canStartWalk()) {
+            setError(`No puedes iniciar más paseos. Límite máximo: ${MAX_ACTIVE_WALKS} paseos activos simultáneamente.`);
+            return;
+        }
+        
         setSelectedWalk(walk);
         setShowStartWalkModal(true);
     };
 
     const handleConfirmStartWalk = async () => {
         if (!selectedWalk) return;
+        
+        if (!canStartWalk()) {
+            setError(`No puedes iniciar más paseos. Límite máximo: ${MAX_ACTIVE_WALKS} paseos activos simultáneamente.`);
+            setShowStartWalkModal(false);
+            setSelectedWalk(null);
+            return;
+        }
         
         try {
             setActionLoading(true);
@@ -175,6 +222,7 @@ const WalkerWalks = () => {
         setShowStartWalkModal(false);
         setShowFinishWalkModal(false);
         setSelectedWalk(null);
+        setError(null);
     };
 
     const filteredWalks = walks.filter((walk) => {
@@ -212,22 +260,21 @@ const WalkerWalks = () => {
         ["Finalizado", "Rechazado"].includes(walk.status)
     ).length;
 
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => {
+                setError(null);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+
     if (loading) {
         return (
             <div className="w-full h-full p-6 bg-background dark:bg-foreground">
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                     <p className="text-lg text-foreground dark:text-background ml-4">Cargando paseos...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (error && !showAcceptModal && !showRejectModal) {
-        return (
-            <div className="w-full h-full p-6 bg-background dark:bg-foreground">
-                <div className="flex justify-center items-center h-64">
-                    <p className="text-lg text-danger">{error}</p>
                 </div>
             </div>
         );
@@ -244,6 +291,54 @@ const WalkerWalks = () => {
                     activeCount={activeCount}
                     historyCount={historyCount}
                 />
+
+                <div className="mb-6 bg-gradient-to-r from-info/10 to-primary/10 rounded-xl p-4 border border-info/20">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                        <div className="flex items-center space-x-6">
+                            <div className="text-sm">
+                                <span className="text-foreground dark:text-background font-medium">
+                                    Paseos Aceptados: 
+                                </span>
+                                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-bold ${
+                                    countAcceptedWalks() >= MAX_ACCEPTED_WALKS 
+                                        ? 'bg-red-500 text-white' 
+                                        : 'bg-success text-white'
+                                }`}>
+                                    {countAcceptedWalks()}/{MAX_ACCEPTED_WALKS}
+                                </span>
+                            </div>
+                            <div className="text-sm">
+                                <span className="text-foreground dark:text-background font-medium">
+                                    Paseos Activos: 
+                                </span>
+                                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-bold ${
+                                    countActiveWalks() >= MAX_ACTIVE_WALKS 
+                                        ? 'bg-red-500 text-white' 
+                                        : 'bg-primary text-white'
+                                }`}>
+                                    {countActiveWalks()}/{MAX_ACTIVE_WALKS}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="text-xs text-accent dark:text-muted">
+                            Límites de capacidad del paseador
+                        </div>
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl">
+                        <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium">{error}</p>
+                            <button
+                                onClick={() => setError(null)}
+                                className="text-red-500 hover:text-red-700 font-bold text-lg"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <WalkerWalksFilter 
                     searchQuery={searchQuery}
@@ -280,6 +375,8 @@ const WalkerWalks = () => {
                                 onStartWalk={handleStartWalk}
                                 onViewWalk={handleViewWalk}
                                 onFinishWalk={handleFinishWalk}
+                                canAcceptMore={canAcceptWalk()}
+                                canStartMore={canStartWalk()}
                             />
                         ))}
                     </div>
