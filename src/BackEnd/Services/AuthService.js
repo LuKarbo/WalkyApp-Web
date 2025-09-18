@@ -2,11 +2,11 @@ import { AuthDataAccess } from "../DataAccess/AuthDataAccess.js";
 
 export const AuthService = {
     async login(credentials) {
-        
-        if (!credentials.email.includes("@")) {
+        // Validaciones básicas
+        if (!credentials.email || !credentials.email.includes("@")) {
             throw new Error("Email inválido");
         }
-        if (credentials.password.length < 8) {
+        if (!credentials.password || credentials.password.length < 8) {
             throw new Error("Contraseña demasiado corta");
         }
 
@@ -17,40 +17,50 @@ export const AuthService = {
             fullName: user.name,
             email: user.email,
             role: user.role,
-            profileImage:
-                user.profileImage || "https://cdn.example.com/default-avatar.png",
+            profileImage: user.profileImage || "https://cdn.example.com/default-avatar.png",
             suscription: user.suscription,
             token: user.token,
         };
     },
 
     async register(data) {
-    console.log(data.fullName + "-" + data.email + "-" + data.password)
-    if (!data || typeof data !== "object") {
-        throw new Error("Datos inválidos");
-    }
-    if (!data.email || !data.email.includes("@")) {
-        throw new Error("Email inválido");
-    }
-    if (!data.password || data.password.length < 8) {
-        console.log(data.password);
-        throw new Error("Contraseña demasiado corta");
-    }
+        // Validaciones mejoradas
+        if (!data || typeof data !== "object") {
+            throw new Error("Datos inválidos");
+        }
+        
+        if (!data.fullName || data.fullName.trim().length < 2) {
+            throw new Error("El nombre debe tener al menos 2 caracteres");
+        }
+        
+        if (!data.email || !data.email.includes("@")) {
+            throw new Error("Email inválido");
+        }
+        
+        if (!data.password || data.password.length < 8) {
+            throw new Error("Contraseña demasiado corta");
+        }
 
-    const payload = {
-        name: data.fullName,
-        email: data.email,
-        password: data.password,
-    };
+        if (data.password !== data.confirmPassword) {
+            throw new Error("Las contraseñas no coinciden");
+        }
 
-    const user = await AuthDataAccess.register(payload);
+        // Preparar datos para la API (mapear fullName -> name)
+        const payload = {
+            name: data.fullName.trim(),
+            email: data.email.toLowerCase().trim(),
+            password: data.password,
+        };
 
-    return {
+        const user = await AuthDataAccess.register(payload);
+
+        return {
             id: user.id,
             fullName: user.name,
             email: user.email,
             role: user.role,
             profileImage: user.profileImage || "https://cdn.example.com/default-avatar.png",
+            suscription: user.suscription,
             token: user.token,
         };
     },
@@ -65,6 +75,7 @@ export const AuthService = {
             email: user.email,
             role: user.role,
             profileImage: user.profileImage || "https://cdn.example.com/default-avatar.png",
+            suscription: user.suscription,
         };
     },
 

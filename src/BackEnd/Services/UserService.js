@@ -1,85 +1,140 @@
-// EJEMPLO
-// Se encarga de hacer las Validaciones y comprobar/preparar los modelos/data para enviarlos a la API o luego de recibirlos
 import { UserDataAccess } from "../DataAccess/UserDataAccess.js";
 
 export const UserService = {
-    async getUserProfile(id) {
-        const user = await UserDataAccess.getUserById(id);
-
-        const profileImage =
-        user.profileImage ||
-        "https://cdn.example.com/default-avatar.png";
-
+    async getAllUsers() {
+        const users = await UserDataAccess.getAllUsers();
         
-        const userDTO = {
+        // Transformar a DTO del frontend
+        return users.map(user => ({
             id: user.id,
-            fullName: user.name,            
+            fullName: user.name,
             email: user.email.toLowerCase(),
             role: user.role,
-            profileImage,
+            profileImage: user.profileImage || "https://cdn.example.com/default-avatar.png",
             phone: user.phone || "No disponible",
             location: user.location || "No disponible",
-            createdAt: user.createdAt || new Date().toISOString()
-        };
-
-        return userDTO;
+            suscription: user.suscription || "Basic",
+            status: user.status || "active",
+            joinedDate: user.joinedDate || new Date().toISOString(),
+            lastLogin: user.lastLogin || new Date().toISOString()
+        }));
     },
 
-    async updateUserProfile(id, profileData) {
+    async getUserById(id) {
+        const user = await UserDataAccess.getUserById(id);
+        
+        return {
+            id: user.id,
+            fullName: user.name,
+            email: user.email.toLowerCase(),
+            role: user.role,
+            profileImage: user.profileImage || "https://cdn.example.com/default-avatar.png",
+            phone: user.phone || "No disponible",
+            location: user.location || "No disponible",
+            suscription: user.suscription || "Basic",
+            status: user.status || "active",
+            joinedDate: user.joinedDate || new Date().toISOString(),
+            lastLogin: user.lastLogin || new Date().toISOString()
+        };
+    },
 
-        if (!profileData.name || profileData.name.trim().length < 2) {
+    async updateUser(id, userData) {
+        // Validaciones
+        if (!userData.name || userData.name.trim().length < 2) {
             throw new Error("El nombre debe tener al menos 2 caracteres");
         }
 
-        if (profileData.phone) {
+        if (!userData.email || !userData.email.includes("@")) {
+            throw new Error("Email inválido");
+        }
+
+        if (!userData.role || !["admin", "client", "walker", "support"].includes(userData.role)) {
+            throw new Error("Rol inválido");
+        }
+
+        if (!userData.status || !["active", "inactive"].includes(userData.status)) {
+            throw new Error("Estado inválido");
+        }
+
+        if (userData.phone && userData.phone.trim() && !/^[\+]?[0-9\-\s\(\)]+$/.test(userData.phone)) {
             throw new Error("Formato de teléfono inválido");
         }
 
         // Preparar datos para la API
         const apiData = {
-            name: profileData.name.trim(),
-            phone: profileData.phone?.trim() || "",
-            location: profileData.location?.trim() || "",
-            avatar: profileData.avatar
+            name: userData.name.trim(),
+            email: userData.email.toLowerCase().trim(),
+            role: userData.role,
+            phone: userData.phone?.trim() || "",
+            location: userData.location?.trim() || "",
+            suscription: userData.suscription || "Basic",
+            status: userData.status,
+            profileImage: userData.profileImage
         };
 
-        const updatedUser = await UserDataAccess.updateUserProfile(id, apiData);
+        const updatedUser = await UserDataAccess.updateUser(id, apiData);
 
-        // Transformar respuesta de la API al DTO del frontend
-        const userDTO = {
+        // Transformar respuesta al DTO del frontend
+        return {
             id: updatedUser.id,
             fullName: updatedUser.name,
             email: updatedUser.email.toLowerCase(),
             role: updatedUser.role,
-            profileImage: updatedUser.profileImage,
+            profileImage: updatedUser.profileImage || "https://cdn.example.com/default-avatar.png",
             phone: updatedUser.phone || "No disponible",
             location: updatedUser.location || "No disponible",
-            createdAt: updatedUser.createdAt || new Date().toISOString()
+            suscription: updatedUser.suscription || "Basic",
+            status: updatedUser.status || "active",
+            joinedDate: updatedUser.joinedDate || new Date().toISOString(),
+            lastLogin: updatedUser.lastLogin || new Date().toISOString()
         };
-
-        return userDTO;
     },
 
-    async changeUserPassword(id, passwordData) {
-
-        if (!passwordData.currentPassword) {
-            throw new Error("La contraseña actual es requerida");
+    async deleteUser(id) {
+        if (!id || typeof id !== 'number') {
+            throw new Error("ID de usuario inválido");
         }
 
-        if (!passwordData.newPassword || passwordData.newPassword.length < 6) {
-            throw new Error("La nueva contraseña debe tener al menos 6 caracteres");
+        return await UserDataAccess.deleteUser(id);
+    },
+
+    async getUserStats() {
+        return await UserDataAccess.getUserStats();
+    },
+
+    async promoteUserToWalker(userId) {
+        if (!userId || typeof userId !== 'number') {
+            throw new Error("ID de usuario inválido");
         }
 
-        if (passwordData.currentPassword === passwordData.newPassword) {
-            throw new Error("La nueva contraseña debe ser diferente a la actual");
+        // Obtener el usuario actual
+        const currentUser = await UserDataAccess.getUserById(userId);
+        
+        if (!currentUser) {
+            throw new Error("Usuario no encontrado");
         }
 
-        const apiData = {
-            currentPassword: passwordData.currentPassword,
-            newPassword: passwordData.newPassword
+        if (currentUser.role === 'walker') {
+            throw new Error("El usuario ya tiene rol de walker");
+        }
+
+        // Actualizar el rol a walker
+        const updatedData = {
+            ...currentUser,
+            role: 'walker'
         };
 
-        const result = await UserDataAccess.changeUserPassword(id, apiData);
-        return result;
+        const updatedUser = await UserDataAccess.updateUser(userId, updatedData);
+
+        return {
+            success: true,
+            message: 'Usuario promovido a walker exitosamente',
+            user: {
+                id: updatedUser.id,
+                fullName: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role
+            }
+        };
     }
 };

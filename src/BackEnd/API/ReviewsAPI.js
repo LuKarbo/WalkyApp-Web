@@ -3,7 +3,7 @@ export const ReviewsAPI = {
         return [
             {
                 id: "R001",
-                userId: 1,
+                userId: 2,
                 walkerId: 1,
                 walkerName: "Sarah Johnson",
                 walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
@@ -31,7 +31,7 @@ export const ReviewsAPI = {
             },
             {
                 id: "R003",
-                userId: 3,
+                userId: 6,
                 walkerId: 1,
                 walkerName: "Sarah Johnson",
                 walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
@@ -45,7 +45,7 @@ export const ReviewsAPI = {
             },
             {
                 id: "R004",
-                userId: 1,
+                userId: 6,
                 walkerId: 3,
                 walkerName: "Emma Davis",
                 walkerImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face",
@@ -59,7 +59,7 @@ export const ReviewsAPI = {
             },
             {
                 id: "R005",
-                userId: 2,
+                userId: 6,
                 walkerId: 4,
                 walkerName: "John Smith",
                 walkerImage: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face",
@@ -73,7 +73,7 @@ export const ReviewsAPI = {
             },
             {
                 id: "R006",
-                userId: 3,
+                userId: 7,
                 walkerId: 1,
                 walkerName: "Sarah Johnson",
                 walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
@@ -87,7 +87,7 @@ export const ReviewsAPI = {
             },
             {
                 id: "R007",
-                userId: 1,
+                userId: 7,
                 walkerId: 2,
                 walkerName: "Mike Wilson",
                 walkerImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
@@ -101,7 +101,7 @@ export const ReviewsAPI = {
             },
             {
                 id: "R008",
-                userId: 4,
+                userId: 2,
                 walkerId: 1,
                 walkerName: "Sarah Johnson",
                 walkerImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
@@ -115,7 +115,7 @@ export const ReviewsAPI = {
             },
             {
                 id: "R009",
-                userId: 5,
+                userId: 2,
                 walkerId: 2,
                 walkerName: "Mike Wilson",
                 walkerImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",

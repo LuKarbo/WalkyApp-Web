@@ -4,7 +4,7 @@ export const PetsAPI = {
             {
                 id: "P001",
                 name: "Max",
-                ownerId: 1,
+                ownerId: 2,
                 image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&h=300&fit=crop&crop=face",
                 weight: 25.5,
                 age: 3,
@@ -22,7 +22,7 @@ export const PetsAPI = {
             {
                 id: "P003",
                 name: "Bella",
-                ownerId: 3,
+                ownerId: 6,
                 image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&h=300&fit=crop&crop=face",
                 weight: 12.8,
                 age: 5,
@@ -31,7 +31,7 @@ export const PetsAPI = {
             {
                 id: "P004",
                 name: "Rocky",
-                ownerId: 3,
+                ownerId: 7,
                 image: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=300&h=300&fit=crop&crop=face",
                 weight: 30.0,
                 age: 4,
