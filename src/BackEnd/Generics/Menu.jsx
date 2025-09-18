@@ -9,25 +9,23 @@ import MyReviews from '../../Pages/User/Client/MyReviews';
 import Tickets from '../../Pages/User/Tickets';
 import Settings from '../../Pages/User/Client/Settings';
 import JoinToUsFrom from '../../Pages/User/JoinToUs';
-import Notifications from '../../Pages/User/Client/MyNotifications'
+import Notifications from '../../Pages/User/Client/MyNotifications';
 import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
-import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
-import WalkerServic from '../../Pages/User/Walker/WalkerService' 
-import WalkView from '../../Pages/User/WalkView/View/WalkView' 
-import SupportWalksView from '../../Pages/Admin/WalksView/AdminWalksView'
-import TicketsAdminView from '../../Pages/Admin/TicketsView/TicketsAdminView'
-import AdminWalks from '../../Pages/Admin/AdminWalks/AdminWalks'
-import AdminPet from '../../Pages/Admin/AdminPet/AdminPet'
-import AdminUsers from '../../Pages/Admin/AdminUsers/AdminUsers'
-import AdminApplications from '../../Pages/Admin/AdminApplicationsManagement/AdminApplicationsManagement'
-import AdminManagement from '../../Pages/Admin/AdminManagement/AdminManagement'
+import WalkerReviews from '../../Pages/User/Walker/WalkerReviews';
+import WalkerServic from '../../Pages/User/Walker/WalkerService';
+import WalkView from '../../Pages/User/WalkView/View/WalkView';
+import SupportWalksView from '../../Pages/Admin/WalksView/AdminWalksView';
+import TicketsAdminView from '../../Pages/Admin/TicketsView/TicketsAdminView';
+import AdminWalks from '../../Pages/Admin/AdminWalks/AdminWalks';
+import AdminPet from '../../Pages/Admin/AdminPet/AdminPet';
+import AdminUsers from '../../Pages/Admin/AdminUsers/AdminUsers';
+import AdminApplications from '../../Pages/Admin/AdminApplicationsManagement/AdminApplicationsManagement';
+import AdminManagement from '../../Pages/Admin/AdminManagement/AdminManagement';
 
 import {
     FiHome,
     FiUsers,
     FiSettings,
-    FiBarChart,
-    FiBookOpen,
     FiClock,
     FiTrendingUp,
     FiMessageSquare,
@@ -43,73 +41,72 @@ import {
     FiMail,
 } from "react-icons/fi";
 
-// Componentes En uso 
-const Home = () => <HomeComponent/>;
-
-const WalkerProfileView = ({ contentParams }) => {
-    return <WalkerProfile id={contentParams} />;
-};
-
-const MyTripsView = () => <MyTrips/>;
-
-const MyWalksWalker = () => <WalkerWalks/>;
-
-const WalkViewComplete = ({ contentParams }) => {
-    console.log({ contentParams })
-    return <WalkView id={contentParams} />
-};
-
-const UserProfile = () => <MyProfile/>;
-const MapChatView  = () => <MapChat/>;
-const SearchWalkerView = () => <SearchWalker/>;
-const MyPetsView = () => <MyPets/>;
-const TicketsView = () => <Tickets/>;
-const SettingsView = () => <Settings/>;
-const JoinToUs = () => <JoinToUsFrom/>;
-const NotificationsView = () => <Notifications/>;
-const WalkerServiceView = () => <WalkerServic/>;
-const WalkerReviewsView = () => <WalkerReviews/>;
-const SupportWalks = () => <SupportWalksView/>
-const TicketsGeneral = () => <TicketsAdminView/>;
-const MyReviewsView = () => <MyReviews/>;
-const AdminWalksView = () => <AdminWalks/>
-const AdminPetView = () => <AdminPet/>;
+// ----- ADMIN -----
 const AdminUserView = () => <AdminUsers/>;
+const AdminPetView = () => <AdminPet/>;
+const AdminWalksView = () => <AdminWalks/>;
 const AdminApplicationsView = () => <AdminApplications/>;
 const PromotionsView = () => <AdminManagement/>;
+const TicketsGeneral = () => <TicketsAdminView/>; // Usado también en soporte
 
-// Mapeo de componentes
+// ----- CLIENTE -----
+const Home = () => <HomeComponent/>;
+const SearchWalkerView = () => <SearchWalker/>;
+const MyTripsView = () => <MyTrips/>;
+const MyPetsView = () => <MyPets/>;
+const TicketsView = () => <Tickets/>; // Usado también en paseador
+const JoinToUs = () => <JoinToUsFrom/>;
+const MyReviewsView = () => <MyReviews/>;
+
+// ----- PASEADOR -----
+const WalkerServiceView = () => <WalkerServic/>;
+const MyWalksWalker = () => <WalkerWalks/>;
+const WalkerReviewsView = () => <WalkerReviews/>;
+/* TicketsView ya definido arriba */
+
+// ----- SOPORTE -----
+const SupportWalks = () => <SupportWalksView/>;
+/* TicketsGeneral ya definido arriba */
+
+// ----- GENERALES -----
+const WalkerProfileView = ({ contentParams }) => <WalkerProfile id={contentParams}/>;
+const WalkViewComplete = ({ contentParams }) => <WalkView id={contentParams}/>;
+const MapChatView  = () => <MapChat/>;
+const NotificationsView = () => <Notifications/>;
+const UserProfile = () => <MyProfile/>; // Usado en todos los roles
+const SettingsView = () => <Settings/>; // Usado en todos los roles
+
+// ==================== MAPEO DE COMPONENTES ====================
 export const menuComponents = {
     // Admin
     'users': AdminUserView,
     'admin-pet': AdminPetView,
     'admin-walks': AdminWalksView,
     'registration-requests': AdminApplicationsView,
-    'tickets-general': TicketsGeneral,
+    'tickets-general': TicketsGeneral, // También en soporte
     'promotions': PromotionsView,
+
+    // Soporte
+    'active-walks': SupportWalks,
     
     // Cliente
     'home': Home,
     'search-walker': SearchWalkerView,
     'my-walks': MyTripsView,
     'my-pets': MyPetsView,
-    'tickets': TicketsView,
+    'tickets': TicketsView, // También en paseador
     'join-to-us': JoinToUs,
     'my-reviews': MyReviewsView,
     
     // Paseador
-    'walker-reviews': WalkerReviewsView,
-    'my-walks-walker': MyWalksWalker,
     'walker-service': WalkerServiceView,
+    'my-walks-walker': MyWalksWalker,
+    'walker-reviews': WalkerReviewsView,
     
-    // Soporte
-    'active-walks': SupportWalks,
-    
-    // General
+    // Generales
     'walker-profile': WalkerProfileView,
     'trip': WalkViewComplete,
     'mapchat': MapChatView,
-
     'notifications': NotificationsView,
     'profile': UserProfile,
     'settings': SettingsView,
@@ -183,31 +180,40 @@ export const commonMenuItemsByRole = {
 };
 
 const menuTitles = {
+    // Cliente
     'home': 'Home',
-    'walker-profile': 'Perfil Del Paseador',
-    'trip': 'Info de Paseo',
-    'join-to-us': 'Queres ser un Paseador?',
     'search-walker': 'Buscar Paseador',
+    'my-walks': 'Mis Paseos',
+    'my-pets': 'Mis Mascotas',
+    'my-reviews': 'Mis Reseñas',
+    'join-to-us': 'Queres ser un Paseador?',
+    'tickets': 'Consultas',
+    'mapchat': 'MapChat',
 
+    // Paseador
     'walker-service': 'Mi Servicio',
+    'my-walks-walker': 'Mis Paseos',
+    'walker-reviews': 'Mis Reseñas',
+
+    // Admin
     'users': 'Usuarios',
     'admin-pet': 'Mascotas',
     'admin-walks': 'Paseos',
     'registration-requests': 'Solicitudes de Alta',
     'tickets-general': 'Consultas',
     'promotions': 'Promociones',
-    'my-walks': 'Mis Paseos',
-    'my-walks-walker': 'Mis Paseos',
-    'my-pets': 'Mis Mascotas',
-    'my-account-perms': 'Ser Paseador',
-    'tickets': 'Consultas',
-    'my-reviews': 'Mis Reseñas',
-    'walker-reviews': 'Mis Reseñas',
+
+    // Soporte
     'active-walks': 'Paseos Activos',
-    'notifications': 'Mis Alertas',
+
+    // Generales
+    'walker-profile': 'Perfil Del Paseador',
+    'trip': 'Info de Paseo',
     'profile': 'Mi Perfil',
+    'notifications': 'Mis Alertas',
     'settings': 'Ajustes',
 };
+
 
 export const getComponentById = (id) => {
     return menuComponents[id] || Home;
