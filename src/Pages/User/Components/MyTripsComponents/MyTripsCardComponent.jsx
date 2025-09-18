@@ -60,7 +60,7 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => 
     };
 
     return (
-        <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-primary/10 h-full flex flex-col min-w-[325px]">
+        <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-primary/10 w-full min-w-0 max-w-[450px] mx-auto h-fit min-h-[400px] max-h-[500px] flex flex-col">
 
             <div className="absolute top-4 right-4 z-10">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-lg ${getStatusColor(trip.status)}`}>
@@ -70,8 +70,9 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => 
 
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-success/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-            <div className="relative p-4 flex flex-col flex-1">
-                <div className="flex items-center mb-4">
+            <div className="relative p-4 flex flex-col flex-1 min-h-0">
+
+                <div className="flex items-center mb-4 flex-shrink-0">
                     <div className="w-10 h-10 bg-gradient-to-br from-primary to-success rounded-full flex items-center justify-center mr-3 shadow-lg flex-shrink-0">
                         <span className="text-white font-bold text-sm">{trip.dogName?.[0] || 'P'}</span>
                     </div>
@@ -86,81 +87,83 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => 
                     </div>
                 </div>
 
-                <div className="space-y-3 mb-6 flex-1">
-                    <div className="flex items-center p-2 bg-primary/10 rounded-lg">
-                        <FiCalendar className="mr-2 text-primary flex-shrink-0" size={14} />
-                        <span className="text-xs font-semibold text-foreground dark:text-background truncate">
-                            {format(new Date(trip.startTime), "MMM dd, yyyy")}
-                        </span>
-                    </div>
-
-                    <div className="flex items-center p-2 bg-success/10 rounded-lg">
-                        <FiClock className="mr-2 text-success flex-shrink-0" size={14} />
-                        <span className="text-xs font-semibold text-foreground dark:text-background truncate">
-                            {format(new Date(trip.startTime), "h:mm a")}
-                            {trip.endTime && ` - ${format(new Date(trip.endTime), "h:mm a")}`}
-                        </span>
-                    </div>
-
-                    {(trip.duration || trip.distance) && (
-                        <div className="flex items-center p-2 bg-info/10 rounded-lg">
-                            <FiMapPin className="mr-2 text-info flex-shrink-0" size={14} />
+                <div className="flex-1 flex flex-col min-h-0">
+                    <div className="space-y-3 mb-4 flex-1 overflow-y-auto">
+                        <div className="flex items-center p-2 bg-primary/10 rounded-lg">
+                            <FiCalendar className="mr-2 text-primary flex-shrink-0" size={14} />
                             <span className="text-xs font-semibold text-foreground dark:text-background truncate">
-                                {trip.duration && `${trip.duration} min`}
-                                {trip.duration && trip.distance && ' • '}
-                                {trip.distance && formatDistance(trip.distance)}
+                                {format(new Date(trip.startTime), "MMM dd, yyyy")}
                             </span>
                         </div>
-                    )}
 
-                    {trip.totalPrice && needsPayment(trip.status) && (
-                        <div className="flex items-center p-2 bg-orange-100 rounded-lg border border-orange-200">
-                            <FiCreditCard className="mr-2 text-orange-600 flex-shrink-0" size={14} />
-                            <span className="text-xs font-semibold text-orange-800 truncate">
-                                Total: ${trip.totalPrice.toLocaleString()}
+                        <div className="flex items-center p-2 bg-success/10 rounded-lg">
+                            <FiClock className="mr-2 text-success flex-shrink-0" size={14} />
+                            <span className="text-xs font-semibold text-foreground dark:text-background truncate">
+                                {format(new Date(trip.startTime), "h:mm a")}
+                                {trip.endTime && ` - ${format(new Date(trip.endTime), "h:mm a")}`}
                             </span>
                         </div>
-                    )}
 
-                    {trip.notes && (
-                        <div className="p-2 bg-accent/10 rounded-lg">
-                            <p className="text-xs text-accent dark:text-muted italic line-clamp-2">
-                                "{trip.notes}"
-                            </p>
-                        </div>
-                    )}
-                </div>
+                        {(trip.duration || trip.distance) && (
+                            <div className="flex items-center p-2 bg-info/10 rounded-lg">
+                                <FiMapPin className="mr-2 text-info flex-shrink-0" size={14} />
+                                <span className="text-xs font-semibold text-foreground dark:text-background truncate">
+                                    {trip.duration && `${trip.duration} min`}
+                                    {trip.duration && trip.distance && ' • '}
+                                    {trip.distance && formatDistance(trip.distance)}
+                                </span>
+                            </div>
+                        )}
 
-                <div className="flex items-center gap-2 mt-auto">
-                    { viewTrip(trip.status) && (
-                        <button
-                            onClick={() => onViewTrip(trip.id)}
-                            className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-info text-info hover:bg-info hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
-                        >
-                            <FiEye className="mr-1" size={12} />
-                            Ver
-                        </button>
-                    )}
-                    
-                    {needsPayment(trip.status) && (
-                        <button
-                            onClick={() => onPayTrip(trip)}
-                            className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
-                        >
-                            <FiCreditCard className="mr-1" size={12} />
-                            Pagar
-                        </button>
-                    )}
-                    
-                    {canCancel(trip.status) && (
-                        <button
-                            onClick={() => onCancelTrip(trip)}
-                            className="px-3 py-2 text-xs font-semibold rounded-lg border-2 border-danger text-danger hover:bg-danger hover:text-white transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
-                        >
-                            <FiXCircle size={12} className="mr-1" />
-                            Cancelar
-                        </button>
-                    )}
+                        {trip.totalPrice && needsPayment(trip.status) && (
+                            <div className="flex items-center p-2 bg-orange-100 rounded-lg border border-orange-200">
+                                <FiCreditCard className="mr-2 text-orange-600 flex-shrink-0" size={14} />
+                                <span className="text-xs font-semibold text-orange-800 truncate">
+                                    Total: ${trip.totalPrice.toLocaleString()}
+                                </span>
+                            </div>
+                        )}
+
+                        {trip.notes && (
+                            <div className="p-2 bg-accent/10 rounded-lg">
+                                <p className="text-xs text-accent dark:text-muted italic line-clamp-3">
+                                    "{trip.notes}"
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-auto flex-shrink-0 pt-2">
+                        { viewTrip(trip.status) && (
+                            <button
+                                onClick={() => onViewTrip(trip.id)}
+                                className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-info text-info hover:bg-info hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                            >
+                                <FiEye className="mr-1" size={12} />
+                                Ver
+                            </button>
+                        )}
+                        
+                        {needsPayment(trip.status) && (
+                            <button
+                                onClick={() => onPayTrip(trip)}
+                                className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                            >
+                                <FiCreditCard className="mr-1" size={12} />
+                                Pagar
+                            </button>
+                        )}
+                        
+                        {canCancel(trip.status) && (
+                            <button
+                                onClick={() => onCancelTrip(trip)}
+                                className="px-3 py-2 text-xs font-semibold rounded-lg border-2 border-danger text-danger hover:bg-danger hover:text-white transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
+                            >
+                                <FiXCircle size={12} className="mr-1" />
+                                Cancelar
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

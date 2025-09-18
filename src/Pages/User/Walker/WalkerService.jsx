@@ -7,6 +7,7 @@ import WalkerServiceStatsComponent from "../Components/WalkerServiceComponents/W
 import WalkerServiceEarningsComponent from "../Components/WalkerServiceComponents/WalkerServiceEarningsComponent";
 import WalkerServiceChartComponent from "../Components/WalkerServiceComponents/WalkerServiceChartComponent";
 import WalkerServiceSettingsComponent from "../Components/WalkerServiceComponents/WalkerServiceSettingsComponent";
+import { FaExclamationTriangle, FaCreditCard, FaTimes } from "react-icons/fa";
 
 const WalkerService = () => {
     const user = useUser();
@@ -28,6 +29,7 @@ const WalkerService = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [saving, setSaving] = useState(false);
+    const [showMercadoPagoAlert, setShowMercadoPagoAlert] = useState(false);
 
     useEffect(() => {
         const loadWalkerData = async () => {
@@ -52,6 +54,11 @@ const WalkerService = () => {
                 
                 setEarnings(calculatedEarnings);
                 setChartData(calculatedChartData);
+                
+                const isMercadoPagoConfigured = walkerSettings.mercadoPagoEnabled && 
+                                                walkerSettings.mercadoPagoAccessToken && 
+                                                walkerSettings.mercadoPagoPublicKey;
+                setShowMercadoPagoAlert(!isMercadoPagoConfigured);
                 
             } catch (err) {
                 console.error("Error loading walker data:", err);
@@ -147,6 +154,15 @@ const WalkerService = () => {
 
     const handleSettingsChange = (newSettings) => {
         setSettings(prev => ({ ...prev, ...newSettings }));
+        
+        const updatedSettings = { ...settings, ...newSettings };
+        const isMercadoPagoConfigured = updatedSettings.mercadoPagoEnabled && 
+                                        updatedSettings.mercadoPagoAccessToken && 
+                                        updatedSettings.mercadoPagoPublicKey;
+        
+        if (isMercadoPagoConfigured && showMercadoPagoAlert) {
+            setShowMercadoPagoAlert(false);
+        }
     };
 
     const handleSaveSettings = async () => {
@@ -158,6 +174,14 @@ const WalkerService = () => {
             const updatedEarnings = calculateEarnings(walksData, updatedSettings);
             setEarnings(updatedEarnings);
             
+            const isMercadoPagoConfigured = updatedSettings.mercadoPagoEnabled && 
+                                            updatedSettings.mercadoPagoAccessToken && 
+                                            updatedSettings.mercadoPagoPublicKey;
+            
+            if (isMercadoPagoConfigured) {
+                setShowMercadoPagoAlert(false);
+            }
+            
             console.log('Configuración guardada exitosamente');
         } catch (err) {
             console.error('Error saving settings:', err);
@@ -165,6 +189,10 @@ const WalkerService = () => {
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleDismissAlert = () => {
+        setShowMercadoPagoAlert(false);
     };
 
     if (loading) {
@@ -197,8 +225,38 @@ const WalkerService = () => {
     const walksStats = getWalksStats();
 
     return (
-        <div className="w-full min-h-screen p-6 bg-background dark:bg-foreground">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div className="max-w min-h-screen p-6 bg-background dark:bg-foreground">
+            <div className="mx-auto space-y-6">
+                
+                {showMercadoPagoAlert && (
+                    <div className="bg-gradient-to-r from-warning/10 to-yellow-red/10 dark:from-warning/20 dark:to-yellow-red/20 border-l-4 border-warning p-6 rounded-lg shadow-lg animate-pulse">
+                        <div className="flex items-start justify-between">
+                            <div className="flex items-start space-x-4">
+                                <div className="p-2 bg-warning rounded-full">
+                                    <FaExclamationTriangle className="text-foreground dark:text-background text-xl" />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-lg font-bold text-foreground dark:text-background mb-2">
+                                        ¡Atención! Sistema de cobro no configurado
+                                    </h4>
+                                    <p className="text-foreground/80 dark:text-background/80 mb-3">
+                                        Si no activas y configuras el sistema de cobro con Mercado Pago, los usuarios no podrán solicitar tu servicio de paseo de mascotas.
+                                    </p>
+                                    <div className="flex items-center space-x-2 text-sm text-accent">
+                                        <FaCreditCard className="text-base" />
+                                        <span>Configura Mercado Pago en la sección "Configuración" más abajo</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleDismissAlert}
+                                className="text-warning hover:text-danger transition-all duration-200 p-1 rounded-full hover:bg-muted"
+                            >
+                                <FaTimes />
+                            </button>
+                        </div>
+                    </div>
+                )}
                 
                 <div className="bg-foreground-userProfile p-6 rounded-lg shadow-lg">
                     <WalkerServiceHeaderComponent 

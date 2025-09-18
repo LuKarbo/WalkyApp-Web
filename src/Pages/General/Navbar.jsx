@@ -6,6 +6,8 @@ import {
 } from "react-icons/fi";
 
 import { getAllMenuItemsByRole } from '../../BackEnd/Generics/Menu.jsx';
+import { useNavigation } from '../../BackEnd/Context/NavigationContext';
+import { useHistory } from '../../BackEnd/Context/HistoryContext';
 
 const Navbar = ({
     isOpen,
@@ -18,12 +20,18 @@ const Navbar = ({
     user,
     onLogout,
 }) => {
+    const { navigateToContent: navContextNavigate } = useNavigation();
+    const { clearHistory } = useHistory();
 
     const handleMenuClick = (id) => {
         if (id === "logout") {
+            clearHistory();
             onLogout();
         } else {
-            if (navigateToContent) {
+            
+            if (navContextNavigate) {
+                navContextNavigate(id);
+            } else if (navigateToContent) {
                 navigateToContent(id);
             } else {
                 setActiveItem(id);

@@ -8,7 +8,9 @@ const WalkerWalksCardComponent = ({
     onShowWaitingPayment, 
     onStartWalk, 
     onViewWalk,
-    onFinishWalk
+    onFinishWalk,
+    canAcceptMore = true,
+    canStartMore = true
 }) => {
     const getStatusColor = (status) => {
         switch (status) {
@@ -61,11 +63,17 @@ const WalkerWalksCardComponent = ({
                 return (
                     <div className="flex items-center gap-2 mt-auto">
                         <button
-                            onClick={() => onAcceptWalk(walk)}
-                            className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg bg-green-500 text-white hover:bg-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                            onClick={() => canAcceptMore ? onAcceptWalk(walk) : null}
+                            disabled={!canAcceptMore}
+                            className={`flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-300 shadow-md ${
+                                canAcceptMore
+                                    ? "bg-green-500 text-white hover:bg-green-600 hover:shadow-lg"
+                                    : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                            }`}
+                            title={!canAcceptMore ? "Has alcanzado el límite máximo de paseos aceptados (5)" : ""}
                         >
                             <FiCheck className="mr-1" size={12} />
-                            Aceptar
+                            {canAcceptMore ? "Aceptar" : "Límite"}
                         </button>
                         <button
                             onClick={() => onRejectWalk(walk)}
@@ -94,11 +102,17 @@ const WalkerWalksCardComponent = ({
                 return (
                     <div className="flex items-center gap-2 mt-auto">
                         <button
-                            onClick={() => onStartWalk(walk)}
-                            className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg bg-primary text-white hover:bg-primary/80 transition-all duration-300 shadow-md hover:shadow-lg"
+                            onClick={() => canStartMore ? onStartWalk(walk) : null}
+                            disabled={!canStartMore}
+                            className={`flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-300 shadow-md ${
+                                canStartMore
+                                    ? "bg-primary text-white hover:bg-primary/80 hover:shadow-lg"
+                                    : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                            }`}
+                            title={!canStartMore ? "Has alcanzado el límite máximo de paseos activos (2)" : ""}
                         >
                             <FiPlay className="mr-1" size={12} />
-                            Iniciar Paseo
+                            {canStartMore ? "Iniciar Paseo" : "Límite Activos"}
                         </button>
                     </div>
                 );
@@ -131,13 +145,26 @@ const WalkerWalksCardComponent = ({
     };
 
     return (
-        <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-success/10 h-full flex flex-col min-w-[325px]">
+        <div className={`group relative overflow-hidden rounded-3xl backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-success/10 h-full flex flex-col min-w-[325px] ${
+
+            (!canAcceptMore && walk.status === "Solicitado") || (!canStartMore && walk.status === "Agendado")
+                ? "bg-gray-50/80 dark:bg-gray-800/80"
+                : "bg-white/80 dark:bg-foreground/80"
+        }`}>
 
             <div className="absolute top-4 right-4 z-10">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-lg ${getStatusColor(walk.status)}`}>
                     {getStatusText(walk.status)}
                 </span>
             </div>
+
+            {((!canAcceptMore && walk.status === "Solicitado") || (!canStartMore && walk.status === "Agendado")) && (
+                <div className="absolute top-4 left-4 z-10">
+                    <span className="px-2 py-1 rounded-full text-xs font-bold bg-red-500/70 text-white shadow-lg">
+                        Límite
+                    </span>
+                </div>
+            )}
 
             <div className="absolute inset-0 bg-gradient-to-br from-success/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
@@ -147,7 +174,11 @@ const WalkerWalksCardComponent = ({
                         <span className="text-white font-bold text-sm">{walk.dogName?.[0] || 'P'}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-foreground dark:text-background group-hover:text-success transition-colors duration-300 truncate">
+                        <h3 className={`text-lg font-bold group-hover:text-success transition-colors duration-300 truncate ${
+                            (!canAcceptMore && walk.status === "Solicitado") || (!canStartMore && walk.status === "Agendado")
+                                ? "text-gray-500 dark:text-gray-400"
+                                : "text-foreground dark:text-background"
+                        }`}>
                             {walk.dogName}
                         </h3>
                         <div className="flex items-center text-accent dark:text-muted">
@@ -197,6 +228,24 @@ const WalkerWalksCardComponent = ({
                             <FiInfo className="mr-2 text-orange-600 flex-shrink-0" size={14} />
                             <span className="text-xs font-semibold text-orange-800 truncate">
                                 Cliente notificado - Esperando pago
+                            </span>
+                        </div>
+                    )}
+
+                    {(!canAcceptMore && walk.status === "Solicitado") && (
+                        <div className="flex items-center p-2 bg-red-100 rounded-lg border border-red-200">
+                            <FiInfo className="mr-2 text-red-600 flex-shrink-0" size={14} />
+                            <span className="text-xs font-semibold text-red-800 truncate">
+                                Límite de 5 paseos aceptados alcanzado
+                            </span>
+                        </div>
+                    )}
+
+                    {(!canStartMore && walk.status === "Agendado") && (
+                        <div className="flex items-center p-2 bg-red-100 rounded-lg border border-red-200">
+                            <FiInfo className="mr-2 text-red-600 flex-shrink-0" size={14} />
+                            <span className="text-xs font-semibold text-red-800 truncate">
+                                Límite de 2 paseos activos alcanzado
                             </span>
                         </div>
                     )}

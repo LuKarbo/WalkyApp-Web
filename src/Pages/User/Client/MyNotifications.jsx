@@ -203,8 +203,8 @@ const MyNotifications = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background dark:bg-foreground p-4 md:p-8">
-            <div className="max-w-4xl mx-auto">
+        <div className="max-w min-h-screen bg-background dark:bg-foreground p-4 md:p-8">
+            <div className="mx-auto">
                 
                 <NotificationFilter
                     search={search}
@@ -237,7 +237,7 @@ const MyNotifications = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="space-y-4 mb-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
                             {notifications.map((notification) => (
                                 <NotificationCard
                                     key={notification.id}
