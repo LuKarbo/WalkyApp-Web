@@ -197,8 +197,8 @@ const WalkerService = () => {
     const walksStats = getWalksStats();
 
     return (
-        <div className="w-full min-h-screen p-6 bg-background dark:bg-foreground">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div className="max-w min-h-screen p-6 bg-background dark:bg-foreground">
+            <div className="mx-auto space-y-6">
                 
                 <div className="bg-foreground-userProfile p-6 rounded-lg shadow-lg">
                     <WalkerServiceHeaderComponent 
