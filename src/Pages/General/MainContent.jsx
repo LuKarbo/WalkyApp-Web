@@ -39,7 +39,7 @@ const MainContent = ({ activeItem, contentParams, navigateToContent }) => {
                 </div>
             </div>
             
-            <div className="bg-card dark:bg-accent rounded-lg shadow-lg min-h-[calc(100vh-200px)]">
+            <div className="rounded-lg min-h-[calc(100vh-200px)]">
                 {ActiveComponent && (
                     <ActiveComponent 
                         contentParams={contentParams} 
