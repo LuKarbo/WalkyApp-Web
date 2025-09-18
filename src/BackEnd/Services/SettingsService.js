@@ -346,5 +346,9 @@ export const SettingsService = {
     isSubscriptionExpiringSoon(expiryDate, daysThreshold = 7) {
         const daysRemaining = this.getDaysUntilExpiry(expiryDate);
         return daysRemaining !== null && daysRemaining <= daysThreshold && daysRemaining > 0;
+    },
+
+    getSubscriptionPlans(){
+        return SettingsDataAccess.getSubscriptionPlans();
     }
 };
