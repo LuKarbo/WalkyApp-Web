@@ -6,6 +6,7 @@ import Register from "./Pages/Auth/Register.jsx";
 import { AuthController } from "./BackEnd/Controllers/AuthController.js";
 import { UserProvider } from "./BackEnd/Context/UserContext";
 import { NavigationProvider } from "./BackEnd/Context/NavigationContext";
+import { HistoryProvider } from "./BackEnd/Context/HistoryContext";
 import { ToastProvider } from "./BackEnd/Context/ToastContext";
 
 const App = () => {
@@ -46,7 +47,7 @@ const App = () => {
     sessionStorage.setItem("lightMode", JSON.stringify(newLightMode));
   };
 
-  // MÃ©todo para cambiar contenido del MainContent
+  // Método para cambiar contenido del MainContent
   // para utilizarlo se necesita el useNavegation del NavigationContext (pero solo funciona dentro de los componentes de NavigationProvider)
   const navigateToContent = (contentId, params = null) => {
     console.log("navigateToContent called:", { contentId, params });
@@ -170,27 +171,29 @@ const App = () => {
           )
         ) : (
           <UserProvider user={user}>
-            <NavigationProvider navigateToContent={navigateToContent}>
-              <div className="flex h-screen bg-background dark:bg-foreground">
-                <Navbar
-                  isOpen={isOpen}
-                  toggleSidebar={toggleSidebar}
-                  isLightMode={isLightMode}
-                  toggleLightMode={toggleLightMode}
-                  activeItem={activeItem}
-                  setActiveItem={setActiveItem}
-                  navigateToContent={navigateToContent}
-                  user={user}
-                  onLogout={handleLogout}
-                />
-                <MainContent 
-                  activeItem={activeItem} 
-                  contentParams={contentParams}
-                  navigateToContent={navigateToContent}
-                  isLightMode={isLightMode} 
-                />
-              </div>
-            </NavigationProvider>
+            <HistoryProvider>
+              <NavigationProvider navigateToContent={navigateToContent}>
+                <div className="flex h-screen bg-background dark:bg-foreground">
+                  <Navbar
+                    isOpen={isOpen}
+                    toggleSidebar={toggleSidebar}
+                    isLightMode={isLightMode}
+                    toggleLightMode={toggleLightMode}
+                    activeItem={activeItem}
+                    setActiveItem={setActiveItem}
+                    navigateToContent={navigateToContent}
+                    user={user}
+                    onLogout={handleLogout}
+                  />
+                  <MainContent 
+                    activeItem={activeItem} 
+                    contentParams={contentParams}
+                    navigateToContent={navigateToContent}
+                    isLightMode={isLightMode} 
+                  />
+                </div>
+              </NavigationProvider>
+            </HistoryProvider>
           </UserProvider>
         )}
       </ToastProvider>
