@@ -1,8 +1,10 @@
 import { GoogleMap, LoadScript, DirectionsService, DirectionsRenderer, Marker } from "@react-google-maps/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { FiMap, FiMapPin } from "react-icons/fi";
+import { WalkTrackingController } from "../../../../BackEnd/Controllers/WalkTrackingController";
 
 const containerStyle = {
-  width: "100%",
+  width: "100%", 
   height: "400px",
 };
 
@@ -11,117 +13,250 @@ const defaultCenter = {
   lng: -58.3816,
 };
 
-export default function WalkMap({ onPointAdded, onClear }) {
-  const [path, setPath] = useState(() => {
-    const saved = localStorage.getItem("ruta");
-    return saved ? JSON.parse(saved) : [];
-  });
-
+export default function WalkMap({ tripId, walkStatus, onPointAdded, onClear }) {
+  const [path, setPath] = useState([]);
   const [directions, setDirections] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleClick = (event) => {
-    const newPoint = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-    const newPath = [...path, newPoint];
-    setPath(newPath);
-    setDirections(null); // reset al agregar un punto
-    localStorage.setItem("ruta", JSON.stringify(newPath));
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location: newPoint }, (results, status) => {
-      if (status === "OK" && results[0]) {
-        const address = results[0].formatted_address;
-        const record = {
-          time: new Date().toLocaleTimeString(),
-          timeFull: new Date().toISOString(),
-          address,
-          lat: newPoint.lat,
-          lng: newPoint.lng,
-        };
-        onPointAdded?.(record); //ejecuta callback si existe
+  // Verificar si el mapa está visible y si es interactivo
+  const isMapVisible = WalkTrackingController.isMapVisible(walkStatus);
+  const isMapInteractive = WalkTrackingController.isMapInteractive(walkStatus);
+  const mapStatusMessage = WalkTrackingController.getMapStatusMessage(walkStatus);
+
+  // Cargar ruta existente al montar el componente
+  useEffect(() => {
+    if (tripId && isMapVisible) {
+      loadWalkRoute();
+    } else {
+      // Si no es visible, limpiar el mapa
+      setPath([]);
+      setDirections(null);
+    }
+  }, [tripId, isMapVisible]);
+
+  const loadWalkRoute = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const route = await WalkTrackingController.fetchWalkRoute(tripId);
+      setPath(route);
+      
+      // Si hay ruta, calcular direcciones
+      if (route.length >= 2) {
+        setDirections(null); // Reset para que se recalcule
       }
-    });
+    } catch (err) {
+      setError('Error cargando ruta: ' + err.message);
+      console.error('Error loading walk route:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const clearPath = () => {
-    setPath([]);
-    setDirections(null);
-    localStorage.removeItem("ruta");
-    onClear?.(); //limpia lista de registros del paseo en chat map
+  const handleClick = async (event) => {
+    if (!isMapInteractive || !tripId) return;
+
+    const newPoint = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+    
+    try {
+      setError(null);
+      
+      // Geocoding para obtener dirección
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ location: newPoint }, async (results, status) => {
+        if (status === "OK" && results[0]) {
+          const address = results[0].formatted_address;
+          
+          try {
+            // Guardar punto usando el controller
+            const savedRecord = await WalkTrackingController.saveWalkPoint(
+              tripId, 
+              newPoint.lat, 
+              newPoint.lng, 
+              address
+            );
+            
+            // Actualizar path local
+            const newPath = [...path, newPoint];
+            setPath(newPath);
+            setDirections(null); // Reset para recalcular direcciones
+            
+            // Callback al componente padre
+            onPointAdded?.(savedRecord);
+            
+          } catch (err) {
+            setError('Error guardando punto: ' + err.message);
+          }
+        } else {
+          // Si no se puede hacer geocoding, usar coordenadas
+          try {
+            const savedRecord = await WalkTrackingController.saveWalkPoint(
+              tripId,
+              newPoint.lat,
+              newPoint.lng,
+              `${newPoint.lat.toFixed(6)}, ${newPoint.lng.toFixed(6)}`
+            );
+            
+            const newPath = [...path, newPoint];
+            setPath(newPath);
+            setDirections(null);
+            
+            onPointAdded?.(savedRecord);
+            
+          } catch (err) {
+            setError('Error guardando punto: ' + err.message);
+          }
+        }
+      });
+    } catch (err) {
+      setError('Error procesando click: ' + err.message);
+    }
   };
 
+  const clearPath = async () => {
+    if (!tripId) return;
+    
+    try {
+      setError(null);
+      
+      // Limpiar datos usando el controller
+      await WalkTrackingController.clearWalkData(tripId);
+      
+      // Limpiar estado local
+      setPath([]);
+      setDirections(null);
+      
+      // Callback al componente padre
+      onClear?.();
+      
+    } catch (err) {
+      setError('Error limpiando datos: ' + err.message);
+    }
+  };
 
+  // Si el mapa no es visible según el estado del paseo
+  if (!isMapVisible) {
+    return (
+      <div className="w-full">
+        <div className="bg-gray-100 rounded-2xl shadow-md p-8 border border-gray-300 h-[400px] flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <FiMap size={64} className="mx-auto mb-4 text-gray-400" />
+            <p className="font-medium text-lg mb-2">Mapa no disponible</p>
+            <p className="text-sm">{mapStatusMessage}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // si tengo puntos guardados, centrar en el primero
   const center = path.length > 0 ? path[0] : defaultCenter;
 
   return (
     <div className="w-full">
-      {/* Botón para limpiar */}
-      <div className="mb-2">
-        <button
-          onClick={clearPath}
-          className="bg-danger text-black px-3 py-1 rounded-md hover:bg-foreground"
-        >
-          Borrar Ruta
-        </button>
+      {/* Header con botón para limpiar */}
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FiMapPin className="text-primary" size={16} />
+          <span className="text-sm text-gray-600">{mapStatusMessage}</span>
+        </div>
+        
+        {isMapInteractive && (
+          <button
+            onClick={clearPath}
+            disabled={loading || path.length === 0}
+            className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 
+                       disabled:opacity-50 disabled:cursor-not-allowed text-sm
+                       transition-colors duration-200"
+          >
+            Borrar Ruta
+          </button>
+        )}
       </div>
-    <div className="flex">
-      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={center}
-          zoom={13}
-          onClick={handleClick}
-        >
-          {path.length >= 2 && !directions && (
-            <DirectionsService
-              options={{
-                origin: path[0],
-                destination: path[path.length - 1],
-                waypoints: path.slice(1, -1).map((p) => ({
-                  location: p,
-                  stopover: true,
-                })),
-                travelMode: "WALKING",
-              }}
-              callback={(res) => {
-                if (res !== null && res.status === "OK") {
-                  setDirections(res);
-                }
-              }}
-            />
-          )}
 
-          {directions && (
-            <DirectionsRenderer
-              options={{
-                directions: directions,
-                polylineOptions: {
-                  strokeColor: "#4ade80",
-                  strokeWeight: 5,
-                },
-              }}
-            />
-          )}
+      {/* Error message */}
+      {error && (
+        <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
 
-          {/* Marcador de inicio */}
-          {path.length > 0 && (
-            <Marker
-              position={path[0]}
-              icon="http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-            />
-          )}
+      {/* Loading overlay */}
+      {loading && (
+        <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+          <div className="flex items-center gap-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <p className="text-blue-600 text-sm">Cargando mapa...</p>
+          </div>
+        </div>
+      )}
 
-          {/*Marcador de destino
-          {path.length > 1 && (
-            <Marker
-              position={path[path.length - 1]}
-              label={{text: "Destino",color: "#ffffff",fontWeight: "bold",}}
-              icon="http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-            />
-          )}*/}
+      <div className="flex">
+        <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={center}
+            zoom={13}
+            onClick={isMapInteractive ? handleClick : undefined}
+            options={{
+              disableDefaultUI: !isMapInteractive,
+              zoomControl: true,
+              mapTypeControl: false,
+              streetViewControl: false,
+              fullscreenControl: false,
+              gestureHandling: isMapInteractive ? 'auto' : 'none'
+            }}
+          >
+            {path.length >= 2 && !directions && (
+              <DirectionsService
+                options={{
+                  origin: path[0],
+                  destination: path[path.length - 1],
+                  waypoints: path.slice(1, -1).map((p) => ({
+                    location: p,
+                    stopover: true,
+                  })),
+                  travelMode: "WALKING",
+                }}
+                callback={(res) => {
+                  if (res !== null && res.status === "OK") {
+                    setDirections(res);
+                  }
+                }}
+              />
+            )}
 
-        </GoogleMap>
-      </LoadScript>
+            {directions && (
+              <DirectionsRenderer
+                options={{
+                  directions: directions,
+                  polylineOptions: {
+                    strokeColor: walkStatus === 'Finalizado' ? "#94a3b8" : "#4ade80",
+                    strokeWeight: 5,
+                    strokeOpacity: walkStatus === 'Finalizado' ? 0.7 : 1
+                  },
+                }}
+              />
+            )}
+
+            {/* Marcador de inicio */}
+            {path.length > 0 && (
+              <Marker
+                position={path[0]}
+                icon="http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+              />
+            )}
+
+            {/* Marcador de fin (solo si hay más de un punto y el paseo está finalizado) */}
+            {path.length > 1 && walkStatus === 'Finalizado' && (
+              <Marker
+                position={path[path.length - 1]}
+                icon="http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+              />
+            )}
+          </GoogleMap>
+        </LoadScript>
       </div>
     </div>
   );

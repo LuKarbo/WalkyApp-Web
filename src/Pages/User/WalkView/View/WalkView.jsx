@@ -84,8 +84,17 @@ const WalkView = ({ id }) => {
 
                 {/* WalkMap + WalkData */}
                 <div className="md:col-span-2 flex flex-col gap-4 h-full">
-                    <WalkMap onPointAdded={handlePointAdded} onClear={handleClearRecords} />
-                    <WalkData records={records} />
+                    <WalkMap 
+                        tripId={tripId} 
+                        walkStatus={walkData?.status} 
+                        onPointAdded={handlePointAdded} 
+                        onClear={handleClearRecords} 
+                    />
+                    <WalkData 
+                        tripId={tripId} 
+                        walkStatus={walkData?.status} 
+                        records={records} 
+                    />
                 </div>
             </div>
         </div>

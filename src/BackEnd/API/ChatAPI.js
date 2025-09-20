@@ -73,7 +73,7 @@ export const ChatAPI = {
                     senderId: 3,
                     senderType: "owner", 
                     senderName: "María García",
-                    message: "Genial, sos mi heroe Faour!",
+                    message: "Genial, sos mi heroe!",
                     timestamp: "2024-01-20T10:20:00",
                     read: false
                 }
