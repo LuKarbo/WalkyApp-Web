@@ -240,8 +240,8 @@ export default function WalkMap({ tripId, walkStatus, onPointAdded, onClear }) {
               />
             )}
 
-            {/* Marcador de inicio */}
-            {path.length > 0 && (
+            {/* Marcador de inicio (solo si hay exactamente un punto) */}
+            {path.length === 1 && (
               <Marker
                 position={path[0]}
                 icon="http://maps.google.com/mapfiles/ms/icons/green-dot.png"
