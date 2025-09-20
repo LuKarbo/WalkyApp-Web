@@ -94,10 +94,10 @@ const WalkChat = ({ tripId, walkStatus }) => {
     return (
         <div className="bg-foreground rounded-2xl shadow-md flex flex-col h-full border border-border mx-auto">
             {/* Header del chat */}
-            <div className="p-3 border-b border-border bg-gray-50 rounded-t-2xl">
+            <div className="p-3 border-b border-border rounded-t-2xl">
                 <div className="flex items-center gap-2">
                     <FiMessageCircle className="text-primary" size={20} />
-                    <h3 className="font-semibold text-gray-800">Chat del Paseo</h3>
+                    <h3 className="font-semibold text-black">Chat del Paseo</h3>
                 </div>
                 <p className="text-xs text-gray-600 mt-1">Estado: {chatStatusMessage}</p>
                 {error && (
@@ -106,7 +106,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
             </div>
 
             {/* Mensajes */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-3 space-y-3 ">
                 {!isChatVisible ? (
                     <div className="text-center text-gray-500 mt-8 p-4">
                         <FiMessageCircle size={48} className="mx-auto mb-3 text-gray-400" />
@@ -137,12 +137,12 @@ const WalkChat = ({ tripId, walkStatus }) => {
                                     className={`max-w-[75%] rounded-lg p-3 shadow-sm ${
                                         isCurrentUser
                                             ? "bg-primary text-black rounded-br-sm"
-                                            : "bg-white text-gray-800 rounded-bl-sm border"
+                                            : "bg-black text-white rounded-bl-sm border"
                                     }`}
                                 >
                                     {/* Nombre del usuario (solo para mensajes de otros) */}
                                     {!isCurrentUser && (
-                                        <p className="text-xs font-medium text-primary mb-1">
+                                        <p className="text-xs font-medium text-gray-500 mb-1">
                                             {message.senderName}
                                         </p>
                                     )}
@@ -168,7 +168,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
             {/* Input de mensaje */}
             <form
                 onSubmit={sendMessage}
-                className={`flex gap-2 mb-2 px-3 py-2 border-t border-border bg-white rounded-b-2xl ${
+                className={`flex gap-2 mb-2 px-3 py-2 border-t border-border rounded-b-2xl ${
                     !canSendMessages ? 'opacity-50' : ''
                 }`}
             >
@@ -185,7 +185,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
                     }
                     disabled={sendingMessage || !canSendMessages}
                     className="flex-1 px-4 py-2 rounded-full border border-gray-300
-                               bg-gray-50 text-black text-sm
+                               bg-gray-50 text-gray-900 text-sm
                                placeholder:text-gray-500
                                focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
                                disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200"
