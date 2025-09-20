@@ -40,9 +40,14 @@ export const ChatController = {
         }
     },
 
-    // Validar si el chat está habilitado según el estado del paseo
-    isChatEnabled(walkStatus) {
-        return ChatService.validateChatEnabled(walkStatus);
+    // Validar si el chat está visible según el estado del paseo
+    isChatVisible(walkStatus) {
+        return ChatService.validateChatVisible(walkStatus);
+    },
+
+    // Validar si se pueden enviar mensajes según el estado del paseo
+    canSendMessages(walkStatus) {
+        return ChatService.validateCanSendMessages(walkStatus);
     },
 
     // Obtener mensaje de estado del chat

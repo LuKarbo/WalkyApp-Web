@@ -45,7 +45,39 @@ export const ChatAPI = {
                     timestamp: "2024-01-20T11:00:00",
                     read: false
                 }
-            ]
+            ],
+            "W003": [
+                {
+                    id: "MSG005",
+                    tripId: "W003",
+                    senderId: 3,
+                    senderType: "owner",
+                    senderName: "María García",
+                    message: "Hola, ¿cómo va el paseo con Mimi?",
+                    timestamp: "2024-01-20T10:15:00",
+                    read: true
+                },
+                {
+                    id: "MSG006",
+                    tripId: "W003",
+                    senderId: 1,
+                    senderType: "walker",
+                    senderName: "María García",
+                    message: "¡Todo perfecto! Como yo nadie te va a cuidar a Mimi",
+                    timestamp: "2024-01-20T10:17:00",
+                    read: true
+                },
+                {
+                    id: "MSG007",
+                    tripId: "W003",
+                    senderId: 3,
+                    senderType: "owner", 
+                    senderName: "María García",
+                    message: "Genial, sos mi heroe Faour!",
+                    timestamp: "2024-01-20T10:20:00",
+                    read: false
+                }
+            ],
         };
 
         // Simulamos delay de red

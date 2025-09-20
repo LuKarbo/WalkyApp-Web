@@ -82,10 +82,16 @@ export const ChatService = {
         return true;
     },
 
-    // Validar si el chat está habilitado según el estado del paseo
-    validateChatEnabled(walkStatus) {
-        const enabledStatuses = ['Activo'];
-        return enabledStatuses.includes(walkStatus);
+    // Validar si el chat se puede mostrar según el estado del paseo
+    validateChatVisible(walkStatus) {
+        const visibleStatuses = ['Activo', 'Finalizado'];
+        return visibleStatuses.includes(walkStatus);
+    },
+
+    // Validar si se pueden enviar mensajes según el estado del paseo
+    validateCanSendMessages(walkStatus) {
+        const sendableStatuses = ['Activo'];
+        return sendableStatuses.includes(walkStatus);
     },
 
     getChatStatusMessage(walkStatus) {
@@ -93,7 +99,7 @@ export const ChatService = {
             case 'Agendado':
                 return 'El chat se habilitará cuando el paseo esté activo';
             case 'Finalizado':
-                return 'El paseo ha finalizado. El chat ya no está disponible';
+                return 'El paseo ha finalizado. Solo lectura';
             case 'Rechazado':
                 return 'El paseo fue rechazado';
             case 'Solicitado':

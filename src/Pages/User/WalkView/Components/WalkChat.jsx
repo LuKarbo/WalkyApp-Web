@@ -15,8 +15,9 @@ const WalkChat = ({ tripId, walkStatus }) => {
     const userName = user?.name || "Usuario";
     const userType = user?.type || "owner"; // 'owner' o 'walker'
 
-    // Verificar si el chat está habilitado según el estado del paseo
-    const isChatEnabled = ChatController.isChatEnabled(walkStatus);
+    // Verificar si el chat está visible y si se pueden enviar mensajes
+    const isChatVisible = ChatController.isChatVisible(walkStatus);
+    const canSendMessages = ChatController.canSendMessages(walkStatus);
     const chatStatusMessage = ChatController.getChatStatusMessage(walkStatus);
 
     // Cargar mensajes al montar el componente
@@ -48,7 +49,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
     const sendMessage = async (e) => {
         e.preventDefault();
         
-        if (!newMessage.trim() || !tripId || !userId || !isChatEnabled) return;
+        if (!newMessage.trim() || !tripId || !userId || !canSendMessages) return;
 
         try {
             setSendingMessage(true);
@@ -106,7 +107,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
 
             {/* Mensajes */}
             <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
-                {!isChatEnabled ? (
+                {!isChatVisible ? (
                     <div className="text-center text-gray-500 mt-8 p-4">
                         <FiMessageCircle size={48} className="mx-auto mb-3 text-gray-400" />
                         <p className="font-medium">Chat no disponible</p>
@@ -116,7 +117,12 @@ const WalkChat = ({ tripId, walkStatus }) => {
                     <div className="text-center text-gray-500 mt-8 p-4">
                         <FiMessageCircle size={48} className="mx-auto mb-3 text-gray-400" />
                         <p className="font-medium">No hay mensajes aún</p>
-                        <p className="text-sm">¡Inicia la conversación!</p>
+                        <p className="text-sm">
+                            {walkStatus === 'Finalizado' ? 
+                                'El paseo ha finalizado' : 
+                                '¡Inicia la conversación!'
+                            }
+                        </p>
                     </div>
                 ) : (
                     messages.map((message, index) => {
@@ -131,7 +137,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
                                     className={`max-w-[75%] rounded-lg p-3 shadow-sm ${
                                         isCurrentUser
                                             ? "bg-primary text-black rounded-br-sm"
-                                            : "bg-foreground text-gray-800 rounded-bl-sm border"
+                                            : "bg-white text-gray-800 rounded-bl-sm border"
                                     }`}
                                 >
                                     {/* Nombre del usuario (solo para mensajes de otros) */}
@@ -142,7 +148,7 @@ const WalkChat = ({ tripId, walkStatus }) => {
                                     )}
                                     
                                     {/* Contenido del mensaje */}
-                                    <p className="break-words text-sm leading-relaxed text-secondary">
+                                    <p className="break-words text-sm leading-relaxed">
                                         {message.text}
                                     </p>
                                     
@@ -163,24 +169,30 @@ const WalkChat = ({ tripId, walkStatus }) => {
             <form
                 onSubmit={sendMessage}
                 className={`flex gap-2 mb-2 px-3 py-2 border-t border-border bg-white rounded-b-2xl ${
-                    !isChatEnabled ? 'opacity-50' : ''
+                    !canSendMessages ? 'opacity-50' : ''
                 }`}
             >
                 <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={isChatEnabled ? "Escribe tu mensaje..." : "Chat no disponible"}
-                    disabled={sendingMessage || !isChatEnabled}
+                    placeholder={
+                        walkStatus === 'Finalizado' 
+                            ? "El paseo ha finalizado - No se pueden enviar mensajes" 
+                            : canSendMessages 
+                                ? "Escribe tu mensaje..." 
+                                : "Chat no disponible"
+                    }
+                    disabled={sendingMessage || !canSendMessages}
                     className="flex-1 px-4 py-2 rounded-full border border-gray-300
-                               bg-gray-50 text-primary text-sm
-                               placeholder:text-primary
+                               bg-gray-50 text-black text-sm
+                               placeholder:text-gray-500
                                focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
                                disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200"
                 />
                 <button
                     type="submit"
-                    disabled={sendingMessage || !newMessage.trim() || !isChatEnabled}
+                    disabled={sendingMessage || !newMessage.trim() || !canSendMessages}
                     className="bg-primary text-white p-2 rounded-full hover:bg-opacity-90 
                                transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
                                flex items-center justify-center min-w-[40px] min-h-[40px]
