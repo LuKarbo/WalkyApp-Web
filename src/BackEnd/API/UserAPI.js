@@ -1,4 +1,5 @@
 import { AuthAPI } from './AuthAPI.js';
+import apiClient from '../ApiClient.js';
 
 export const UserAPI = {
     async getAllUsers() {
@@ -8,14 +9,28 @@ export const UserAPI = {
 
     async getUserById(id) {
         console.log("UsersAPI - Obteniendo usuario por ID:", id);
-        const users = await AuthAPI.getAllUsers();
-        const user = users.find(u => u.id === id);
         
-        if (!user) {
+        try {
+            const response = await apiClient.get(`/users/${id}`);
+            const user = response.data.user;
+            
+            return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                profileImage: user.profileImage || user.profile_image,
+                suscription: user.suscription || user.subscription || 'Basic',
+                phone: user.phone || "",
+                location: user.location || "",
+                joinedDate: user.joinedDate || user.joined_date,
+                status: user.status,
+                lastLogin: user.lastLogin || user.last_login
+            };
+        } catch (error) {
+            console.error("Error obteniendo usuario por ID:", error);
             throw new Error("Usuario no encontrado");
         }
-        
-        return user;
     },
 
     async updateUser(id, userData) {
@@ -30,26 +45,53 @@ export const UserAPI = {
 
     async getUserStats() {
         console.log("UsersAPI - Obteniendo estadísticas de usuarios");
-        const users = await AuthAPI.getAllUsers();
         
-        const stats = {
-            total: users.length,
-            active: users.filter(u => u.status === 'active').length,
-            inactive: users.filter(u => u.status === 'inactive').length,
-            byRole: {
-                admin: users.filter(u => u.role === 'admin').length,
-                client: users.filter(u => u.role === 'client').length,
-                walker: users.filter(u => u.role === 'walker').length,
-                support: users.filter(u => u.role === 'support').length
-            },
-            recentJoins: users.filter(u => {
-                const joinDate = new Date(u.joinedDate);
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                return joinDate > thirtyDaysAgo;
-            }).length
-        };
+        try {
+            const response = await apiClient.get('/users/stats');
+            
+            const stats = response.data.stats;
+            
+            return {
+                total: stats.total,
+                active: stats.active,
+                inactive: stats.inactive,
+                byRole: {
+                    admin: stats.byRole.admin,
+                    client: stats.byRole.client,
+                    walker: stats.byRole.walker,
+                    support: stats.byRole.support
+                },
+                recentJoins: stats.recentJoins
+            };
+        } catch (error) {
+            console.error("Error obteniendo estadísticas:", error);
+            
+            try {
+                const users = await this.getAllUsers();
+                
+                const stats = {
+                    total: users.length,
+                    active: users.filter(u => u.status === 'active').length,
+                    inactive: users.filter(u => u.status === 'inactive').length,
+                    byRole: {
+                        admin: users.filter(u => u.role === 'admin').length,
+                        client: users.filter(u => u.role === 'client').length,
+                        walker: users.filter(u => u.role === 'walker').length,
+                        support: users.filter(u => u.role === 'support').length
+                    },
+                    recentJoins: users.filter(u => {
+                        const joinDate = new Date(u.joinedDate);
+                        const thirtyDaysAgo = new Date();
+                        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                        return joinDate > thirtyDaysAgo;
+                    }).length
+                };
 
-        return stats;
+                return stats;
+            } catch (fallbackError) {
+                console.error("Error en fallback de estadísticas:", fallbackError);
+                throw new Error('Error al obtener estadísticas de usuarios');
+            }
+        }
     }
 };

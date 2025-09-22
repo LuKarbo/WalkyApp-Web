@@ -1,221 +1,214 @@
-export const AuthAPI = {
-    users: [
-        {
-            id: 1,
-            name: "Juan Admin",
-            email: "admin@walkyapp.com",
-            password: "12345678",
-            role: "admin",
-            profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-            suscription: "Premium",
-            phone: "+1234567890",
-            location: "Buenos Aires, Argentina",
-            joinedDate: new Date('2023-01-15').toISOString(),
-            status: "active",
-            lastLogin: new Date().toISOString()
-        },
-        {
-            id: 2,
-            name: "María Cliente",
-            email: "client@walkyapp.com",
-            password: "12345678",
-            role: "client",
-            profileImage: "https://images.unsplash.com/photo-1494790108755-2616b2e3c8c5",
-            suscription: "Basic",
-            phone: "+1234567891",
-            location: "Córdoba, Argentina",
-            joinedDate: new Date('2023-03-22').toISOString(),
-            status: "active",
-            lastLogin: new Date().toISOString()
-        },
-        {
-            id: 3,
-            name: "Carlos Paseador",
-            email: "walker@walkyapp.com",
-            password: "12345678",
-            role: "walker",
-            profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-            suscription: "Professional",
-            phone: "+1234567892",
-            location: "Rosario, Argentina",
-            joinedDate: new Date('2023-05-10').toISOString(),
-            status: "active",
-            lastLogin: new Date().toISOString()
-        },
-        {
-            id: 4,
-            name: "Ana Soporte",
-            email: "support@walkyapp.com",
-            password: "12345678",
-            role: "support",
-            profileImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-            suscription: "Staff",
-            phone: "+1234567893",
-            location: "Mendoza, Argentina",
-            joinedDate: new Date('2023-02-28').toISOString(),
-            status: "active",
-            lastLogin: new Date().toISOString()
-        },
-        {
-            id: 5,
-            name: "Pedro Cliente Inactivo",
-            email: "inactive@walkyapp.com",
-            password: "12345678",
-            role: "client",
-            profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-            suscription: "Basic",
-            phone: "+1234567894",
-            location: "La Plata, Argentina",
-            joinedDate: new Date('2022-12-01').toISOString(),
-            status: "inactive",
-            lastLogin: new Date('2023-01-15').toISOString()
-        },
-        {
-            id: 6,
-            name: "María 2",
-            email: "client2@walkyapp.com",
-            password: "12345678",
-            role: "client",
-            profileImage: "https://images.unsplash.com/photo-1494790108755-2616b2e3c8c5",
-            suscription: "Basic",
-            phone: "+1234567891",
-            location: "Córdoba, Argentina",
-            joinedDate: new Date('2023-03-22').toISOString(),
-            status: "active",
-            lastLogin: new Date().toISOString()
-        },
-        {
-            id: 7,
-            name: "María 3",
-            email: "client3@walkyapp.com",
-            password: "12345678",
-            role: "client",
-            profileImage: "https://images.unsplash.com/photo-1494790108755-2616b2e3c8c5",
-            suscription: "Basic",
-            phone: "+1234567891",
-            location: "Córdoba, Argentina",
-            joinedDate: new Date('2023-03-22').toISOString(),
-            status: "active",
-            lastLogin: new Date().toISOString()
-        },
-    ],
+import apiClient from '../ApiClient.js';
 
+export const AuthAPI = {
     async login(credentials) {
         console.log("Simulando llamada API login:", credentials);
         
-        const user = this.users.find(u => 
-            u.email === credentials.email && 
-            u.password === credentials.password &&
-            u.status === "active"
-        );
+        try {
+            const response = await apiClient.post('/auth/login', {
+                email: credentials.email,
+                password: credentials.password
+            });
 
-        if (user) {
+            const userData = response.data.user;
             
-            user.lastLogin = new Date().toISOString();
-            
+            if (userData.token) {
+                apiClient.setToken(userData.token);
+            }
+
             return {
-                ...user,
-                token: `fake-jwt-token-${user.id}`,
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                password: credentials.password,
+                role: userData.role,
+                profileImage: userData.profileImage || userData.profile_image,
+                suscription: userData.suscription || userData.subscription || 'Basic',
+                phone: userData.phone || "",
+                location: userData.location || "",
+                joinedDate: userData.joinedDate || userData.joined_date,
+                status: userData.status,
+                lastLogin: userData.lastLogin || userData.last_login,
+                token: userData.token
             };
+        } catch (error) {
+            console.error("Error en login:", error);
+            throw new Error("Credenciales inválidas o cuenta inactiva");
         }
-
-        throw new Error("Credenciales inválidas o cuenta inactiva");
     },
 
     async register(data) {
         console.log("Simulando llamada API register:", data);
         
-        if (this.users.some(u => u.email === data.email)) {
-            throw new Error("El email ya está registrado");
+        try {
+            const response = await apiClient.post('/auth/register', {
+                name: data.name,
+                email: data.email,
+                password: data.password,
+                phone: data.phone || "",
+                location: data.location || "",
+                role: data.role || "client"
+            });
+
+            const userData = response.data.user;
+            
+            if (userData.token) {
+                apiClient.setToken(userData.token);
+            }
+
+            return {
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                password: data.password,
+                role: userData.role,
+                profileImage: userData.profileImage || userData.profile_image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
+                suscription: "Basic",
+                phone: userData.phone || "",
+                location: userData.location || "",
+                joinedDate: userData.joinedDate || userData.joined_date,
+                status: "active",
+                lastLogin: userData.lastLogin || userData.last_login,
+                token: userData.token
+            };
+        } catch (error) {
+            console.error("Error en register:", error);
+            if (error.message.includes('email ya está registrado')) {
+                throw new Error("El email ya está registrado");
+            }
+            throw new Error(error.message || 'Error al registrar usuario');
         }
-
-        const newUser = {
-            id: Math.max(...this.users.map(u => u.id)) + 1,
-            name: data.name,
-            email: data.email,
-            password: data.password,
-            role: data.role || "client",
-            profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-            suscription: "Basic",
-            phone: data.phone || "",
-            location: data.location || "",
-            joinedDate: new Date().toISOString(),
-            status: "active",
-            lastLogin: new Date().toISOString()
-        };
-
-        this.users.push(newUser);
-
-        return {
-            ...newUser,
-            token: `fake-jwt-token-${newUser.id}`,
-        };
     },
 
     async checkSession(token) {
         console.log("Simulando verificación de sesión con token:", token);
         
-        const userId = token?.replace('fake-jwt-token-', '');
-        const user = this.users.find(u => u.id === parseInt(userId) && u.status === "active");
+        try {
+            const response = await apiClient.post('/auth/check-session', null, {
+                headers: {
+                    Authorization: `Bearer ${token || apiClient.getToken()}`
+                }
+            });
 
-        if (user) {
+            const userData = response.data.user;
+            
+            if (userData.token) {
+                apiClient.setToken(userData.token);
+            }
+
             return {
-                ...user,
-                token,
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                role: userData.role,
+                profileImage: userData.profileImage || userData.profile_image,
+                suscription: userData.suscription || userData.subscription || 'Basic',
+                phone: userData.phone || "",
+                location: userData.location || "",
+                joinedDate: userData.joinedDate || userData.joined_date,
+                status: userData.status,
+                lastLogin: userData.lastLogin || userData.last_login,
+                token: userData.token || token
             };
+        } catch (error) {
+            console.error("Error en checkSession:", error);
+            apiClient.removeToken();
+            throw new Error("Sesión inválida o expirada");
         }
-
-        throw new Error("Sesión inválida o expirada");
     },
 
     async logout() {
         console.log("Simulando cierre de sesión");
+        
+        try {
+            await apiClient.post('/auth/logout');
+        } catch (error) {
+            console.error("Error en logout:", error);
+        }
+        
+        apiClient.removeToken();
         return { success: true };
     },
 
     async getAllUsers() {
         console.log("Simulando obtener todos los usuarios");
-        return [...this.users];
+        
+        try {
+            const response = await apiClient.get('/users');
+            
+            return response.data.users.map(user => ({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                profileImage: user.profileImage || user.profile_image,
+                suscription: user.suscription || user.subscription || 'Basic',
+                phone: user.phone || "",
+                location: user.location || "",
+                joinedDate: user.joinedDate || user.joined_date,
+                status: user.status,
+                lastLogin: user.lastLogin || user.last_login
+            }));
+        } catch (error) {
+            console.error("Error obteniendo usuarios:", error);
+            throw new Error(error.message || 'Error al obtener usuarios');
+        }
     },
 
     async updateUser(id, userData) {
         console.log("Simulando actualización de usuario:", { id, userData });
         
-        const userIndex = this.users.findIndex(u => u.id === id);
-        if (userIndex === -1) {
-            throw new Error("Usuario no encontrado");
+        try {
+            console.log("updateUser AUTH");
+            console.log(userData);
+            const response = await apiClient.put(`/users/${id}`, userData);
+
+            const updatedUser = response.data.user;
+            
+            return {
+                id: updatedUser.id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                profileImage: updatedUser.profileImage || updatedUser.profile_image,
+                suscription: updatedUser.suscription || updatedUser.subscription || 'Basic',
+                phone: updatedUser.phone || "",
+                location: updatedUser.location || "",
+                joinedDate: updatedUser.joinedDate || updatedUser.joined_date,
+                status: updatedUser.status,
+                lastLogin: updatedUser.lastLogin || updatedUser.last_login
+            };
+        } catch (error) {
+            console.error("Error actualizando usuario:", error);
+            if (error.message.includes('email ya está en uso')) {
+                throw new Error("El email ya está en uso por otro usuario");
+            }
+            if (error.message.includes('Usuario no encontrado')) {
+                throw new Error("Usuario no encontrado");
+            }
+            throw new Error(error.message || 'Error al actualizar usuario');
         }
-
-        if (userData.email && this.users.some(u => u.email === userData.email && u.id !== id)) {
-            throw new Error("El email ya está en uso por otro usuario");
-        }
-
-        this.users[userIndex] = {
-            ...this.users[userIndex],
-            ...userData,
-            id 
-        };
-
-        return this.users[userIndex];
     },
 
     async deleteUser(id) {
         console.log("Simulando eliminación de usuario:", id);
         
-        const userIndex = this.users.findIndex(u => u.id === id);
-        if (userIndex === -1) {
-            throw new Error("Usuario no encontrado");
-        }
+        try {
+            const response = await apiClient.delete(`/users/${id}`);
 
-        const user = this.users[userIndex];
-        if (user.role === 'admin') {
-            const adminCount = this.users.filter(u => u.role === 'admin' && u.status === 'active').length;
-            if (adminCount <= 1) {
+            return {
+                success: response.data.success,
+                message: "Usuario eliminado correctamente"
+            };
+        } catch (error) {
+            console.error("Error eliminando usuario:", error);
+            if (error.message.includes('último administrador')) {
                 throw new Error("No se puede eliminar el último administrador activo");
             }
+            if (error.message.includes('Usuario no encontrado')) {
+                throw new Error("Usuario no encontrado");
+            }
+            throw new Error(error.message || 'Error al eliminar usuario');
         }
-
-        this.users.splice(userIndex, 1);
-        return { success: true, message: "Usuario eliminado correctamente" };
     }
 };

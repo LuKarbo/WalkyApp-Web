@@ -40,6 +40,8 @@ export const UserService = {
 
     async updateUser(id, userData) {
         // Validaciones
+        console.log(userData);
+
         if (!userData.name || userData.name.trim().length < 2) {
             throw new Error("El nombre debe tener al menos 2 caracteres");
         }
@@ -51,28 +53,8 @@ export const UserService = {
         if (!userData.role || !["admin", "client", "walker", "support"].includes(userData.role)) {
             throw new Error("Rol inválido");
         }
-
-        if (!userData.status || !["active", "inactive"].includes(userData.status)) {
-            throw new Error("Estado inválido");
-        }
-
-        if (userData.phone && userData.phone.trim() && !/^[\+]?[0-9\-\s\(\)]+$/.test(userData.phone)) {
-            throw new Error("Formato de teléfono inválido");
-        }
-
-        // Preparar datos para la API
-        const apiData = {
-            name: userData.name.trim(),
-            email: userData.email.toLowerCase().trim(),
-            role: userData.role,
-            phone: userData.phone?.trim() || "",
-            location: userData.location?.trim() || "",
-            suscription: userData.suscription || "Basic",
-            status: userData.status,
-            profileImage: userData.profileImage
-        };
-
-        const updatedUser = await UserDataAccess.updateUser(id, apiData);
+        console.log(userData);
+        const updatedUser = await UserDataAccess.updateUser(id, userData);
 
         // Transformar respuesta al DTO del frontend
         return {
