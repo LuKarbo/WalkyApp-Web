@@ -1,8 +1,10 @@
 export const NotificationAPI = {
-    async getAllNotifications() {
-        return [
+    async getNotificationsByUser(userId) {
+        
+        const allNotifications = [
             {
                 id: 1,
+                userId: 1,
                 title: "Paseo confirmado",
                 content: "Tu paseo con Sarah Johnson ha sido confirmado para mañana a las 10:00 AM. Sarah estará en el punto de encuentro acordado. Recuerda tener listo todo lo necesario para tu mascota.",
                 type: "success",
@@ -12,6 +14,7 @@ export const NotificationAPI = {
             },
             {
                 id: 2,
+                userId: 1,
                 title: "Solicitud de paseo cancelada",
                 content: "Lamentamos informarte que Mike Wilson ha cancelado tu solicitud de paseo programado para hoy debido a condiciones climáticas adversas. Te recomendamos reagendar para otro día.",
                 type: "warning",
@@ -21,6 +24,7 @@ export const NotificationAPI = {
             },
             {
                 id: 3,
+                userId: 2,
                 title: "Nuevo paseador disponible",
                 content: "¡Buenas noticias! Emma Davis, una nueva paseadora especializada en entrenamiento conductual, se ha unido a nuestro equipo en tu área. Échale un vistazo a su perfil.",
                 type: "info",
@@ -30,6 +34,7 @@ export const NotificationAPI = {
             },
             {
                 id: 4,
+                userId: 2,
                 title: "Recordatorio de pago",
                 content: "Tu pago por el paseo con John Smith está pendiente. El servicio fue completado el 3 de septiembre. Por favor, procesa el pago para mantener tu cuenta al día.",
                 type: "warning",
@@ -39,6 +44,7 @@ export const NotificationAPI = {
             },
             {
                 id: 5,
+                userId: 1,
                 title: "Paseo completado",
                 content: "Lisa Rodriguez ha completado exitosamente el paseo de tu mascota. El reporte del paseo ya está disponible en tu historial. ¡Tu mascota tuvo un excelente tiempo!",
                 type: "success",
@@ -48,6 +54,7 @@ export const NotificationAPI = {
             },
             {
                 id: 6,
+                userId: 2,
                 title: "Califica tu experiencia",
                 content: "¡Tu paseo con Sarah Johnson fue genial! Nos encantaría conocer tu opinión. Califica tu experiencia y ayuda a otros usuarios a tomar mejores decisiones.",
                 type: "info",
@@ -57,6 +64,7 @@ export const NotificationAPI = {
             },
             {
                 id: 7,
+                userId: 2,
                 title: "Oferta especial disponible",
                 content: "¡Oferta especial! Obtén un 20% de descuento en tu próximo paseo. Esta oferta es válida hasta el final del mes. Usa el código WALK20 al hacer tu próxima reserva.",
                 type: "info",
@@ -66,6 +74,7 @@ export const NotificationAPI = {
             },
             {
                 id: 8,
+                userId: 2,
                 title: "Actualización de perfil de paseador",
                 content: "Mike Wilson ha actualizado su perfil con nuevas certificaciones en entrenamiento canino. Ahora también ofrece servicios especializados para cachorros.",
                 type: "info",
@@ -75,6 +84,7 @@ export const NotificationAPI = {
             },
             {
                 id: 9,
+                userId: 1,
                 title: "Solicitud de paseo recibida",
                 content: "Emma Davis ha aceptado tu solicitud de paseo para el fin de semana. Te contactará pronto para coordinar los detalles del encuentro y confirmar la hora exacta.",
                 type: "success",
@@ -84,6 +94,7 @@ export const NotificationAPI = {
             },
             {
                 id: 10,
+                userId: 1,
                 title: "Mantenimiento del sistema",
                 content: "El sistema estará en mantenimiento el domingo de 2:00 AM a 4:00 AM. Durante este tiempo, podrías experimentar interrupciones menores en el servicio.",
                 type: "warning",
@@ -93,6 +104,7 @@ export const NotificationAPI = {
             },
             {
                 id: 11,
+                userId: 2,
                 title: "Paseador no disponible",
                 content: "John Smith no estará disponible la próxima semana debido a compromisos personales. Te sugerimos contactar a otros paseadores en tu área.",
                 type: "warning",
@@ -102,6 +114,7 @@ export const NotificationAPI = {
             },
             {
                 id: 12,
+                userId: 1,
                 title: "Nueva zona de servicio",
                 content: "¡Expandimos nuestros servicios! Ahora también cubrimos la zona norte de la ciudad. Encuentra paseadores disponibles en tu nueva área de cobertura.",
                 type: "info",
@@ -111,6 +124,7 @@ export const NotificationAPI = {
             },
             {
                 id: 13,
+                userId: 1,
                 title: "Reporte de paseo disponible",
                 content: "El reporte detallado de tu paseo con Lisa Rodriguez ya está disponible. Incluye fotos, rutas tomadas y notas sobre el comportamiento de tu mascota.",
                 type: "success",
@@ -120,6 +134,7 @@ export const NotificationAPI = {
             },
             {
                 id: 14,
+                userId: 2,
                 title: "Cambio en horarios de paseador",
                 content: "Sarah Johnson ha actualizado sus horarios disponibles. Ahora también ofrece paseos temprano en la mañana y los fines de semana.",
                 type: "info",
@@ -129,6 +144,7 @@ export const NotificationAPI = {
             },
             {
                 id: 15,
+                userId: 1,
                 title: "Felicidades por tu primera reserva",
                 content: "¡Bienvenido a nuestra comunidad! Has completado tu primera reserva exitosamente. Esperamos que tengas una excelente experiencia con nuestros servicios.",
                 type: "success",
@@ -137,10 +153,43 @@ export const NotificationAPI = {
                 walkerName: null
             }
         ];
+
+        return allNotifications.filter(notification => notification.userId === parseInt(userId));
     },
 
-    async getNotificationById(id) {
-        const notifications = await this.getAllNotifications();
-        return notifications.find(notification => notification.id === parseInt(id));
+    async getNotificationById(id, userId) {
+        const userNotifications = await this.getNotificationsByUser(userId);
+        return userNotifications.find(notification => notification.id === parseInt(id));
+    },
+
+    async setNotificationReaded(notificationId, userId) {
+        
+        console.log(`Notification ${notificationId} for user ${userId} marked as read`);
+        
+        return {
+            success: true,
+            message: "Notification marked as read successfully"
+        };
+    },
+
+    async createNotification(notificationData) {
+        
+        const newNotification = {
+            id: Date.now(),
+            userId: notificationData.userId,
+            title: notificationData.title,
+            content: notificationData.content,
+            type: notificationData.type || "info",
+            date: new Date().toISOString(),
+            read: false,
+            walkerName: notificationData.walkerName || null
+        };
+
+        console.log("New notification created:", newNotification);
+        
+        return {
+            success: true,
+            notification: newNotification
+        };
     }
 };

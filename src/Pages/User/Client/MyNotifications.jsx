@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { NotificationController } from '../../../BackEnd/Controllers/NotificationController';
+import { useUser } from '../../../BackEnd/Context/UserContext';
 import NotificationFilter from '../Components/Notifications/NotificationFilter';
 import NotificationCard from '../Components/Notifications/NotificationCard';
 import { FiBell, FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -16,13 +17,21 @@ const MyNotifications = () => {
     const [hasPrevPage, setHasPrevPage] = useState(false);
 
     const ITEMS_PER_PAGE = 10;
-
+    const user = useUser();
+    
     const loadNotifications = useCallback(async (page = 1, searchTerm = "") => {
         try {
             setLoading(true);
             setError(null);
             
+            if (!user?.id) {
+                setError('Usuario no autenticado');
+                setLoading(false);
+                return;
+            }
+            
             const response = await NotificationController.fetchNotifications(
+                user.id,
                 page, 
                 ITEMS_PER_PAGE, 
                 searchTerm
@@ -41,16 +50,24 @@ const MyNotifications = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [user?.id]);
 
     useEffect(() => {
-        loadNotifications(1, search);
-        setCurrentPage(1);
-    }, [search, loadNotifications]);
+        if (user?.id) { 
+            loadNotifications(1, search);
+            setCurrentPage(1);
+        }
+    }, [search, loadNotifications, user?.id]);
 
     const handleMarkAsRead = async (notificationId) => {
         try {
-            await NotificationController.markNotificationAsRead(notificationId);
+            
+            if (!user?.id) {
+                console.error('Usuario no autenticado');
+                return;
+            }
+
+            await NotificationController.markNotificationAsRead(notificationId, user.id);
             
             setNotifications(prevNotifications => 
                 prevNotifications.map(notification =>
@@ -61,6 +78,8 @@ const MyNotifications = () => {
             );
         } catch (err) {
             console.error('Error marking notification as read:', err);
+            
+            setError('Error al marcar la notificación como leída: ' + err.message);
         }
     };
 
@@ -164,6 +183,23 @@ const MyNotifications = () => {
         );
     };
 
+    if (!user?.id) {
+        return (
+            <div className="min-h-screen bg-background dark:bg-foreground p-4 md:p-8">
+                <div className="max-w-4xl mx-auto">
+                    <div className="flex justify-center items-center h-64">
+                        <div className="text-center space-y-4">
+                            <FiBell className="w-12 h-12 text-red-500 mx-auto" />
+                            <p className="text-lg text-red-500">
+                                Debes iniciar sesión para ver tus notificaciones
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     if (loading && notifications.length === 0) {
         return (
             <div className="min-h-screen bg-background dark:bg-foreground p-4 md:p-8">
@@ -192,6 +228,7 @@ const MyNotifications = () => {
                             <button 
                                 onClick={() => loadNotifications(1, search)}
                                 className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200"
+                                disabled={!user?.id}
                             >
                                 Reintentar
                             </button>

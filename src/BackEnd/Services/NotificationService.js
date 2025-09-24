@@ -1,8 +1,12 @@
 import { NotificationDataAccess } from "../DataAccess/NotificationDataAccess.js";
 
 export const NotificationService = {
-    async getNotificationsForUser(page = 1, limit = 10, searchTerm = "") {
-        const notifications = await NotificationDataAccess.getAllNotifications();
+    async getNotificationsForUser(userId, page = 1, limit = 10, searchTerm = "") {
+        if (!userId) {
+            throw new Error("User ID is required");
+        }
+
+        const notifications = await NotificationDataAccess.getNotificationsByUser(userId);
         
         const filteredNotifications = notifications.filter(notification => {
             if (!searchTerm) return true;
@@ -42,11 +46,18 @@ export const NotificationService = {
         };
     },
 
-    async getNotificationById(id) {
-        const notification = await NotificationDataAccess.getNotificationById(id);
+    async getNotificationById(notificationId, userId) {
+        if (!notificationId) {
+            throw new Error("Notification ID is required");
+        }
+        if (!userId) {
+            throw new Error("User ID is required");
+        }
+
+        const notification = await NotificationDataAccess.getNotificationById(notificationId, userId);
         
         if (!notification) {
-            throw new Error("Notification not found");
+            throw new Error("Notification not found or does not belong to user");
         }
 
         return {
@@ -60,8 +71,26 @@ export const NotificationService = {
         };
     },
 
-    async markAsRead(id) {
-        console.log(`Notification ${id} marked as read`);
-        return true;
+    async markAsRead(notificationId, userId) {
+        if (!notificationId) {
+            throw new Error("Notification ID is required");
+        }
+        if (!userId) {
+            throw new Error("User ID is required");
+        }
+
+        const notification = await NotificationDataAccess.getNotificationById(notificationId, userId);
+        if (!notification) {
+            throw new Error("Notification not found or does not belong to user");
+        }
+
+        const result = await NotificationDataAccess.setNotificationReaded(notificationId, userId);
+        
+        if (!result.success) {
+            throw new Error("Failed to mark notification as read");
+        }
+
+        console.log(`Notification ${notificationId} for user ${userId} marked as read`);
+        return result;
     }
 };
