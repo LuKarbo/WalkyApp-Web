@@ -37,6 +37,8 @@ const MyNotifications = () => {
                 searchTerm
             );
             
+            console.log(response);
+
             setNotifications(response.notifications);
             setCurrentPage(response.currentPage);
             setTotalPages(response.totalPages);
@@ -200,7 +202,7 @@ const MyNotifications = () => {
         );
     }
 
-    if (loading && notifications.length === 0) {
+    if (loading && notifications?.length === 0) {
         return (
             <div className="min-h-screen bg-background dark:bg-foreground p-4 md:p-8">
                 <div className="max-w-4xl mx-auto">
@@ -250,7 +252,7 @@ const MyNotifications = () => {
                     totalCount={totalCount}
                 />
 
-                {loading && notifications.length > 0 && (
+                {loading && notifications?.length > 0 && (
                     <div className="text-center py-4">
                         <div className="inline-flex items-center space-x-2 text-primary">
                             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -259,7 +261,7 @@ const MyNotifications = () => {
                     </div>
                 )}
 
-                {notifications.length === 0 && !loading ? (
+                {notifications?.length === 0 && !loading ? (
                     <div className="text-center py-16">
                         <div className="text-6xl mb-4">🔔</div>
                         <h3 className="text-xl font-bold text-foreground dark:text-background mb-2">
@@ -275,7 +277,7 @@ const MyNotifications = () => {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
-                            {notifications.map((notification) => (
+                            {notifications?.map((notification) => (
                                 <NotificationCard
                                     key={notification.id}
                                     notification={notification}
