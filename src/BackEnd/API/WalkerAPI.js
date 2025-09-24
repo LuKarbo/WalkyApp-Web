@@ -1,118 +1,52 @@
-// WalkerAPI.js
+import apiClient from '../ApiClient.js';
+
 export const WalkerAPI = {
-    // Datos simulados para settings de walkers
-    walkerSettings: {
-        1: {
-            location: "Buenos Aires, Palermo",
-            pricePerPet: 15000,
-            hasGPSTracker: true,
-            hasDiscount: false,
-            discountPercentage: 0,
-            updatedAt: '2025-01-15T10:30:00Z'
-        },
-        2: {
-            location: "Córdoba, Nueva Córdoba",
-            pricePerPet: 12000,
-            hasGPSTracker: false,
-            hasDiscount: true,
-            discountPercentage: 10,
-            updatedAt: '2025-01-10T15:45:00Z'
-        },
-        3: {
-            location: "Rosario, Centro",
-            pricePerPet: 13500,
-            hasGPSTracker: false,
-            hasDiscount: false,
-            discountPercentage: 0,
-            updatedAt: '2025-01-12T09:20:00Z'
-        },
-        4: {
-            location: "Mendoza, Ciudad",
-            pricePerPet: 14000,
-            hasGPSTracker: true,
-            hasDiscount: true,
-            discountPercentage: 15,
-            updatedAt: '2025-01-08T16:30:00Z'
-        },
-        5: {
-            location: "Buenos Aires, Belgrano",
-            pricePerPet: 16000,
-            hasGPSTracker: true,
-            hasDiscount: false,
-            discountPercentage: 0,
-            updatedAt: '2025-01-14T11:15:00Z'
+    
+    async getAllWalkers() {
+        try {
+            const response = await apiClient.get('/walkers');
+            
+            return response.data.walkers || [];
+        } catch (error) {
+            console.error('Error al obtener paseadores:', error);
+            throw new Error('No se pudieron cargar los paseadores');
         }
     },
 
-    async getAllWalkers() {
-        // Se Simula la llamada a la API
-        return [
-            {
-                id: 1,
-                name: "Sarah Johnson",
-                rating: 4.9,
-                experience: "3 years",
-                specialties: "Training, Senior Dogs",
-                image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-                location: "Buenos Aires",
-                verified: true
-            },
-            {
-                id: 2,
-                name: "Mike Wilson",
-                rating: 4.8,
-                experience: "5 years",
-                specialties: "Puppies, Group Walks",
-                image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-                location: "Córdoba",
-                verified: true
-            },
-            {
-                id: 3,
-                name: "Emma Davis",
-                rating: 4.7,
-                experience: "2 years",
-                specialties: "Behavioral Training",
-                image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
-                location: "Rosario",
-                verified: false
-            },
-            {
-                id: 4,
-                name: "John Smith",
-                rating: 4.9,
-                experience: "4 years",
-                specialties: "Special Needs Dogs",
-                image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-                location: "Mendoza",
-                verified: true
-            },
-            {
-                id: 5,
-                name: "Lisa Rodriguez",
-                rating: 4.8,
-                experience: "6 years",
-                specialties: "Large Breeds, Exercise",
-                image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-                location: "Buenos Aires",
-                verified: true
-            }
-        ];
-    },
-
     async getWalkerById(id) {
-        // Se Simula la llamada a la API
-        const walkers = await this.getAllWalkers();
-        return walkers.find(walker => walker.id === parseInt(id));
+        try {
+            if (!id) {
+                throw new Error('ID de paseador requerido');
+            }
+            
+            const response = await apiClient.get(`/walkers/${id}`);
+            return response.data.walker || null;
+        } catch (error) {
+            console.error(`Error al obtener paseador ${id}:`, error);
+            if (error.message.includes('404')) {
+                return null;
+            }
+            throw new Error('No se pudo cargar el paseador');
+        }
     },
 
     async getWalkerSettings(walkerId) {
-        
-        const walkerIdInt = parseInt(walkerId);
-        const settings = this.walkerSettings[walkerIdInt];
-        
-        if (!settings) {
-            // Retornar configuración por defecto si no existe
+        try {
+            if (!walkerId) {
+                throw new Error('ID de paseador requerido');
+            }
+
+            const response = await apiClient.get(`/walkers/${walkerId}/settings`);
+            return response.data.settings || {
+                location: "",
+                pricePerPet: 15000,
+                hasGPSTracker: false,
+                hasDiscount: false,
+                discountPercentage: 0
+            };
+        } catch (error) {
+            console.error(`Error al obtener configuraciones del paseador ${walkerId}:`, error);
+            
             return {
                 location: "",
                 pricePerPet: 15000,
@@ -122,60 +56,175 @@ export const WalkerAPI = {
                 updatedAt: new Date().toISOString()
             };
         }
-        
-        return settings;
     },
 
     async updateWalkerSettings(walkerId, settings) {
-        
-        const walkerIdInt = parseInt(walkerId);
-        const currentSettings = this.walkerSettings[walkerIdInt] || {
-            location: "",
-            pricePerPet: 15000,
-            hasGPSTracker: false,
-            hasDiscount: false,
-            discountPercentage: 0
-        };
+        try {
+            if (!walkerId) {
+                throw new Error('ID de paseador requerido');
+            }
 
-        this.walkerSettings[walkerIdInt] = {
-            ...currentSettings,
-            ...settings,
-            updatedAt: new Date().toISOString()
-        };
-        
-        // Log
-        console.log(`Walker ${walkerId} settings updated:`, this.walkerSettings[walkerIdInt]);
-        
-        return this.walkerSettings[walkerIdInt];
+            if (!settings || Object.keys(settings).length === 0) {
+                throw new Error('Configuraciones requeridas');
+            }
+
+            const response = await apiClient.put(`/walkers/${walkerId}/settings`, settings);
+            
+            console.log(`Walker ${walkerId} settings updated:`, response.data.settings);
+            
+            return response.data.settings;
+        } catch (error) {
+            console.error(`Error al actualizar configuraciones del paseador ${walkerId}:`, error);
+            throw new Error(error.message || 'No se pudieron actualizar las configuraciones');
+        }
     },
 
     async getWalkerEarningsSettings(walkerId) {
-        
-        const settings = await this.getWalkerSettings(walkerId);
-        
-        return {
-            pricePerPet: settings.pricePerPet,
-            hasDiscount: settings.hasDiscount,
-            discountPercentage: settings.discountPercentage,
-            effectivePrice: settings.hasDiscount ? 
-                settings.pricePerPet * (1 - settings.discountPercentage / 100) : 
-                settings.pricePerPet
-        };
+        try {
+            if (!walkerId) {
+                throw new Error('ID de paseador requerido');
+            }
+
+            const response = await apiClient.get(`/walkers/${walkerId}/earnings`);
+            const earnings = response.data.earnings;
+            
+            return {
+                pricePerPet: earnings.currentPricePerPet || 15000,
+                hasDiscount: earnings.hasDiscount || false,
+                discountPercentage: earnings.discountPercentage || 0,
+                effectivePrice: earnings.hasDiscount ? 
+                    earnings.currentPricePerPet * (1 - earnings.discountPercentage / 100) : 
+                    earnings.currentPricePerPet
+            };
+        } catch (error) {
+            console.error(`Error al obtener configuraciones de ganancias del paseador ${walkerId}:`, error);
+            
+            return {
+                pricePerPet: 15000,
+                hasDiscount: false,
+                discountPercentage: 0,
+                effectivePrice: 15000
+            };
+        }
     },
 
     async updateWalkerLocation(walkerId, location) {
-        return await this.updateWalkerSettings(walkerId, { location });
+        try {
+            if (!walkerId) {
+                throw new Error('ID de paseador requerido');
+            }
+
+            if (!location || location.trim() === '') {
+                throw new Error('Ubicación requerida');
+            }
+
+            const response = await apiClient.patch(`/walkers/${walkerId}/location`, { 
+                location: location.trim() 
+            });
+            
+            return response.data.settings;
+        } catch (error) {
+            console.error(`Error al actualizar ubicación del paseador ${walkerId}:`, error);
+            throw new Error(error.message || 'No se pudo actualizar la ubicación');
+        }
     },
 
     async updateWalkerPricing(walkerId, pricingData) {
-        const { pricePerPet, hasDiscount, discountPercentage } = pricingData;
-        
-        const updatedSettings = {
-            pricePerPet,
-            hasDiscount,
-            discountPercentage: hasDiscount ? discountPercentage : 0
-        };
-        
-        return await this.updateWalkerSettings(walkerId, updatedSettings);
+        try {
+            if (!walkerId) {
+                throw new Error('ID de paseador requerido');
+            }
+
+            if (!pricingData) {
+                throw new Error('Datos de precios requeridos');
+            }
+
+            const { pricePerPet, hasDiscount, discountPercentage } = pricingData;
+
+            // Validaciones del lado del cliente
+            if (pricePerPet !== undefined && pricePerPet < 0) {
+                throw new Error('El precio por mascota no puede ser negativo');
+            }
+
+            if (discountPercentage !== undefined && (discountPercentage < 0 || discountPercentage > 100)) {
+                throw new Error('El porcentaje de descuento debe estar entre 0 y 100');
+            }
+
+            if (hasDiscount && (!discountPercentage || discountPercentage <= 0)) {
+                throw new Error('Debe especificar un porcentaje de descuento válido');
+            }
+
+            const response = await apiClient.patch(`/walkers/${walkerId}/pricing`, pricingData);
+            
+            return response.data.settings;
+        } catch (error) {
+            console.error(`Error al actualizar precios del paseador ${walkerId}:`, error);
+            throw new Error(error.message || 'No se pudieron actualizar los precios');
+        }
     },
+
+    // Métodos adicionales útiles
+    async searchWalkers(filters = {}) {
+        try {
+            const queryParams = new URLSearchParams();
+            
+            if (filters.query) queryParams.append('query', filters.query);
+            if (filters.location) queryParams.append('location', filters.location);
+            if (filters.minRating) queryParams.append('minRating', filters.minRating);
+            if (filters.limit) queryParams.append('limit', filters.limit);
+
+            const queryString = queryParams.toString();
+            const endpoint = queryString ? `/walkers/search?${queryString}` : '/walkers/search';
+            
+            const response = await apiClient.get(endpoint);
+            return response.data.walkers || [];
+        } catch (error) {
+            console.error('Error al buscar paseadores:', error);
+            throw new Error('No se pudieron buscar los paseadores');
+        }
+    },
+
+    async validateWalker(walkerId) {
+        try {
+            if (!walkerId) {
+                throw new Error('ID de paseador requerido');
+            }
+
+            const response = await apiClient.get(`/walkers/${walkerId}/validate`);
+            return response.data.isValid || false;
+        } catch (error) {
+            console.error(`Error al validar paseador ${walkerId}:`, error);
+            return false;
+        }
+    },
+
+    async getWalkerEarnings(walkerId) {
+        try {
+            if (!walkerId) {
+                throw new Error('ID de paseador requerido');
+            }
+
+            const response = await apiClient.get(`/walkers/${walkerId}/earnings`);
+            return response.data.earnings || {
+                monthly: 0,
+                total: 0,
+                completedWalks: 0,
+                currentPricePerPet: 15000,
+                hasDiscount: false,
+                discountPercentage: 0
+            };
+        } catch (error) {
+            console.error(`Error al obtener ganancias del paseador ${walkerId}:`, error);
+            
+            return {
+                monthly: 0,
+                total: 0,
+                completedWalks: 0,
+                currentPricePerPet: 15000,
+                hasDiscount: false,
+                discountPercentage: 0
+            };
+        }
+    },
+
 };

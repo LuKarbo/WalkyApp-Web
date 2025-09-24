@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AiOutlineStar } from "react-icons/ai";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { MdVerified } from "react-icons/md";
+import { MdGpsFixed, MdGpsOff } from "react-icons/md";
 import GetServiceModal from "../../Modals/GetServiceModal";
 
 const WalkerCard = ({ 
@@ -31,9 +31,7 @@ const WalkerCard = ({
     };
 
     const handleRequestSent = () => {
-        
         console.log('Solicitud de paseo enviada exitosamente');
-
     };
 
     return (
@@ -55,24 +53,48 @@ const WalkerCard = ({
                         <StarRating rating={walker.rating} />
                     </div>
 
-                    {walker.verified && (
-                        <div className="absolute top-3 left-3 bg-primary/90 backdrop-blur-sm rounded-full p-2">
-                            <MdVerified className="text-white w-4 h-4" />
-                        </div>
-                    )}
+                    <div className="absolute top-3 left-3">
+                        {walker.hasGPSTracker ? (
+                            <div className="bg-green-500/90 backdrop-blur-sm rounded-full p-1.5 tooltip-container">
+                                <MdGpsFixed className="text-white w-4 h-4" />
+                                <div className="tooltip absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                                    GPS Activo
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-gray-500/90 backdrop-blur-sm rounded-full p-1.5 tooltip-container">
+                                <MdGpsOff className="text-white w-4 h-4" />
+                                <div className="tooltip absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                                    Sin GPS
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="p-5">
                     <div className="space-y-4">
                         
                         <div className="space-y-2">
-                            <h3 className="font-bold text-lg text-foreground dark:text-background leading-tight">
-                                {walker.name}
-                            </h3>
-                            <div className="flex items-center space-x-1 text-sm text-accent dark:text-muted">
-                                <FaMapMarkerAlt />
-                                <span>{walker.location}</span>
+                            <div className="flex items-start justify-between">
+                                <h3 className="font-bold text-lg text-foreground dark:text-background leading-tight flex-1">
+                                    {walker.name}
+                                </h3>
+                                
+                                <div className="ml-2 flex items-center">
+                                    {walker.hasGPSTracker ? (
+                                        <MdGpsFixed className="text-green-500 w-5 h-5" />
+                                    ) : (
+                                        <MdGpsOff className="text-gray-400 w-5 h-5" />
+                                    )}
+                                </div>
                             </div>
+                            
+                            <div className="flex items-center space-x-1 text-sm text-accent dark:text-muted">
+                                <FaMapMarkerAlt className="w-3 h-3" />
+                                <span>{walker.location || "Ubicación no disponible"}</span>
+                            </div>
+                            
                             {walker.experience && (
                                 <p className="text-accent dark:text-muted text-sm">
                                     {walker.experience}
@@ -80,21 +102,19 @@ const WalkerCard = ({
                             )}
                         </div>
 
-                        <div className="flex flex-col gap-2 pt-2">                            
-                            <div className="grid grid-cols-2 gap-2">
-                                <button 
-                                    onClick={handleRequestWalk}
-                                    className="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md"
-                                >
-                                    Solicitar Paseo
-                                </button>
-                                <button 
-                                    onClick={() => onViewProfile(walker.id)}
-                                    className="w-full bg-background dark:bg-foreground border border-primary text-primary hover:bg-primary hover:text-white py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md text-sm"
-                                >
-                                    Ver Perfil
-                                </button>
-                            </div>
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                            <button 
+                                onClick={handleRequestWalk}
+                                className="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md text-sm"
+                            >
+                                Solicitar
+                            </button>
+                            <button 
+                                onClick={() => onViewProfile(walker.id)}
+                                className="w-full bg-background dark:bg-foreground border border-primary text-primary hover:bg-primary hover:text-white py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md text-sm"
+                            >
+                                Ver Perfil
+                            </button>
                         </div>
                     </div>
                 </div>

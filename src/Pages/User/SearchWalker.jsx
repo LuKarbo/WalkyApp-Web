@@ -8,9 +8,10 @@ const SearchWalker = () => {
     const [search, setSearch] = useState("");
     const [location, setLocation] = useState("");
     const [rating, setRating] = useState(0);
-    const [verified, setVerified] = useState(false);
+    const [hasGps, setHasGps] = useState(false);
     const [filteredWalkers, setFilteredWalkers] = useState([]);
     const [walkers, setWalkers] = useState([]);
+    const [availableLocations, setAvailableLocations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
@@ -22,12 +23,15 @@ const SearchWalker = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const walkersData = await WalkerController.fetchWalkersForHome();
+                const walkersData = await WalkerController.fetchWalkers();
                 
                 const walkersForSearch = walkersData.filter(walker => !walker.isPlaceholder);
                 
+                const uniqueLocations = [...new Set(walkersForSearch.map(walker => walker.location))].filter(Boolean).sort();
+                
                 setWalkers(walkersForSearch);
                 setFilteredWalkers(walkersForSearch);
+                setAvailableLocations(uniqueLocations);
             } catch (err) {
                 setError('Error loading walkers: ' + err.message);
                 console.error('Error loading walkers:', err);
@@ -44,11 +48,11 @@ const SearchWalker = () => {
             const matchesSearch = walker.name.toLowerCase().includes(search.toLowerCase());
             const matchesLocation = !location || walker.location === location;
             const matchesRating = !rating || walker.rating >= rating;
-            const matchesVerified = !verified || walker.verified === verified;
-            return matchesSearch && matchesLocation && matchesRating && matchesVerified;
+            const matchesGps = !hasGps || walker.hasGPSTracker === hasGps;
+            return matchesSearch && matchesLocation && matchesRating && matchesGps;
         });
         setFilteredWalkers(filtered);
-    }, [search, location, rating, verified, walkers]);
+    }, [search, location, rating, hasGps, walkers]);
 
     const handleViewProfile = (walkerId) => {
         navigateToContent('walker-profile', { walkerId });
@@ -58,7 +62,7 @@ const SearchWalker = () => {
         setSearch("");
         setLocation("");
         setRating(0);
-        setVerified(false);
+        setHasGps(false);
     };
 
     if (loading) {
@@ -91,14 +95,14 @@ const SearchWalker = () => {
                     setLocation={setLocation}
                     rating={rating}
                     setRating={setRating}
-                    verified={verified}
-                    setVerified={setVerified}
+                    hasGps={hasGps}
+                    setHasGps={setHasGps}
+                    availableLocations={availableLocations}
                     showFilters={showFilters}
                     setShowFilters={setShowFilters}
                     clearFilters={clearFilters}
                 />
 
-                {/* Results */}
                 {filteredWalkers.length === 0 ? (
                     <div className="text-center py-16">
                         <div className="text-6xl mb-4">🐕</div>

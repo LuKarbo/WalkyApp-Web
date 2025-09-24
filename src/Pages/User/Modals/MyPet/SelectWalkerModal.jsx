@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MdClose, MdAccessTime, MdPets, MdVerified, MdStar } from "react-icons/md";
+import { MdClose, MdAccessTime, MdPets, MdVerified, MdStar, MdGpsFixed, MdGpsOff } from "react-icons/md";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { WalkerController } from '../../../../BackEnd/Controllers/WalkerController';
 import { WalksController } from '../../../../BackEnd/Controllers/WalksController';
@@ -12,12 +12,15 @@ const SelectWalkerModal = ({
     onRequestSent 
 }) => {
     const [walkers, setWalkers] = useState([]);
+    const [walkersSettings, setWalkersSettings] = useState({});
     const [selectedWalker, setSelectedWalker] = useState(null);
+    const [selectedWalkerSettings, setSelectedWalkerSettings] = useState(null);
     const [walkDate, setWalkDate] = useState('');
     const [walkTime, setWalkTime] = useState('');
     const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false);
     const [loadingWalkers, setLoadingWalkers] = useState(false);
+    const [loadingWalkerSettings, setLoadingWalkerSettings] = useState(false);
     const [error, setError] = useState(null);
     const [step, setStep] = useState('select-walker');
 
@@ -29,6 +32,7 @@ const SelectWalkerModal = ({
             loadWalkers();
             setStep('select-walker');
             setSelectedWalker(null);
+            setSelectedWalkerSettings(null);
             setWalkDate('');
             setWalkTime('');
             setDescription('');
@@ -40,9 +44,11 @@ const SelectWalkerModal = ({
         try {
             setLoadingWalkers(true);
             setError(null);
-            const walkersData = await WalkerController.fetchWalkersForHome();
+            const walkersData = await WalkerController.fetchWalkers();
             const availableWalkers = walkersData.filter(walker => !walker.isPlaceholder);
             setWalkers(availableWalkers);
+            
+            await loadAllWalkersSettings(availableWalkers);
         } catch (err) {
             setError('Error loading walkers: ' + err.message);
             console.error('Error loading walkers:', err);
@@ -51,15 +57,77 @@ const SelectWalkerModal = ({
         }
     };
 
-    const handleWalkerSelect = (walker) => {
+    const loadAllWalkersSettings = async (walkersList) => {
+        const settingsPromises = walkersList.map(async (walker) => {
+            try {
+                const settings = await WalkerController.fetchWalkerSettings(walker.id);
+                return { walkerId: walker.id, settings };
+            } catch (err) {
+                console.error(`Error loading settings for walker ${walker.id}:`, err);
+                return {
+                    walkerId: walker.id,
+                    settings: {
+                        pricePerPet: 15000,
+                        hasGPSTracker: false,
+                        hasDiscount: false,
+                        discountPercentage: 0
+                    }
+                };
+            }
+        });
+
+        const settingsResults = await Promise.all(settingsPromises);
+        const settingsMap = {};
+        settingsResults.forEach(({ walkerId, settings }) => {
+            settingsMap[walkerId] = settings;
+        });
+        setWalkersSettings(settingsMap);
+    };
+
+    const loadSelectedWalkerSettings = async (walkerId) => {
+        try {
+            setLoadingWalkerSettings(true);
+            const settings = await WalkerController.fetchWalkerSettings(walkerId);
+            setSelectedWalkerSettings(settings);
+        } catch (err) {
+            console.error('Error loading walker settings:', err);
+            setSelectedWalkerSettings({
+                pricePerPet: 15000,
+                hasGPSTracker: false,
+                hasDiscount: false,
+                discountPercentage: 0
+            });
+        } finally {
+            setLoadingWalkerSettings(false);
+        }
+    };
+
+    const handleWalkerSelect = async (walker) => {
         setSelectedWalker(walker);
         setStep('schedule');
+        if (!walkersSettings[walker.id]) {
+            await loadSelectedWalkerSettings(walker.id);
+        } else {
+            setSelectedWalkerSettings(walkersSettings[walker.id]);
+        }
     };
 
     const handleBackToWalkers = () => {
         setStep('select-walker');
         setSelectedWalker(null);
+        setSelectedWalkerSettings(null);
         setError(null);
+    };
+
+    const calculateFinalPrice = () => {
+        const settings = selectedWalkerSettings || walkersSettings[selectedWalker?.id];
+        const basePrice = settings?.pricePerPet || 15000;
+        
+        if (settings?.hasDiscount && settings?.discountPercentage > 0) {
+            const discountAmount = basePrice * (settings.discountPercentage / 100);
+            return basePrice - discountAmount;
+        }
+        return basePrice;
     };
 
     const handleSubmit = async (e) => {
@@ -79,13 +147,14 @@ const SelectWalkerModal = ({
             setLoading(true);
             setError(null);
 
+            const finalPrice = calculateFinalPrice();
             const walkRequest = {
                 walkerId: selectedWalker.id,
                 ownerId: userId,
                 petIds: [preSelectedPet.id],
                 scheduledDateTime: `${walkDate}T${walkTime}`,
                 description: description,
-                totalPrice: selectedWalker.pricePerPet || 15000,
+                totalPrice: finalPrice,
                 status: 'Pending'
             };
 
@@ -104,6 +173,7 @@ const SelectWalkerModal = ({
     const handleClose = () => {
         setStep('select-walker');
         setSelectedWalker(null);
+        setSelectedWalkerSettings(null);
         setWalkDate('');
         setWalkTime('');
         setDescription('');
@@ -201,54 +271,74 @@ const SelectWalkerModal = ({
                             </p>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {walkers.map(walker => (
-                                    <div
-                                        key={walker.id}
-                                        onClick={() => handleWalkerSelect(walker)}
-                                        className="border border-primary/20 rounded-lg p-4 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
-                                    >
-                                        <div className="flex items-center space-x-4">
-                                            <img
-                                                src={walker.image}
-                                                alt={walker.name}
-                                                className="w-16 h-16 rounded-full object-cover"
-                                                onError={(e) => {
-                                                    e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde";
-                                                }}
-                                            />
-                                            <div className="flex-1">
-                                                <div className="flex items-center space-x-2 mb-1">
-                                                    <h4 className="text-lg font-semibold text-foreground dark:text-background group-hover:text-primary transition-colors">
-                                                        {walker.name}
-                                                    </h4>
-                                                    {walker.verified && (
-                                                        <MdVerified className="text-green-500 w-5 h-5" />
+                                {walkers.map(walker => {
+                                    const walkerSettings = walkersSettings[walker.id];
+                                    const pricePerPet = walkerSettings?.pricePerPet || 15000;
+                                    const hasGPSTracking = walkerSettings?.hasGPSTracker || false;
+                                    
+                                    return (
+                                        <div
+                                            key={walker.id}
+                                            onClick={() => handleWalkerSelect(walker)}
+                                            className="border border-primary/20 rounded-lg p-4 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
+                                        >
+                                            <div className="flex items-center space-x-4">
+                                                <img
+                                                    src={walker.image}
+                                                    alt={walker.name}
+                                                    className="w-16 h-16 rounded-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde";
+                                                    }}
+                                                />
+                                                <div className="flex-1">
+                                                    <div className="flex items-center space-x-2 mb-1">
+                                                        <h4 className="text-lg font-semibold text-foreground dark:text-background group-hover:text-primary transition-colors">
+                                                            {walker.name}
+                                                        </h4>
+                                                        <div className="flex items-center space-x-1">
+                                                            {walker.verified && (
+                                                                <MdVerified className="text-green-500 w-5 h-5" />
+                                                            )}
+                                                            {hasGPSTracking ? (
+                                                                <MdGpsFixed className="text-green-500 w-5 h-5" />
+                                                            ) : (
+                                                                <MdGpsOff className="text-gray-400 w-5 h-5" />
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-1 text-sm text-accent dark:text-muted mb-1">
+                                                        <FaMapMarkerAlt className="w-4 h-4" />
+                                                        <span>{walker.location || 'Ubicación no disponible'}</span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-4 text-sm">
+                                                        <div className="flex items-center space-x-1">
+                                                            <MdStar className="text-yellow-400 w-4 h-4" />
+                                                            <span className="text-foreground dark:text-background font-medium">
+                                                                {walker.rating || '5.0'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-primary font-semibold">
+                                                                ${pricePerPet.toLocaleString()}
+                                                            </span>
+                                                            {walkerSettings?.hasDiscount && walkerSettings?.discountPercentage > 0 && (
+                                                                <span className="text-xs text-green-600 font-medium">
+                                                                    {walkerSettings.discountPercentage}% descuento
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    {walker.experience && (
+                                                        <p className="text-sm text-accent dark:text-muted mt-1 line-clamp-2">
+                                                            {walker.experience}
+                                                        </p>
                                                     )}
                                                 </div>
-                                                <div className="flex items-center space-x-1 text-sm text-accent dark:text-muted mb-1">
-                                                    <FaMapMarkerAlt className="w-4 h-4" />
-                                                    <span>{walker.location}</span>
-                                                </div>
-                                                <div className="flex items-center space-x-4 text-sm">
-                                                    <div className="flex items-center space-x-1">
-                                                        <MdStar className="text-yellow-400 w-4 h-4" />
-                                                        <span className="text-foreground dark:text-background font-medium">
-                                                            {walker.rating}
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-primary font-semibold">
-                                                        ${(walker.pricePerPet || 15000).toLocaleString()}
-                                                    </span>
-                                                </div>
-                                                {walker.experience && (
-                                                    <p className="text-sm text-accent dark:text-muted mt-1 line-clamp-2">
-                                                        {walker.experience}
-                                                    </p>
-                                                )}
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -270,13 +360,20 @@ const SelectWalkerModal = ({
                                         <h3 className="text-xl font-semibold text-foreground dark:text-background">
                                             {selectedWalker?.name}
                                         </h3>
-                                        {selectedWalker?.verified && (
-                                            <MdVerified className="text-green-500 w-5 h-5" />
-                                        )}
+                                        <div className="flex items-center space-x-1">
+                                            {selectedWalker?.verified && (
+                                                <MdVerified className="text-green-500 w-5 h-5" />
+                                            )}
+                                            {(selectedWalkerSettings?.hasGPSTracker || walkersSettings[selectedWalker?.id]?.hasGPSTracker) ? (
+                                                <MdGpsFixed className="text-green-500 w-5 h-5" />
+                                            ) : (
+                                                <MdGpsOff className="text-gray-400 w-5 h-5" />
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="flex items-center space-x-1 text-accent dark:text-muted">
                                         <FaMapMarkerAlt className="w-4 h-4" />
-                                        <span>{selectedWalker?.location}</span>
+                                        <span>{selectedWalker?.location || 'Ubicación no disponible'}</span>
                                     </div>
                                     <p className="text-sm text-accent dark:text-muted mt-1">
                                         {selectedWalker?.experience}
@@ -286,16 +383,38 @@ const SelectWalkerModal = ({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-primary/10 p-3 rounded-lg">
-                                    <p className="text-sm text-accent dark:text-muted">Precio</p>
-                                    <p className="text-lg font-semibold text-foreground dark:text-background">
-                                        ${(selectedWalker?.pricePerPet || 15000).toLocaleString()}
-                                    </p>
+                                    <div className="flex flex-col">
+                                        <p className="text-sm text-accent dark:text-muted">Precio por mascota</p>
+                                        {loadingWalkerSettings ? (
+                                            <p className="text-lg font-semibold text-foreground dark:text-background">
+                                                Cargando...
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <p className="text-lg font-semibold text-foreground dark:text-background">
+                                                    ${(selectedWalkerSettings?.pricePerPet || walkersSettings[selectedWalker?.id]?.pricePerPet || 15000).toLocaleString()}
+                                                </p>
+                                                {(selectedWalkerSettings?.hasDiscount || walkersSettings[selectedWalker?.id]?.hasDiscount) && 
+                                                    (selectedWalkerSettings?.discountPercentage > 0 || walkersSettings[selectedWalker?.id]?.discountPercentage > 0) && (
+                                                    <p className="text-sm text-green-600 font-medium">
+                                                        {selectedWalkerSettings?.discountPercentage || walkersSettings[selectedWalker?.id]?.discountPercentage}% descuento aplicado
+                                                    </p>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="bg-primary/10 p-3 rounded-lg">
                                     <p className="text-sm text-accent dark:text-muted">Rastreo GPS</p>
-                                    <p className="text-lg font-semibold text-green-500">
-                                        {selectedWalker?.hasGPSTracking !== false ? '✓ Activo' : '✗ No disponible'}
-                                    </p>
+                                    {loadingWalkerSettings ? (
+                                        <p className="text-lg font-semibold text-foreground dark:text-background">
+                                            Cargando...
+                                        </p>
+                                    ) : (
+                                        <p className={`text-lg font-semibold ${(selectedWalkerSettings?.hasGPSTracker || walkersSettings[selectedWalker?.id]?.hasGPSTracker) ? 'text-green-500' : 'text-gray-500'}`}>
+                                            {(selectedWalkerSettings?.hasGPSTracker || walkersSettings[selectedWalker?.id]?.hasGPSTracker) ? '✓ Activo' : '✗ No disponible'}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -348,12 +467,27 @@ const SelectWalkerModal = ({
                         </div>
 
                         <div className="mb-6 p-4 bg-primary/10 rounded-lg">
+                            {!loadingWalkerSettings && (selectedWalkerSettings || walkersSettings[selectedWalker?.id]) && (
+                                <>
+                                    {((selectedWalkerSettings?.hasDiscount || walkersSettings[selectedWalker?.id]?.hasDiscount) && 
+                                        (selectedWalkerSettings?.discountPercentage > 0 || walkersSettings[selectedWalker?.id]?.discountPercentage > 0)) && (
+                                        <div className="flex justify-between items-center mb-2 text-green-600">
+                                            <span>Descuento ({selectedWalkerSettings?.discountPercentage || walkersSettings[selectedWalker?.id]?.discountPercentage}%)</span>
+                                            <span>
+                                                -${(((selectedWalkerSettings?.pricePerPet || walkersSettings[selectedWalker?.id]?.pricePerPet || 15000) * 
+                                                        (selectedWalkerSettings?.discountPercentage || walkersSettings[selectedWalker?.id]?.discountPercentage)) / 100).toLocaleString()}
+                                            </span>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                            
                             <div className="flex justify-between items-center">
                                 <span className="text-lg font-semibold text-foreground dark:text-background">
                                     Total
                                 </span>
                                 <span className="text-xl font-bold text-primary">
-                                    ${(selectedWalker?.pricePerPet || 15000).toLocaleString()}
+                                    {loadingWalkerSettings ? 'Cargando...' : `$${calculateFinalPrice().toLocaleString()}`}
                                 </span>
                             </div>
                         </div>
@@ -368,10 +502,12 @@ const SelectWalkerModal = ({
                             </button>
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || loadingWalkerSettings}
                                 className="flex-1 py-3 px-4 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {loading ? 'Enviando...' : `Solicitar Paseo - $${(selectedWalker?.pricePerPet || 15000).toLocaleString()}`}
+                                {loading ? 'Enviando...' : 
+                                    loadingWalkerSettings ? 'Cargando...' : 
+                                    `Solicitar Paseo - $${calculateFinalPrice().toLocaleString()}`}
                             </button>
                         </div>
                     </form>

@@ -5,6 +5,10 @@ export const WalkerController = {
         return await WalkerService.getWalkersForHome();
     },
 
+    async fetchWalkers() {
+        return await WalkerService.getAllWalkers();
+    },
+
     async fetchWalkerProfile(id) {
         return await WalkerService.getWalkerProfile(id);
     },

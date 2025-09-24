@@ -65,22 +65,6 @@ const WalkerHeaderComponent = ({
                         </span>
                     </div>
 
-                    <div className="mb-4">
-                        <h3 className="text-sm font-semibold text-foreground dark:text-background mb-2">
-                            Especialidades:
-                        </h3>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                            {walkerData.specialties.map((specialty, index) => (
-                                <span
-                                    key={index}
-                                    className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full border border-primary/20"
-                                >
-                                    {specialty}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
                     <div className="flex justify-center md:justify-start mt-6">
                         <button 
                             onClick={onRequestWalk}
