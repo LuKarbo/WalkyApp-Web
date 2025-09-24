@@ -53,5 +53,14 @@ export const UserController = {
             console.error('Error in UserController.promoteUserToWalker:', error);
             throw error;
         }
+    },
+
+    async changeUserPassword(userId, passwordData) {
+    try {
+        return await UserService.changeUserPassword(userId, passwordData);
+    } catch (error) {
+        console.error('Error in UserController.changeUserPassword:', error);
+        throw error;
     }
+}
 };

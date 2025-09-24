@@ -93,5 +93,39 @@ export const UserAPI = {
                 throw new Error('Error al obtener estadísticas de usuarios');
             }
         }
+    },
+
+    async changeUserPassword(userId, passwordData) {
+        console.log("UserAPI - Cambiando contraseña para usuario:", userId);
+        
+        try {
+            const response = await apiClient.put(`/users/${userId}/password`, {
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword
+            });
+
+            return {
+                success: response.data.success,
+                message: response.data.message || "Contraseña cambiada correctamente"
+            };
+        } catch (error) {
+            console.error("Error cambiando contraseña:", error);
+            
+            if (error.message.includes('contraseña actual incorrecta') || 
+                error.message.includes('current password')) {
+                throw new Error("La contraseña actual es incorrecta");
+            }
+            
+            if (error.message.includes('Usuario no encontrado')) {
+                throw new Error("Usuario no encontrado");
+            }
+            
+            if (error.message.includes('misma contraseña') || 
+                error.message.includes('same password')) {
+                throw new Error("La nueva contraseña debe ser diferente a la actual");
+            }
+            
+            throw new Error(error.message || 'Error al cambiar la contraseña');
+        }
     }
 };

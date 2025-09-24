@@ -118,5 +118,35 @@ export const UserService = {
                 role: updatedUser.role
             }
         };
+    },
+
+    async changeUserPassword(userId, passwordData) {
+        // Validaciones
+        if (!userId || typeof userId !== 'number') {
+            throw new Error("ID de usuario inválido");
+        }
+
+        if (!passwordData.currentPassword || passwordData.currentPassword.length < 6) {
+            throw new Error("La contraseña actual debe tener al menos 6 caracteres");
+        }
+
+        if (!passwordData.newPassword || passwordData.newPassword.length < 6) {
+            throw new Error("La nueva contraseña debe tener al menos 6 caracteres");
+        }
+
+        if (passwordData.currentPassword === passwordData.newPassword) {
+            throw new Error("La nueva contraseña debe ser diferente a la actual");
+        }
+
+        try {
+            await UserDataAccess.changeUserPassword(userId, passwordData);
+            return {
+                success: true,
+                message: 'Contraseña cambiada exitosamente'
+            };
+        } catch (error) {
+            console.error('Error in UserService.changeUserPassword:', error);
+            throw error;
+        }
     }
 };

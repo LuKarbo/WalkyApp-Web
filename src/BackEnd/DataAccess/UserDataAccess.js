@@ -19,5 +19,9 @@ export const UserDataAccess = {
 
     async getUserStats() {
         return await UserAPI.getUserStats();
+    },
+
+    async changeUserPassword(userId, passwordData) {
+        return await UserAPI.changeUserPassword(userId, passwordData);
     }
 };
