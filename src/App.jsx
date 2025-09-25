@@ -63,7 +63,7 @@ const App = () => {
   const getDefaultActiveItem = (userRole) => {
     switch (userRole) {
       case 'admin':
-        return 'statistics';
+        return 'promotions';
       case 'client':
         return 'home';
       case 'walker':
