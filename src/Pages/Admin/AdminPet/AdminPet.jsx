@@ -3,6 +3,7 @@ import { FiUsers, FiHeart } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
 import { PetsController } from '../../../BackEnd/Controllers/PetsController';
 import { UserController } from '../../../BackEnd/Controllers/UserController';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import AdminPetsHeaderComponent from '../Components/AdminPetsComponents/AdminPetsHeaderComponent';
 import AdminPetsCardComponent from '../Components/AdminPetsComponents/AdminPetsCardComponent';
@@ -17,10 +18,13 @@ const AdminPets = () => {
     const [ownerFilter, setOwnerFilter] = useState("all");
     const [ageFilter, setAgeFilter] = useState("all");
     const [weightFilter, setWeightFilter] = useState("all");
-    const [refreshTrigger, setRefreshTrigger] = useState(0);
+    // eliminado el estado 'refreshTrigger' que forzaba la recarga completa
+    // const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedPet, setSelectedPet] = useState(null);
+
+    const { success, error: errorToast } = useToast();      //rename error to avoid conflict
 
     useEffect(() => {
         const loadData = async () => {
@@ -35,15 +39,21 @@ const AdminPets = () => {
                 const allPets = await getAllPetsFromAllOwners(allUsers);
                 setPets(allPets);
             } catch (err) {
-                setError('Error loading data: ' + err.message);
-                console.error('Error loading data:', err);
+                const errorMessage = 'Error al cargar los datos de mascotas: ' + err.message;
+                setError(errorMessage);
+                errorToast('Error al cargar los datos', {
+                    title: 'Error de Carga',
+                    duration: 6000
+                }); 
             } finally {
                 setLoading(false);
             }
         };
 
+        // useEffect ahora solo se ejecuta una vez al inicio.
+        // La actualización se hara directamente en handleSaveEditPet.
         loadData();
-    }, [refreshTrigger]);
+    }, [errorToast]); 
 
     const getAllPetsFromAllOwners = async (usersList) => {
         try {
@@ -60,7 +70,7 @@ const AdminPets = () => {
                         ownerName: user.fullName
                     }));
                 } catch (error) {
-                    console.warn(`No pets found for user ${user.id} (${user.fullName})`);
+                    // eliminado el console.warn. se retorna un array vacío si no hay mascotas.
                     return [];
                 }
             });
@@ -79,14 +89,37 @@ const AdminPets = () => {
 
     const handleSaveEditPet = async (petId, petData) => {
         try {
-            await PetsController.updatePet(petId, petData);
-            setRefreshTrigger(prev => prev + 1);
+            const updatedPetResponse = await PetsController.updatePet(petId, petData); 
+
+            const petOwnerInfo = pets.find(p => p.id === petId && p.ownerId === selectedPet.ownerId);
+
+            const petToReplace = {
+                ...updatedPetResponse,
+                ownerId: petOwnerInfo.ownerId,
+                ownerName: petOwnerInfo.ownerName 
+            };
+
+            // se actualiza el estado 'pets' de manera eficiente (solo la mascota modificada)
+            setPets(prevPets => 
+                prevPets.map(pet => 
+                    (pet.id === petId && pet.ownerId === selectedPet.ownerId) 
+                        ? petToReplace
+                        : pet
+                )
+            );
+            
             setShowEditModal(false);
             setSelectedPet(null);
-            alert("Mascota actualizada correctamente");
+            
+            success("Mascota actualizada correctamente", {
+                title: "Éxito",
+                duration: 4000
+            });
         } catch (error) {
-            console.error("Error al actualizar mascota:", error);
-            alert(`Error al actualizar la mascota: ${error.message}`);
+            errorToast("No se pudo actualizar la mascota", {
+                title: "Error",
+                duration: 4000
+            });
         }
     };
 
