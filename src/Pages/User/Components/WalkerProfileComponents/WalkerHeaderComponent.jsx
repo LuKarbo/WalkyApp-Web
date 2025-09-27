@@ -1,5 +1,5 @@
 import { AiOutlineStar } from "react-icons/ai";
-import { MdVerified, MdOutlineCancel, MdLocationOn, MdWork } from "react-icons/md";
+import { MdGpsFixed, MdGpsOff, MdLocationOn, MdWork } from "react-icons/md";
 
 const WalkerHeaderComponent = ({ 
     walkerData, 
@@ -20,9 +20,9 @@ const WalkerHeaderComponent = ({
                         alt={walkerData.fullName}
                         className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-primary/20"
                     />
-                    {walkerData.verified && (
+                    {walkerData.hasGPSTracking && (
                         <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-2">
-                            <MdVerified className="text-white w-6 h-6" />
+                            <MdGpsFixed className="text-white w-6 h-6" />
                         </div>
                     )}
                 </div>
@@ -33,10 +33,10 @@ const WalkerHeaderComponent = ({
                         <h1 className="text-3xl font-bold text-foreground dark:text-background">
                             {walkerData.fullName}
                         </h1>
-                        {walkerData.verified ? (
-                            <MdVerified className="text-green-500 w-6 h-6" />
+                        {walkerData.hasGPSTracker ? (
+                            <MdGpsFixed className="text-green-500 w-6 h-6" />
                         ) : (
-                            <MdOutlineCancel className="text-gray-400 w-6 h-6" />
+                            <MdGpsOff className="text-gray-400 w-6 h-6" />
                         )}
                     </div>
 

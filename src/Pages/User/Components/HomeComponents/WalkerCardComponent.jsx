@@ -140,7 +140,7 @@ const WalkerCardComponent = ({ walkers }) => {
                                             </div>
                                         </div>
                                         <div className="text-sm text-accent dark:text-muted">
-                                            <span>{walker.experience}</span>
+                                            <span>{walker.experience?.replace(' years', '') + ' años de experiencia'}</span>
                                         </div>
                                     </div>
 
