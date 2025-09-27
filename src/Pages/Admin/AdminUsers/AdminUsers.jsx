@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FiUsers, FiShield, FiUserPlus } from "react-icons/fi";
 import { UserController } from '../../../BackEnd/Controllers/UserController';
 import { useUser } from "../../../BackEnd/Context/UserContext";
+import { useToast } from "../../../BackEnd/Context/ToastContext";
 
 import AdminUsersHeaderComponent from '../Components/AdminUsersComponents/AdminUsersHeaderComponent';
 import AdminUsersCardComponent from '../Components/AdminUsersComponents/AdminUsersCardComponent';
@@ -15,7 +16,8 @@ const AdminUsers = () => {
     const [error, setError] = useState(null);
     const [userStats, setUserStats] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-
+    const { success, error: errorToast } = useToast();        //rename error to errorToast to avoid conflict with useState
+    
     const [searchQuery, setSearchQuery] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
@@ -44,7 +46,7 @@ const AdminUsers = () => {
                 setUserStats(statsData);
             } catch (err) {
                 setError('Error loading users: ' + err.message);
-                console.error('Error loading users:', err);
+
             } finally {
                 setLoading(false);
             }
@@ -79,10 +81,15 @@ const AdminUsers = () => {
             setRefreshTrigger(prev => prev + 1);
             setShowEditModal(false);
             setSelectedUser(null);
-            alert("Usuario actualizado correctamente");
+            success("Usuario actualizado correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (error) {
-            console.error("Error al actualizar usuario:", error);
-            alert(`Error al actualizar el usuario: ${error.message}`);
+            errorToast("Error al actualizar el usuario" , {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -92,10 +99,16 @@ const AdminUsers = () => {
             setRefreshTrigger(prev => prev + 1);
             setShowDeleteModal(false);
             setSelectedUser(null);
-            alert("Usuario eliminado correctamente");
+            success("Usuario eliminado correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (error) {
-            console.error("Error al eliminar usuario:", error);
-            alert(`Error al eliminar el usuario: ${error.message}`);
+            errorToast("Error al eliminar el usuario", {
+                title: 'Error',
+                duration: 4000
+            }
+            );
         }
     };
 
