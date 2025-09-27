@@ -37,7 +37,7 @@ const AdminManagementHeaderComponent = ({
                             }`}
                         >
                             <FiImage size={16} />
-                            Banners ({activeBannersCount}/{totalBanners})
+                            Banners ({totalBanners})
                         </button>
                         
                         <button
@@ -49,7 +49,7 @@ const AdminManagementHeaderComponent = ({
                             }`}
                         >
                             <FiDollarSign size={16} />
-                            Planes ({activePlansCount + 1}/{totalPlans})
+                            Planes ({totalPlans})
                         </button>
                     </div>
 

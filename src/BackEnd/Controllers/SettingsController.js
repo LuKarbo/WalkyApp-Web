@@ -18,6 +18,34 @@ export const SettingsController = {
     },
 
     async getSubscriptionPlans() {
-        return await SettingsService.getSubscriptionPlans();
+        return await SettingsService.getActiveSubscriptionPlans();
+    },
+
+    async getAllSubscriptionPlans() {
+        return await SettingsService.getAllSubscriptionPlans();
+    },
+
+    async getSubscriptionPlanById(planId) {
+        return await SettingsService.getSubscriptionPlanById(planId);
+    },
+
+    async createSubscriptionPlan(planData) {
+        return await SettingsService.createSubscriptionPlan(planData);
+    },
+
+    async updateSubscriptionPlan(planId, planData) {
+        return await SettingsService.updateSubscriptionPlan(planId, planData);
+    },
+
+    async deleteSubscriptionPlan(planId) {
+        return await SettingsService.deleteSubscriptionPlan(planId);
+    },
+
+    async togglePlanStatus(planId) {
+        return await SettingsService.togglePlanStatus(planId);
+    },
+
+    async validateSubscriptionUpgrade(userId, newPlanId) {
+        return await SettingsService.validateSubscriptionUpgrade(userId, newPlanId);
     }
 };

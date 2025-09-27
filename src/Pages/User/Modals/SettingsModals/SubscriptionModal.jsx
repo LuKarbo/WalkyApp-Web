@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaTimes, FaCrown, FaCheck, FaStar } from 'react-icons/fa';
+import { FaTimes, FaCrown, FaCheck, FaStar, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { MdDiamond } from 'react-icons/md';
 import { SettingsController } from '../../../../BackEnd/Controllers/SettingsController';
 import { useUser } from '../../../../BackEnd/Context/UserContext';
@@ -14,7 +14,7 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
     const planConfig = {
         free: {
             icon: FaStar,
-            color: 'from-primary to-success',
+            color: 'from-green-400 to-green-600',
             popular: false
         },
         bronze: {
@@ -30,6 +30,11 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
         gold: {
             icon: FaCrown,
             color: 'from-yellow-400 to-yellow-600',
+            popular: false
+        },
+        platinum: {
+            icon: MdDiamond,
+            color: 'from-purple-400 to-purple-600',
             popular: false
         }
     };
@@ -47,11 +52,14 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
             
             const plansWithConfig = subscriptionPlans.map(plan => ({
                 ...plan,
-                ...planConfig[plan.id],
+                ...planConfig[plan.plan_id || plan.id],
                 
-                features: translateFeatures(plan.features),
+                features: Array.isArray(plan.features) ? plan.features : [],
                 
-                limitations: getLimitationsForPlan(plan.id)
+                maxWalks: plan.max_walks,
+                supportLevel: plan.support_level,
+                cancellationPolicy: plan.cancellation_policy,
+                discountPercentage: plan.discount_percentage || 0
             }));
             
             setPlans(plansWithConfig);
@@ -62,56 +70,30 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
         }
     };
 
-    const translateFeatures = (features) => {
-        const translations = {
-            'Up to 2 walks per month': 'Hasta 2 paseos por mes',
-            'Basic walkers': 'Paseadores básicos',
-            'Email support': 'Soporte por email',
-            'Basic notifications': 'Notificaciones básicas',
-            'Up to 8 walks per month': 'Hasta 8 paseos por mes',
-            'Real-time GPS tracking': 'GPS en tiempo real',
-            'Walk photos': 'Fotos durante el paseo',
-            'Verified walkers': 'Paseadores verificados',
-            'Priority support': 'Soporte prioritario',
-            'Activity reports': 'Reportes de actividad',
-            'Up to 15 walks per month': 'Hasta 15 paseos por mes',
-            'Premium walkers access': 'Acceso a paseadores premium',
-            'Photos and videos': 'Fotos y videos del paseo',
-            'Free cancellation 24h': 'Cancelación gratuita 24h antes',
-            '24/7 support': 'Soporte 24/7',
-            'Detailed reports': 'Reportes detallados',
-            '10% discount on extras': '10% descuento en servicios extra',
-            'Unlimited walks': 'Paseos ilimitados',
-            'VIP walker access': 'Acceso VIP a mejores paseadores',
-            'Premium GPS with history': 'GPS premium con historial',
-            'HD videos': 'Videos HD del paseo',
-            'Free cancellation anytime': 'Cancelación gratuita sin restricciones',
-            'Dedicated 24/7 support': 'Soporte dedicado 24/7',
-            'Monthly vet reports': 'Reportes veterinarios mensuales',
-            '20% discount on extras': '20% descuento en servicios extra',
-            'Emergency service': 'Servicio de emergencia',
-            'Night walks available': 'Paseos nocturnos disponibles'
-        };
-        
-        return features.map(feature => translations[feature] || feature);
+    const getWalksText = (maxWalks) => {
+        if (maxWalks === -1) return 'Paseos ilimitados';
+        if (maxWalks === 0) return 'Sin paseos incluidos';
+        return `Hasta ${maxWalks} paseos por mes`;
     };
 
-    const getLimitationsForPlan = (planId) => {
-        switch (planId) {
-            case 'free':
-                return [
-                    'Sin GPS en tiempo real',
-                    'Sin fotos durante el paseo',
-                    'Sin paseadores premium'
-                ];
-            case 'bronze':
-                return [
-                    'Sin paseadores premium',
-                    'Sin cancelación gratuita'
-                ];
-            default:
-                return [];
-        }
+    const getSupportText = (supportLevel) => {
+        const supportMap = {
+            'email': 'Soporte por email',
+            'priority': 'Soporte prioritario',
+            '24/7': 'Soporte 24/7',
+            'dedicated': 'Soporte dedicado'
+        };
+        return supportMap[supportLevel] || 'Soporte estándar';
+    };
+
+    const getCancellationText = (policy) => {
+        const policyMap = {
+            'none': 'Sin cancelación gratuita',
+            'standard': 'Cancelación gratuita 24h antes',
+            'flexible': 'Cancelación gratuita 2h antes',
+            'anytime': 'Cancelación gratuita sin restricciones'
+        };
+        return policyMap[policy] || 'Política estándar';
     };
 
     const handlePlanSelect = async (planId) => {
@@ -133,6 +115,20 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
         } finally {
             setLoading(false);
         }
+    };
+
+    const isExpiringSoon = (expiryDate) => {
+        if (!expiryDate) return false;
+        const expiry = new Date(expiryDate);
+        const today = new Date();
+        const diffTime = expiry - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays <= 7 && diffDays > 0;
+    };
+
+    const isExpired = (expiryDate) => {
+        if (!expiryDate) return false;
+        return new Date(expiryDate) < new Date();
     };
 
     if (!isOpen) return null;
@@ -161,15 +157,32 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
                     </div>
                     
                     {currentSubscription && (
-                        <div className="mt-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                            <p className="text-sm text-foreground dark:text-background">
-                                <span className="font-medium">Plan actual:</span> {currentSubscription.plan?.toUpperCase() || 'FREE'}
-                                {currentSubscription.expiryDate && (
-                                    <span className="ml-2 text-accent dark:text-muted">
-                                        • Vence: {new Date(currentSubscription.expiryDate).toLocaleDateString('es-ES')}
-                                    </span>
-                                )}
-                            </p>
+                        <div className="mt-4">
+                            <div className={`p-3 rounded-lg border ${
+                                isExpired(currentSubscription.expiryDate) 
+                                    ? 'bg-danger/10 border-danger/20' 
+                                    : isExpiringSoon(currentSubscription.expiryDate)
+                                    ? 'bg-warning/10 border-warning/20'
+                                    : 'bg-primary/10 border-primary/20'
+                            }`}>
+                                <div className="flex items-center gap-2">
+                                    {isExpired(currentSubscription.expiryDate) && <FaExclamationTriangle className="text-danger" />}
+                                    {isExpiringSoon(currentSubscription.expiryDate) && <FaInfoCircle className="text-warning" />}
+                                    <p className="text-sm text-foreground dark:text-background">
+                                        <span className="font-medium">Plan actual:</span> {currentSubscription.plan?.toUpperCase() || 'FREE'}
+                                        {currentSubscription.expiryDate && (
+                                            <span className="ml-2 text-accent dark:text-muted">
+                                                • {isExpired(currentSubscription.expiryDate) ? 'Venció' : 'Vence'}: {new Date(currentSubscription.expiryDate).toLocaleDateString('es-ES')}
+                                            </span>
+                                        )}
+                                        {currentSubscription.startDate && (
+                                            <span className="ml-2 text-accent dark:text-muted">
+                                                • Activo desde: {new Date(currentSubscription.startDate).toLocaleDateString('es-ES')}
+                                            </span>
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -178,18 +191,20 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
                     {plansLoading ? (
                         <div className="flex justify-center items-center h-64">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                            <p className="text-foreground dark:text-background ml-4">Cargando planes disponibles...</p>
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {plans.map((plan) => {
-                                    const IconComponent = plan.icon;
-                                    const isCurrentPlan = currentSubscription?.plan === plan.id;
-                                    const isSelected = selectedPlan === plan.id;
+                                    const IconComponent = plan.icon || FaStar;
+                                    const isCurrentPlan = currentSubscription?.plan === (plan.plan_id || plan.id);
+                                    const isSelected = selectedPlan === (plan.plan_id || plan.id);
+                                    const planId = plan.plan_id || plan.id;
                                     
                                     return (
                                         <div
-                                            key={plan.id}
+                                            key={planId}
                                             className={`relative rounded-2xl border-2 transition-all duration-300 ${
                                                 plan.popular
                                                     ? 'border-primary shadow-lg shadow-primary/20 scale-105'
@@ -223,18 +238,51 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
                                                     <h3 className="text-xl font-bold text-foreground dark:text-background mb-2">
                                                         {plan.name}
                                                     </h3>
+                                                    <p className="text-sm text-accent dark:text-muted mb-4 capitalize">
+                                                        {plan.category}
+                                                    </p>
                                                     <div className="mb-4">
                                                         <span className="text-3xl font-bold text-foreground dark:text-background">
                                                             ${plan.price}
                                                         </span>
                                                         <span className="text-accent dark:text-muted ml-1">
-                                                            {plan.duration === 'forever' ? 'Gratis para siempre' : 'por mes'}
+                                                            {plan.duration === 'forever' ? '/siempre' : 
+                                                                plan.duration === 'monthly' ? '/mes' :
+                                                                plan.duration === 'yearly' ? '/año' :
+                                                                plan.duration === 'weekly' ? '/semana' : ''}
                                                         </span>
+                                                        {plan.discountPercentage > 0 && (
+                                                            <div className="text-xs text-success font-medium mt-1">
+                                                                {plan.discountPercentage}% descuento en extras
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-3 mb-6">
-                                                    {plan.features.map((feature, index) => (
+                                                    
+                                                    <div className="flex items-start space-x-3">
+                                                        <FaCheck className="text-success mt-0.5 flex-shrink-0" />
+                                                        <span className="text-sm text-foreground dark:text-background font-medium">
+                                                            {getWalksText(plan.maxWalks)}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex items-start space-x-3">
+                                                        <FaCheck className="text-success mt-0.5 flex-shrink-0" />
+                                                        <span className="text-sm text-foreground dark:text-background">
+                                                            {getSupportText(plan.supportLevel)}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex items-start space-x-3">
+                                                        <FaCheck className="text-success mt-0.5 flex-shrink-0" />
+                                                        <span className="text-sm text-foreground dark:text-background">
+                                                            {getCancellationText(plan.cancellationPolicy)}
+                                                        </span>
+                                                    </div>
+
+                                                    {plan.features?.map((feature, index) => (
                                                         <div key={index} className="flex items-start space-x-3">
                                                             <FaCheck className="text-success mt-0.5 flex-shrink-0" />
                                                             <span className="text-sm text-foreground dark:text-background">
@@ -242,19 +290,18 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
                                                             </span>
                                                         </div>
                                                     ))}
-                                                    
-                                                    {plan.limitations?.map((limitation, index) => (
-                                                        <div key={index} className="flex items-start space-x-3 opacity-60">
-                                                            <FaTimes className="text-danger mt-0.5 flex-shrink-0" />
-                                                            <span className="text-sm text-foreground dark:text-background line-through">
-                                                                {limitation}
-                                                            </span>
-                                                        </div>
-                                                    ))}
                                                 </div>
 
+                                                {plan.description && (
+                                                    <div className="mb-6 p-3 bg-muted/20 rounded-lg">
+                                                        <p className="text-xs text-accent dark:text-muted">
+                                                            {plan.description}
+                                                        </p>
+                                                    </div>
+                                                )}
+
                                                 <button
-                                                    onClick={() => handlePlanSelect(plan.id)}
+                                                    onClick={() => handlePlanSelect(planId)}
                                                     disabled={loading || isCurrentPlan}
                                                     className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
                                                         isCurrentPlan
@@ -273,8 +320,8 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
                                                         </div>
                                                     ) : isCurrentPlan ? (
                                                         'Plan Actual'
-                                                    ) : plan.id === 'free' ? (
-                                                        'Cambiar a Gratis'
+                                                    ) : planId === 'free' ? (
+                                                        'Cambiar a Gratuito'
                                                     ) : (
                                                         `Suscribirse a ${plan.name}`
                                                     )}
@@ -283,13 +330,6 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
                                         </div>
                                     );
                                 })}
-                            </div>
-
-                            <div className="mt-8 p-4 bg-muted/20 dark:bg-accent/10 rounded-lg">
-                                <p className="text-sm text-center text-accent dark:text-muted">
-                                    Todos los planes incluyen garantía de satisfacción de 30 días. 
-                                    Puedes cambiar o cancelar tu suscripción en cualquier momento.
-                                </p>
                             </div>
                         </>
                     )}

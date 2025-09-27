@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { FiSettings, FiImage, FiDollarSign } from "react-icons/fi";
 import { BannersController } from '../../../BackEnd/Controllers/BannersController';
-import { SettingsService } from '../../../BackEnd/Services/SettingsService';
+import { SettingsController } from '../../../BackEnd/Controllers/SettingsController';
 import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import AdminManagementHeaderComponent from '../Components/AdminManagementComponents/AdminManagementHeaderComponent';
@@ -9,6 +9,7 @@ import AdminBannersSection from '../Components/AdminManagementComponents/AdminBa
 import AdminPlansSection from '../Components/AdminManagementComponents/AdminPlansSection';
 import BannerModal from '../Components/AdminManagementComponents/BannerModal';
 import PlanModal from '../Components/AdminManagementComponents/PlanModal';
+import ConfirmationDeleteModal from '../Components/AdminManagementComponents/ConfirmationDeleteModal';
 
 const AdminManagement = () => {
     const [activeTab, setActiveTab] = useState("banners");
@@ -24,6 +25,10 @@ const AdminManagement = () => {
     const [showPlanModal, setShowPlanModal] = useState(false);
     const [editingPlan, setEditingPlan] = useState(null);
     const [planActionLoading, setPlanActionLoading] = useState(false);
+    
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [deleteItemType, setDeleteItemType] = useState('plan');
 
     useEffect(() => {
         loadData();
@@ -35,7 +40,7 @@ const AdminManagement = () => {
             
             const [bannersData, plansData] = await Promise.all([
                 BannersController.getAllBanners(),
-                SettingsService.getAllSubscriptionPlans()
+                SettingsController.getAllSubscriptionPlans()
             ]);
             
             setBanners(bannersData);
@@ -93,25 +98,12 @@ const AdminManagement = () => {
         }
     };
 
-    const handleDeleteBanner = async (bannerId) => {
-        if (!confirm('¿Estás seguro de que quieres eliminar este banner?')) return;
-        
-        try {
-            setBannerActionLoading(true);
-            await BannersController.deleteBanner(bannerId);
-            success('Banner eliminado correctamente', {
-                title: 'Éxito',
-                duration: 4000
-            });
-            await loadData();
-        } catch (err) {
-            console.error('Error deleting banner:', err);
-            error(err.message || 'Error al eliminar el banner', {
-                title: 'Error al Eliminar',
-                duration: 6000
-            });
-        } finally {
-            setBannerActionLoading(false);
+    const handleDeleteBanner = (bannerId) => {
+        const banner = banners.find(b => b.id === bannerId);
+        if (banner) {
+            setItemToDelete(banner);
+            setDeleteItemType('banner');
+            setShowDeleteModal(true);
         }
     };
 
@@ -150,13 +142,13 @@ const AdminManagement = () => {
             setPlanActionLoading(true);
             
             if (editingPlan) {
-                await SettingsService.updateSubscriptionPlan(editingPlan.id, planData);
+                await SettingsController.updateSubscriptionPlan(editingPlan.plan_id || editingPlan.id, planData);
                 success('Plan actualizado correctamente', {
                     title: 'Éxito',
                     duration: 4000
                 });
             } else {
-                await SettingsService.createSubscriptionPlan(planData);
+                await SettingsController.createSubscriptionPlan(planData);
                 success('Plan creado correctamente', {
                     title: 'Éxito',
                     duration: 4000
@@ -177,32 +169,19 @@ const AdminManagement = () => {
         }
     };
 
-    const handleDeletePlan = async (planId) => {
-        if (!confirm('¿Estás seguro de que quieres eliminar este plan?')) return;
-        
-        try {
-            setPlanActionLoading(true);
-            await SettingsService.deleteSubscriptionPlan(planId);
-            success('Plan eliminado correctamente', {
-                title: 'Éxito',
-                duration: 4000
-            });
-            await loadData();
-        } catch (err) {
-            console.error('Error deleting plan:', err);
-            error(err.message || 'Error al eliminar el plan', {
-                title: 'Error al Eliminar',
-                duration: 6000
-            });
-        } finally {
-            setPlanActionLoading(false);
+    const handleDeletePlan = (planId) => {
+        const plan = plans.find(p => p.plan_id === planId);
+        if (plan) {
+            setItemToDelete(plan);
+            setDeleteItemType('plan');
+            setShowDeleteModal(true);
         }
     };
 
     const handleTogglePlanStatus = async (planId) => {
         try {
             setPlanActionLoading(true);
-            await SettingsService.togglePlanStatus(planId);
+            await SettingsController.togglePlanStatus(planId);
             info('Estado del plan actualizado', {
                 title: 'Actualizado',
                 duration: 3000
@@ -219,8 +198,46 @@ const AdminManagement = () => {
         }
     };
 
+    const handleConfirmDelete = async () => {
+        if (!itemToDelete) return;
+        
+        try {
+            if (deleteItemType === 'banner') {
+                setBannerActionLoading(true);
+                await BannersController.deleteBanner(itemToDelete.id);
+                success('Banner eliminado correctamente', {
+                    title: 'Éxito',
+                    duration: 4000
+                });
+            } else if (deleteItemType === 'plan') {
+                setPlanActionLoading(true);
+                await SettingsController.deleteSubscriptionPlan(itemToDelete.plan_id);
+                success('Plan eliminado correctamente', {
+                    title: 'Éxito',
+                    duration: 4000
+                });
+            }
+            
+            await loadData();
+            setShowDeleteModal(false);
+            setItemToDelete(null);
+        } catch (err) {
+            console.error(`Error deleting ${deleteItemType}:`, err);
+            error(err.message || `Error al eliminar el ${deleteItemType === 'banner' ? 'banner' : 'plan'}`, {
+                title: 'Error al Eliminar',
+                duration: 6000
+            });
+        } finally {
+            if (deleteItemType === 'banner') {
+                setBannerActionLoading(false);
+            } else if (deleteItemType === 'plan') {
+                setPlanActionLoading(false);
+            }
+        }
+    };
+
     const activeBannersCount = banners.filter(b => b.isActive).length;
-    const activePlansCount = plans.filter(p => p.isActive && p.id !== 'free').length;
+    const activePlansCount = plans.filter(p => p.is_active && p.plan_id !== 'free').length;
 
     if (loading) {
         return (
@@ -290,6 +307,18 @@ const AdminManagement = () => {
                     planData={editingPlan}
                     isLoading={planActionLoading}
                     activePlansCount={activePlansCount}
+                />
+
+                <ConfirmationDeleteModal 
+                    isOpen={showDeleteModal}
+                    onClose={() => {
+                        setShowDeleteModal(false);
+                        setItemToDelete(null);
+                    }}
+                    onConfirm={handleConfirmDelete}
+                    isLoading={deleteItemType === 'banner' ? bannerActionLoading : planActionLoading}
+                    itemData={itemToDelete}
+                    itemType={deleteItemType}
                 />
             </div>
         </div>

@@ -75,10 +75,10 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, loading, isActive, i
                     </div>
                 </div>
 
-                {plan.createdAt && (
+                {plan.created_at && (
                     <div className="text-xs text-accent dark:text-muted mb-4">
-                        <p>Creado: {new Date(plan.createdAt).toLocaleDateString()}</p>
-                        <p>Actualizado: {new Date(plan.updatedAt).toLocaleDateString()}</p>
+                        <p>Creado: {new Date(plan.created_at).toLocaleDateString()}</p>
+                        <p>Actualizado: {new Date(plan.updated_at).toLocaleDateString()}</p>
                     </div>
                 )}
 
@@ -94,7 +94,7 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, loading, isActive, i
                         </button>
 
                         <button
-                            onClick={() => onToggleStatus(plan.id)}
+                            onClick={() => onToggleStatus(plan.plan_id)}
                             disabled={loading}
                             className={`flex items-center justify-center p-2 rounded-lg border-2 transition-all duration-200 disabled:opacity-50 ${
                                 isActive
@@ -107,7 +107,7 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, loading, isActive, i
                         </button>
 
                         <button
-                            onClick={() => onDelete(plan.id)}
+                            onClick={() => onDelete(plan.plan_id)}
                             disabled={loading}
                             className="flex items-center justify-center p-2 rounded-lg border-2 border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-all duration-200 disabled:opacity-50"
                             title="Eliminar"

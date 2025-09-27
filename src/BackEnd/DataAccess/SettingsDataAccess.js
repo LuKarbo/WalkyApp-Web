@@ -47,5 +47,17 @@ export const SettingsDataAccess = {
 
     async getUsersWithPlan(planId) {
         return await SettingsAPI.getUsersWithPlan(planId);
+    },
+
+    async getSubscriptionStats() {
+        return await SettingsAPI.getSubscriptionStats();
+    },
+
+    async getPlanFeatures(planId) {
+        return await SettingsAPI.getPlanFeatures(planId);
+    },
+
+    async validatePlanTransition(fromPlanId, toPlanId) {
+        return await SettingsAPI.validatePlanTransition(fromPlanId, toPlanId);
     }
 };

@@ -3,210 +3,182 @@ export const SettingsAPI = {
     userSettings: {
         1: {
             email: 'juan.perez@example.com',
-            notifications: {
-                walkStatus: true,
-                announcements: true,
-                subscription: false,
-                messages: true,
-                systemAlerts: true
-            },
-            updatedAt: '2025-01-15T10:30:00Z'
+            notification_walk_status: true,
+            notification_announcements: true,
+            notification_subscription: false,
+            notification_messages: true,
+            notification_system_alerts: true,
+            updated_at: '2025-01-15T10:30:00Z'
         },
         2: {
             email: 'maria.garcia@example.com',
-            notifications: {
-                walkStatus: true,
-                announcements: false,
-                subscription: true,
-                messages: true,
-                systemAlerts: false
-            },
-            updatedAt: '2025-01-10T15:45:00Z'
+            notification_walk_status: true,
+            notification_announcements: false,
+            notification_subscription: true,
+            notification_messages: true,
+            notification_system_alerts: false,
+            updated_at: '2025-01-10T15:45:00Z'
         },
         3: {
             email: 'carlos.lopez@example.com',
-            notifications: {
-                walkStatus: false,
-                announcements: true,
-                subscription: true,
-                messages: false,
-                systemAlerts: true
-            },
-            updatedAt: '2025-01-12T09:20:00Z'
+            notification_walk_status: false,
+            notification_announcements: true,
+            notification_subscription: true,
+            notification_messages: false,
+            notification_system_alerts: true,
+            updated_at: '2025-01-12T09:20:00Z'
         }
     },
 
     userSubscriptions: {
         1: {
             plan: 'silver',
-            startDate: '2024-12-01T00:00:00Z',
-            expiryDate: '2025-01-01T00:00:00Z',
-            isActive: true
+            start_date: '2024-12-01T00:00:00Z',
+            expiry_date: '2025-01-01T00:00:00Z',
+            is_active: true
         },
         2: {
             plan: 'bronze',
-            startDate: '2024-11-15T00:00:00Z',
-            expiryDate: '2025-02-15T00:00:00Z',
-            isActive: true
+            start_date: '2024-11-15T00:00:00Z',
+            expiry_date: '2025-02-15T00:00:00Z',
+            is_active: true
         },
         3: {
             plan: 'free',
-            startDate: null,
-            expiryDate: null,
-            isActive: true
+            start_date: null,
+            expiry_date: null,
+            is_active: true
         }
     },
 
     subscriptionPlans: [
         {
-            id: 'free',
+            id: 1,
+            plan_id: 'free',
             name: 'Free Plan',
             price: 0,
             duration: 'forever',
             category: 'basic',
-            features: [
-                'Up to 2 walks per month',
-                'Basic walkers',
-                'Email support',
-                'Basic notifications'
-            ],
             description: 'Perfecto para comenzar y probar nuestros servicios básicos',
-            maxWalks: 2,
-            hasGPS: false,
-            hasPhotos: false,
-            hasPremiumWalkers: false,
-            supportLevel: 'email',
-            cancellationPolicy: 'none',
-            isActive: true,
-            createdAt: '2024-01-01T00:00:00Z',
-            updatedAt: '2024-01-01T00:00:00Z'
+            max_walks: 2,
+            features: [
+                'Hasta 2 paseos por mes',
+                'Paseadores básicos',
+                'Soporte por email',
+                'Notificaciones básicas'
+            ],
+            support_level: 'email',
+            cancellation_policy: 'none',
+            discount_percentage: 0,
+            is_active: true,
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z'
         },
         {
-            id: 'bronze',
+            id: 2,
+            plan_id: 'bronze',
             name: 'Bronze',
             price: 9.99,
             duration: 'monthly',
             category: 'standard',
-            features: [
-                'Up to 8 walks per month',
-                'Real-time GPS tracking',
-                'Walk photos',
-                'Verified walkers',
-                'Priority support',
-                'Activity reports'
-            ],
             description: 'Ideal para mascotas que necesitan paseos regulares con seguimiento',
-            maxWalks: 8,
-            hasGPS: true,
-            hasPhotos: true,
-            hasPremiumWalkers: false,
-            supportLevel: 'priority',
-            cancellationPolicy: 'standard',
-            isActive: true,
-            createdAt: '2024-06-01T00:00:00Z',
-            updatedAt: '2024-06-01T00:00:00Z'
+            max_walks: 8,
+            features: [
+                'Hasta 8 paseos por mes',
+                'GPS en tiempo real',
+                'Fotos durante el paseo',
+                'Paseadores verificados',
+                'Soporte prioritario',
+                'Reportes de actividad'
+            ],
+            support_level: 'priority',
+            cancellation_policy: 'standard',
+            discount_percentage: 0,
+            is_active: true,
+            created_at: '2024-06-01T00:00:00Z',
+            updated_at: '2024-06-01T00:00:00Z'
         },
         {
-            id: 'silver',
+            id: 3,
+            plan_id: 'silver',
             name: 'Silver',
             price: 19.99,
             duration: 'monthly',
             category: 'premium',
-            features: [
-                'Up to 15 walks per month',
-                'Premium walkers access',
-                'Real-time GPS tracking',
-                'Photos and videos',
-                'Free cancellation 24h',
-                '24/7 support',
-                'Detailed reports',
-                '10% discount on extras'
-            ],
             description: 'La opción más popular con acceso premium y beneficios exclusivos',
-            maxWalks: 15,
-            hasGPS: true,
-            hasPhotos: true,
-            hasVideos: true,
-            hasPremiumWalkers: true,
-            supportLevel: '24/7',
-            cancellationPolicy: 'flexible',
-            discountPercentage: 10,
-            isActive: true,
-            createdAt: '2024-06-01T00:00:00Z',
-            updatedAt: '2024-06-01T00:00:00Z'
+            max_walks: 15,
+            features: [
+                'Hasta 15 paseos por mes',
+                'Acceso a paseadores premium',
+                'GPS en tiempo real',
+                'Fotos y videos del paseo',
+                'Cancelación gratuita 24h antes',
+                'Soporte 24/7',
+                'Reportes detallados',
+                '10% descuento en servicios extra'
+            ],
+            support_level: '24/7',
+            cancellation_policy: 'flexible',
+            discount_percentage: 10,
+            is_active: true,
+            created_at: '2024-06-01T00:00:00Z',
+            updated_at: '2024-06-01T00:00:00Z'
         },
         {
-            id: 'gold',
+            id: 4,
+            plan_id: 'gold',
             name: 'Gold',
             price: 39.99,
             duration: 'monthly',
             category: 'vip',
-            features: [
-                'Unlimited walks',
-                'VIP walker access',
-                'Premium GPS with history',
-                'HD videos',
-                'Free cancellation anytime',
-                'Dedicated 24/7 support',
-                'Monthly vet reports',
-                '20% discount on extras',
-                'Emergency service',
-                'Night walks available'
-            ],
             description: 'El plan más completo para el máximo cuidado de tu mascota',
-            maxWalks: -1, 
-            hasGPS: true,
-            hasPhotos: true,
-            hasVideos: true,
-            hasHDVideos: true,
-            hasPremiumWalkers: true,
-            hasVIPWalkers: true,
-            supportLevel: 'dedicated',
-            cancellationPolicy: 'anytime',
-            discountPercentage: 20,
-            hasEmergencyService: true,
-            hasNightWalks: true,
-            hasVetReports: true,
-            isActive: true,
-            createdAt: '2024-06-01T00:00:00Z',
-            updatedAt: '2024-06-01T00:00:00Z'
+            max_walks: -1,
+            features: [
+                'Paseos ilimitados',
+                'Acceso VIP a mejores paseadores',
+                'GPS premium con historial completo',
+                'Videos HD del paseo',
+                'Cancelación gratuita sin restricciones',
+                'Soporte dedicado 24/7',
+                'Reportes veterinarios mensuales',
+                '20% descuento en servicios extra',
+                'Servicio de emergencia',
+                'Paseos nocturnos disponibles'
+            ],
+            support_level: 'dedicated',
+            cancellation_policy: 'anytime',
+            discount_percentage: 20,
+            is_active: true,
+            created_at: '2024-06-01T00:00:00Z',
+            updated_at: '2024-06-01T00:00:00Z'
         },
         {
-            id: 'platinum',
+            id: 5,
+            plan_id: 'platinum',
             name: 'Platinum',
             price: 59.99,
             duration: 'monthly',
             category: 'exclusive',
+            description: 'El plan más exclusivo con servicios personalizados y paseador dedicado',
+            max_walks: -1,
             features: [
-                'Unlimited premium walks',
-                'Personal dedicated walker',
-                'Live video streaming',
-                'Veterinary consultations included',
-                'Pet grooming discounts',
-                'Priority emergency response',
-                'Custom walk schedules',
-                'Monthly health reports'
+                'Paseos premium ilimitados',
+                'Paseador personal dedicado',
+                'Transmisión en vivo durante paseos',
+                'Consultas veterinarias incluidas',
+                'Descuentos en servicios de grooming',
+                'Respuesta prioritaria en emergencias',
+                'Horarios de paseo personalizados',
+                'Reportes de salud mensuales detallados',
+                '25% descuento en todos los extras',
+                'Servicio de taxi para mascotas'
             ],
-            description: 'El plan más exclusivo con servicios personalizados',
-            maxWalks: -1,
-            hasGPS: true,
-            hasPhotos: true,
-            hasVideos: true,
-            hasHDVideos: true,
-            hasPremiumWalkers: true,
-            hasVIPWalkers: true,
-            hasPersonalWalker: true,
-            supportLevel: 'dedicated',
-            cancellationPolicy: 'anytime',
-            discountPercentage: 25,
-            hasEmergencyService: true,
-            hasNightWalks: true,
-            hasVetReports: true,
-            hasLiveStreaming: true,
-            hasVetConsultations: true,
-            isActive: false,
-            createdAt: '2024-09-01T00:00:00Z',
-            updatedAt: '2024-09-01T00:00:00Z'
+            support_level: 'dedicated',
+            cancellation_policy: 'anytime',
+            discount_percentage: 25,
+            is_active: false,
+            created_at: '2024-09-01T00:00:00Z',
+            updated_at: '2024-09-01T00:00:00Z'
         }
     ],
 
@@ -219,14 +191,12 @@ export const SettingsAPI = {
         if (!settings) {
             return {
                 email: '',
-                notifications: {
-                    walkStatus: true,
-                    announcements: true,
-                    subscription: true,
-                    messages: true,
-                    systemAlerts: true
-                },
-                updatedAt: new Date().toISOString()
+                notification_walk_status: true,
+                notification_announcements: true,
+                notification_subscription: true,
+                notification_messages: true,
+                notification_system_alerts: true,
+                updated_at: new Date().toISOString()
             };
         }
         
@@ -239,13 +209,35 @@ export const SettingsAPI = {
         const userIdInt = parseInt(userId);
         const currentSettings = this.userSettings[userIdInt] || {};
 
-        this.userSettings[userIdInt] = {
+        const updatedSettings = {
             ...currentSettings,
-            ...settings,
-            updatedAt: new Date().toISOString()
+            updated_at: new Date().toISOString()
         };
+
+        if (settings.email !== undefined) {
+            updatedSettings.email = settings.email;
+        }
+
+        if (settings.notifications) {
+            if (settings.notifications.walkStatus !== undefined) {
+                updatedSettings.notification_walk_status = settings.notifications.walkStatus;
+            }
+            if (settings.notifications.announcements !== undefined) {
+                updatedSettings.notification_announcements = settings.notifications.announcements;
+            }
+            if (settings.notifications.subscription !== undefined) {
+                updatedSettings.notification_subscription = settings.notifications.subscription;
+            }
+            if (settings.notifications.messages !== undefined) {
+                updatedSettings.notification_messages = settings.notifications.messages;
+            }
+            if (settings.notifications.systemAlerts !== undefined) {
+                updatedSettings.notification_system_alerts = settings.notifications.systemAlerts;
+            }
+        }
         
-        return this.userSettings[userIdInt];
+        this.userSettings[userIdInt] = updatedSettings;
+        return updatedSettings;
     },
 
     async getUserSubscription(userId) {
@@ -264,7 +256,7 @@ export const SettingsAPI = {
         
         this.userSubscriptions[userIdInt] = {
             ...subscriptionData,
-            updatedAt: new Date().toISOString()
+            updated_at: new Date().toISOString()
         };
         
         return this.userSubscriptions[userIdInt];
@@ -272,7 +264,7 @@ export const SettingsAPI = {
 
     async getSubscriptionPlans() {
         await new Promise(resolve => setTimeout(resolve, 150));
-        return this.subscriptionPlans.filter(plan => plan.isActive);
+        return this.subscriptionPlans.filter(plan => plan.is_active);
     },
 
     async getAllSubscriptionPlans() {
@@ -282,21 +274,35 @@ export const SettingsAPI = {
 
     async getActiveSubscriptionPlans() {
         await new Promise(resolve => setTimeout(resolve, 150));
-        return this.subscriptionPlans.filter(plan => plan.isActive);
+        return this.subscriptionPlans.filter(plan => plan.is_active);
     },
 
     async getSubscriptionPlanById(planId) {
         await new Promise(resolve => setTimeout(resolve, 100));
-        return this.subscriptionPlans.find(plan => plan.id === planId) || null;
+        return this.subscriptionPlans.find(plan => plan.plan_id === planId || plan.id === planId) || null;
     },
 
     async createSubscriptionPlan(planData) {
         await new Promise(resolve => setTimeout(resolve, 500));
         
+        const newId = Math.max(...this.subscriptionPlans.map(p => p.id)) + 1;
+        
         const newPlan = {
-            ...planData,
-            createdAt: planData.createdAt || new Date().toISOString(),
-            updatedAt: planData.updatedAt || new Date().toISOString()
+            id: newId,
+            plan_id: planData.plan_id,
+            name: planData.name,
+            price: planData.price,
+            duration: planData.duration || 'monthly',
+            category: planData.category || 'standard',
+            description: planData.description || '',
+            max_walks: planData.max_walks || 0,
+            features: typeof planData.features === 'string' ? JSON.parse(planData.features) : planData.features,
+            support_level: planData.support_level || 'email',
+            cancellation_policy: planData.cancellation_policy || 'none',
+            discount_percentage: planData.discount_percentage || 0,
+            is_active: planData.is_active || false,
+            created_at: planData.created_at || new Date().toISOString(),
+            updated_at: planData.updated_at || new Date().toISOString()
         };
 
         this.subscriptionPlans.push(newPlan);
@@ -306,26 +312,30 @@ export const SettingsAPI = {
     async updateSubscriptionPlan(planId, planData) {
         await new Promise(resolve => setTimeout(resolve, 400));
         
-        const planIndex = this.subscriptionPlans.findIndex(plan => plan.id === planId);
+        const planIndex = this.subscriptionPlans.findIndex(plan => plan.plan_id === planId || plan.id === planId);
         
         if (planIndex === -1) {
             throw new Error("Plan no encontrado");
         }
 
-        this.subscriptionPlans[planIndex] = {
+        const updatedPlan = {
             ...this.subscriptionPlans[planIndex],
             ...planData,
-            id: planId,
-            updatedAt: new Date().toISOString()
+            updated_at: new Date().toISOString()
         };
 
-        return this.subscriptionPlans[planIndex];
+        if (planData.features && typeof planData.features === 'string') {
+            updatedPlan.features = JSON.parse(planData.features);
+        }
+
+        this.subscriptionPlans[planIndex] = updatedPlan;
+        return updatedPlan;
     },
 
     async deleteSubscriptionPlan(planId) {
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        const planIndex = this.subscriptionPlans.findIndex(plan => plan.id === planId);
+        const planIndex = this.subscriptionPlans.findIndex(plan => plan.plan_id === planId || plan.id === planId);
         
         if (planIndex === -1) {
             throw new Error("Plan no encontrado");
@@ -352,17 +362,91 @@ export const SettingsAPI = {
         await new Promise(resolve => setTimeout(resolve, 100));
         
         const totalUsers = Object.keys(this.userSubscriptions).length;
-        const planCounts = this.subscriptionPlans.reduce((acc, plan) => {
-            acc[plan.id] = 0;
-            return acc;
-        }, {});
+        const planCounts = {};
+        
+        this.subscriptionPlans.forEach(plan => {
+            planCounts[plan.plan_id] = 0;
+        });
+
+        Object.values(this.userSubscriptions).forEach(subscription => {
+            if (planCounts[subscription.plan] !== undefined) {
+                planCounts[subscription.plan]++;
+            }
+        });
+
+        const mostPopularPlan = Object.keys(planCounts).reduce((a, b) => 
+            planCounts[a] > planCounts[b] ? a : b
+        );
 
         return {
             totalUsers,
             planDistribution: planCounts,
-            mostPopularPlan: Object.keys(planCounts).reduce((a, b) => 
-                planCounts[a] > planCounts[b] ? a : b
-            )
+            mostPopularPlan,
+            activeSubscriptions: Object.values(this.userSubscriptions).filter(sub => sub.is_active).length,
+            expiredSubscriptions: Object.values(this.userSubscriptions).filter(sub => 
+                sub.expiry_date && new Date(sub.expiry_date) < new Date()
+            ).length
+        };
+    },
+
+    async getPlanFeatures(planId) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const plan = this.subscriptionPlans.find(p => p.plan_id === planId || p.id === planId);
+        if (!plan) return null;
+
+        return {
+            maxWalks: plan.max_walks,
+            hasGPS: plan.max_walks > 2,
+            hasPhotos: plan.max_walks > 2,
+            hasVideos: plan.max_walks > 8,
+            hasHDVideos: plan.max_walks === -1,
+            hasPremiumWalkers: plan.max_walks > 8,
+            hasVIPWalkers: plan.max_walks === -1,
+            hasPersonalWalker: plan.plan_id === 'platinum',
+            supportLevel: plan.support_level,
+            cancellationPolicy: plan.cancellation_policy,
+            discountPercentage: plan.discount_percentage,
+            hasEmergencyService: plan.max_walks === -1,
+            hasNightWalks: plan.max_walks === -1,
+            hasVetReports: plan.max_walks === -1,
+            hasLiveStreaming: plan.plan_id === 'platinum',
+            hasVetConsultations: plan.plan_id === 'platinum'
+        };
+    },
+
+    async validatePlanTransition(fromPlanId, toPlanId) {
+        await new Promise(resolve => setTimeout(resolve, 150));
+        
+        const fromPlan = this.subscriptionPlans.find(p => p.plan_id === fromPlanId);
+        const toPlan = this.subscriptionPlans.find(p => p.plan_id === toPlanId);
+        
+        if (!toPlan) {
+            throw new Error("Plan de destino no válido");
+        }
+
+        const planHierarchy = { 
+            free: 0, 
+            bronze: 1, 
+            silver: 2, 
+            gold: 3, 
+            platinum: 4 
+        };
+
+        const isUpgrade = planHierarchy[toPlanId] > planHierarchy[fromPlanId];
+        const isDowngrade = planHierarchy[toPlanId] < planHierarchy[fromPlanId];
+
+        return {
+            isValid: true,
+            isUpgrade,
+            isDowngrade,
+            requiresPayment: isUpgrade,
+            refundAmount: isDowngrade ? (fromPlan?.price || 0) - (toPlan?.price || 0) : 0,
+            message: isUpgrade ? 
+                'Upgrade disponible - se requiere pago adicional' :
+                isDowngrade ? 
+                'Downgrade disponible - se aplicará reembolso prorrateado' :
+                'Cambio de plan sin costo adicional'
         };
     }
 };

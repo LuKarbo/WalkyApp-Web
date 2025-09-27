@@ -9,9 +9,9 @@ const AdminPlansSection = ({
         onToggleStatus, 
         loading 
     }) => {
-        const freePlan = plans.find(plan => plan.id === "free");
-        const activePlans = plans.filter(plan => plan.isActive && plan.id !== "free");
-        const inactivePlans = plans.filter(plan => !plan.isActive && plan.id !== "free");
+        const freePlan = plans.find(plan => plan.plan_id === "free");
+        const activePlans = plans.filter(plan => plan.is_active && plan.plan_id !== "free");
+        const inactivePlans = plans.filter(plan => !plan.is_active && plan.plan_id !== "free");
 
     return (
         <div className="space-y-8">
@@ -111,7 +111,7 @@ const AdminPlansSection = ({
                 </div>
             )}
 
-            {plans.filter(p => p.id !== "free").length === 0 && (
+            {plans.filter(p => p.plan_id !== "free").length === 0 && (
                 <div className="text-center py-16">
                     <div className="bg-white/50 dark:bg-foreground/50 backdrop-blur-sm rounded-3xl p-12 max-w-md mx-auto shadow-xl">
                         <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-success/20 rounded-full flex items-center justify-center mx-auto mb-6">
