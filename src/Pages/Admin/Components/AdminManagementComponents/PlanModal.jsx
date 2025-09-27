@@ -21,19 +21,38 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
 
     useEffect(() => {
         if (planData) {
+            let normalizedFeatures = [''];
+            if (planData.features) {
+                if (Array.isArray(planData.features)) {
+                    normalizedFeatures = planData.features.length > 0 ? [...planData.features] : [''];
+                } else if (typeof planData.features === 'string') {
+                    try {
+                        const parsedFeatures = JSON.parse(planData.features);
+                        normalizedFeatures = Array.isArray(parsedFeatures) && parsedFeatures.length > 0 ? parsedFeatures : [''];
+                    } catch {
+                        normalizedFeatures = [planData.features];
+                    }
+                } else if (typeof planData.features === 'object') {
+                    normalizedFeatures = Object.entries(planData.features)
+                        .filter(([key, value]) => value === true)
+                        .map(([key]) => key.replace(/_/g, ' '));
+                    if (normalizedFeatures.length === 0) normalizedFeatures = [''];
+                }
+            }
+
             setFormData({
                 plan_id: planData.plan_id || '',
                 name: planData.name || '',
-                price: planData.price || 0,
+                price: Number(planData.price) || 0,
                 duration: planData.duration || 'monthly',
                 category: planData.category || 'standard',
                 description: planData.description || '',
-                max_walks: planData.max_walks || 0,
-                features: Array.isArray(planData.features) ? [...planData.features] : (planData.features ? [planData.features] : ['']),
+                max_walks: Number(planData.max_walks) || 0,
+                features: normalizedFeatures,
                 support_level: planData.support_level || 'email',
                 cancellation_policy: planData.cancellation_policy || 'none',
-                discount_percentage: planData.discount_percentage || 0,
-                is_active: planData.is_active || false
+                discount_percentage: Number(planData.discount_percentage) || 0,
+                is_active: Boolean(planData.is_active)
             });
         } else {
             setFormData({
@@ -100,15 +119,20 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
     };
 
     const removeFeature = (index) => {
-        const newFeatures = formData.features.filter((_, i) => i !== index);
-        setFormData(prev => ({ ...prev, features: newFeatures }));
+        if (formData.features.length > 1) {
+            const newFeatures = formData.features.filter((_, i) => i !== index);
+            setFormData(prev => ({ ...prev, features: newFeatures }));
+        }
     };
 
     const handleSubmit = () => {
         if (validateForm()) {
             const dataToSave = {
                 ...formData,
-                features: formData.features.filter(feature => feature.trim())
+                features: formData.features.filter(feature => feature.trim()),
+                price: Number(formData.price),
+                max_walks: Number(formData.max_walks),
+                discount_percentage: Number(formData.discount_percentage)
             };
             onSave(dataToSave);
         }
@@ -398,7 +422,8 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-2.5 text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors duration-200"
+                        disabled={isLoading}
+                        className="px-6 py-2.5 text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors duration-200 disabled:opacity-50"
                     >
                         Cancelar
                     </button>

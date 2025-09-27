@@ -47,15 +47,17 @@ const AdminPlansSection = ({
                         </span>
                     </div>
                     
-                    <PlanCard
-                        plan={freePlan}
-                        onEdit={() => {}}
-                        onDelete={() => {}}
-                        onToggleStatus={() => {}}
-                        loading={false}
-                        isActive={true}
-                        isEditable={false}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <PlanCard
+                            plan={freePlan}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
+                            onToggleStatus={() => {}}
+                            loading={false}
+                            isActive={true}
+                            isEditable={false}
+                        />
+                    </div>
                 </div>
             )}
 
@@ -71,7 +73,7 @@ const AdminPlansSection = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {activePlans.map((plan) => (
                             <PlanCard
-                                key={plan.id}
+                                key={plan.id || plan.plan_id}
                                 plan={plan}
                                 onEdit={onEditPlan}
                                 onDelete={onDeletePlan}
@@ -97,7 +99,7 @@ const AdminPlansSection = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {inactivePlans.map((plan) => (
                             <PlanCard
-                                key={plan.id}
+                                key={plan.id || plan.plan_id}
                                 plan={plan}
                                 onEdit={onEditPlan}
                                 onDelete={onDeletePlan}
@@ -125,7 +127,8 @@ const AdminPlansSection = ({
                         </p>
                         <button
                             onClick={onCreatePlan}
-                            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200"
+                            disabled={loading}
+                            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200 disabled:opacity-50"
                         >
                             Crear Primer Plan
                         </button>

@@ -42,9 +42,10 @@ const AdminManagement = () => {
                 BannersController.getAllBanners(),
                 SettingsController.getAllSubscriptionPlans()
             ]);
-            
+
             setBanners(bannersData);
             setPlans(plansData);
+            
         } catch (err) {
             console.error('Error loading data:', err);
             error('Error al cargar los datos', {

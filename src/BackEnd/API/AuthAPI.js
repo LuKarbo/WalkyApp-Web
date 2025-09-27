@@ -156,10 +156,10 @@ export const AuthAPI = {
     },
 
     async updateUser(id, userData) {
-        console.log("Simulando actualización de usuario:", { id, userData });
+        console.log("Simulando actualización de usuario completa:", { id, userData });
         
         try {
-            console.log("updateUser AUTH");
+            console.log("updateUser AUTH - Actualización completa");
             console.log(userData);
             const response = await apiClient.put(`/users/${id}`, userData);
 
@@ -185,6 +185,45 @@ export const AuthAPI = {
             }
             if (error.message.includes('Usuario no encontrado')) {
                 throw new Error("Usuario no encontrado");
+            }
+            throw new Error(error.message || 'Error al actualizar usuario');
+        }
+    },
+
+    async updateUserByAdmin(id, adminUserData) {
+        console.log("Simulando actualización de usuario por admin:", { id, adminUserData });
+        
+        try {
+            console.log("updateUserByAdmin AUTH - Solo campos permitidos para admin");
+            console.log(adminUserData);
+            
+            const response = await apiClient.put(`/users/adminUpdate/${id}`, {
+                ...adminUserData,
+                isAdminUpdate: true 
+            });
+
+            const updatedUser = response.data.user;
+            
+            return {
+                id: updatedUser.id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                profileImage: updatedUser.profileImage || updatedUser.profile_image,
+                suscription: updatedUser.suscription || updatedUser.subscription || 'Basic',
+                phone: updatedUser.phone || "",
+                location: updatedUser.location || "",
+                joinedDate: updatedUser.joinedDate || updatedUser.joined_date,
+                status: updatedUser.status,
+                lastLogin: updatedUser.lastLogin || updatedUser.last_login
+            };
+        } catch (error) {
+            console.error("Error actualizando usuario por admin:", error);
+            if (error.message.includes('Usuario no encontrado')) {
+                throw new Error("Usuario no encontrado");
+            }
+            if (error.message.includes('sin permisos')) {
+                throw new Error("No tienes permisos para realizar esta acción");
             }
             throw new Error(error.message || 'Error al actualizar usuario');
         }

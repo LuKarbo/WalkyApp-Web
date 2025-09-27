@@ -13,6 +13,10 @@ export const UserDataAccess = {
         return await UserAPI.updateUser(id, userData);
     },
 
+    async updateUserByAdmin(id, adminUserData) {
+        return await UserAPI.updateUserByAdmin(id, adminUserData);
+    },
+
     async deleteUser(id) {
         return await UserAPI.deleteUser(id);
     },

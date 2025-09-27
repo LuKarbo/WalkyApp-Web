@@ -198,9 +198,17 @@ export const SettingsService = {
             throw new Error("El número máximo de paseos no puede ser menor a -1 (usa -1 para ilimitado)");
         }
 
-        const existingPlan = await SettingsDataAccess.getSubscriptionPlanById(planData.plan_id);
-        if (existingPlan) {
-            throw new Error("Ya existe un plan con este ID");
+        try {
+            const existingPlan = await SettingsDataAccess.getSubscriptionPlanById(planData.plan_id);
+            if (existingPlan) {
+                throw new Error("Ya existe un plan con este ID");
+            }
+        } catch (error) {
+            if (!error.message.includes('Plan not found') && 
+                !error.message.includes('Plan no encontrado') &&
+                !error.message.includes('404')) {
+                throw error;
+            }
         }
 
         if (planData.is_active || planData.isActive) {
@@ -219,13 +227,11 @@ export const SettingsService = {
             category: planData.category || 'standard',
             description: planData.description || '',
             max_walks: planData.max_walks || 0,
-            features: JSON.stringify(planData.features),
+            features: planData.features,
             support_level: planData.support_level || 'email',
             cancellation_policy: planData.cancellation_policy || 'none',
             discount_percentage: planData.discount_percentage || 0,
-            is_active: planData.is_active || planData.isActive || false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            is_active: planData.is_active || planData.isActive || false
         };
 
         const newPlan = await SettingsDataAccess.createSubscriptionPlan(newPlanData);
@@ -271,16 +277,7 @@ export const SettingsService = {
             }
         }
 
-        const updateData = {
-            ...planData,
-            updated_at: new Date().toISOString()
-        };
-
-        if (planData.features) {
-            updateData.features = JSON.stringify(planData.features);
-        }
-
-        const updatedPlan = await SettingsDataAccess.updateSubscriptionPlan(planId, updateData);
+        const updatedPlan = await SettingsDataAccess.updateSubscriptionPlan(planId, planData);
         return updatedPlan;
     },
 
@@ -330,11 +327,7 @@ export const SettingsService = {
             }
         }
 
-        const updatedPlan = await SettingsDataAccess.updateSubscriptionPlan(planId, {
-            is_active: !existingPlan.is_active,
-            updated_at: new Date().toISOString()
-        });
-
+        const updatedPlan = await SettingsDataAccess.togglePlanStatus(planId);
         return updatedPlan;
     },
 
@@ -376,7 +369,7 @@ export const SettingsService = {
     calculateProrationAmount(currentPlan, newPlan, daysRemaining) {
         if (!currentPlan || !newPlan) return 0;
         
-        let daysInPeriod = 30; // default monthly
+        let daysInPeriod = 30;
         switch (currentPlan.duration) {
             case 'weekly': daysInPeriod = 7; break;
             case 'yearly': daysInPeriod = 365; break;

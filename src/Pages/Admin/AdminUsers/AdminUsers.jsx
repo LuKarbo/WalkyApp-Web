@@ -75,7 +75,9 @@ const AdminUsers = () => {
 
     const handleSaveEditUser = async (userId, userData) => {
         try {
-            await UserController.updateUser(userId, userData);
+            console.log("AdminUsers - Guardando con updateUserByAdmin:", { userId, userData });
+            
+            await UserController.updateUserByAdmin(userId, userData);
             setRefreshTrigger(prev => prev + 1);
             setShowEditModal(false);
             setSelectedUser(null);

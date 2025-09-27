@@ -38,6 +38,11 @@ export const UserAPI = {
         return await AuthAPI.updateUser(id, userData);
     },
 
+    async updateUserByAdmin(id, adminUserData) {
+        console.log("UsersAPI - Actualizando usuario por admin:", { id, adminUserData });
+        return await AuthAPI.updateUserByAdmin(id, adminUserData);
+    },
+
     async deleteUser(id) {
         console.log("UsersAPI - Eliminando usuario:", id);
         return await AuthAPI.deleteUser(id);
