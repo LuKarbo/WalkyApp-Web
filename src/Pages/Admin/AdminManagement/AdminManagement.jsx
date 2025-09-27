@@ -41,7 +41,6 @@ const AdminManagement = () => {
             setBanners(bannersData);
             setPlans(plansData);
         } catch (err) {
-            console.error('Error loading data:', err);
             error('Error al cargar los datos', {
                 title: 'Error de Carga',
                 duration: 6000

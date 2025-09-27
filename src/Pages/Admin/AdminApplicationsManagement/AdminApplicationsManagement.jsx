@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaUsers, FaClock, FaCheckCircle, FaTimes, FaFilter } from 'react-icons/fa';
 import { JoinToUsController } from '../../../BackEnd/Controllers/JoinToUsController';
 import { UserController } from '../../../BackEnd/Controllers/UserController';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import ApplicationsList from '../Components/AdminApplicationsComponents/ApplicationsList';
 import ApplicationDetails from '../Components/AdminApplicationsComponents/ApplicationDetails';
@@ -25,6 +26,7 @@ const AdminApplicationsManagement = () => {
         under_review: 0
     });
     const [errors, setErrors] = useState({});
+    const { success, error, info } = useToast();
 
     useEffect(() => {
         loadApplications();
@@ -40,9 +42,14 @@ const AdminApplicationsManagement = () => {
             setLoading(true);
             const response = await JoinToUsController.getAllRegistrations();
             setApplications(response);
+            setErrors({}); // Limpiar errores de carga si tiene éxito
         } catch (error) {
-            console.error('Error loading applications:', error);
-            setErrors({ load: 'Error al cargar las solicitudes' });
+            const errorMessage = 'Error al cargar las solicitudes. Intente recargar.';
+            error(errorMessage, {
+                title: 'Error de Carga',
+                duration: 4000
+            });
+            setErrors({ load: errorMessage });
         } finally {
             setLoading(false);
         }
@@ -53,7 +60,7 @@ const AdminApplicationsManagement = () => {
             const response = await JoinToUsController.getRegistrationStats();
             setStats(response);
         } catch (error) {
-            console.error('Error loading stats:', error);
+            // dont show error toast for stats failure
         }
     };
 
@@ -100,6 +107,8 @@ const AdminApplicationsManagement = () => {
     const handleReviewSubmit = async (adminNotes = '') => {
         if (!selectedApplication || !reviewAction) return;
 
+        const actionText = reviewAction === 'approve' ? 'Aprobación' : 'Rechazo';
+        
         try {
             setReviewing(true);
             setErrors({});
@@ -111,7 +120,15 @@ const AdminApplicationsManagement = () => {
             );
 
             if (reviewAction === 'approve') {
-                await UserController.promoteUserToWalker(selectedApplication.userId);
+                try {
+                    await UserController.promoteUserToWalker(selectedApplication.userId);
+                } catch (promoteError) {
+                    info('La solicitud fue aprobada, pero hubo un error al promover al usuario a paseador.', {
+                        title: 'Alerta Parcial',
+                        duration: 5000
+                    });
+                    throw promoteError;
+                }
             }
 
             await loadApplications();
@@ -119,14 +136,23 @@ const AdminApplicationsManagement = () => {
 
             const updatedApplication = await JoinToUsController.getRegistrationById(selectedApplication.id);
             setSelectedApplication(updatedApplication);
+            
+            success("Acción completada exitosamente", {
+                title: "Éxito",
+                duration: 5000
+            });
 
             setShowReviewModal(false);
             setReviewAction(null);
 
         } catch (error) {
-            console.error('Error reviewing application:', error);
+            const errorMessage = error.message || `Error al procesar la solicitud de ${selectedApplication.email}`;
+            error(`Fallo en la ${actionText}. Detalles: ${errorMessage}`, {
+                title: `${actionText} Fallida`,
+                duration: 8000
+            });
             setErrors({ 
-                review: error.message || 'Error al procesar la solicitud' 
+                review: `Error: ${errorMessage}`
             });
         } finally {
             setReviewing(false);
@@ -209,14 +235,15 @@ const AdminApplicationsManagement = () => {
 
                 <ApplicationsStats stats={stats} />
 
+                {/* Mantenemos el error persistente de carga y revisión para que ocupe espacio si es necesario */}
                 {errors.load && (
-                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 backdrop-blur-sm">
+                    <div className="mb-6 p-4 bg-danger/10 border border-danger/20 rounded-xl text-danger backdrop-blur-sm">
                         {errors.load}
                     </div>
                 )}
 
                 {errors.review && (
-                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 backdrop-blur-sm">
+                    <div className="mb-6 p-4 bg-danger/10 border border-danger/20 rounded-xl text-danger backdrop-blur-sm">
                         {errors.review}
                     </div>
                 )}
