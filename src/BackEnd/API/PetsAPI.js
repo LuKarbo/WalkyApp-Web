@@ -1,89 +1,84 @@
+import apiClient from '../ApiClient.js';
+
 export const PetsAPI = {
     async getAllPets() {
-        return [
-            {
-                id: "P001",
-                name: "Max",
-                ownerId: 2,
-                image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&h=300&fit=crop&crop=face",
-                weight: 25.5,
-                age: 3,
-                description: "Un golden retriever muy amigable y juguetón. Le encanta correr en el parque."
-            },
-            {
-                id: "P002",
-                name: "Luna",
-                ownerId: 2,
-                image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=300&fit=crop&crop=face",
-                weight: 18.2,
-                age: 2,
-                description: "Una border collie muy inteligente y activa. Perfecta para paseos largos."
-            },
-            {
-                id: "P003",
-                name: "Bella",
-                ownerId: 6,
-                image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&h=300&fit=crop&crop=face",
-                weight: 12.8,
-                age: 5,
-                description: "Una beagle dulce y tranquila. Le gusta explorar nuevos lugares."
-            },
-            {
-                id: "P004",
-                name: "Rocky",
-                ownerId: 7,
-                image: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=300&h=300&fit=crop&crop=face",
-                weight: 30.0,
-                age: 4,
-                description: "Un pastor alemán leal y protector. Excelente compañero para actividades al aire libre."
-            }
-        ];
+        try {
+            const response = await apiClient.get('/pets');
+            return response.data.pets;
+        } catch (error) {
+            throw new Error(error.message || 'Error al obtener mascotas');
+        }
     },
 
     async getPetById(id) {
-        const pets = await this.getAllPets();
-        return pets.find(pet => pet.id === id);
+        try {
+            const response = await apiClient.get(`/pets/${id}`);
+            return response.data.pet;
+        } catch (error) {
+            if (error.message.includes('404') || error.message.includes('no encontrada')) {
+                return null;
+            }
+            throw new Error(error.message || 'Error al obtener mascota');
+        }
     },
 
     async getPetsByOwner(ownerId) {
-        const pets = await this.getAllPets();
-        return pets.filter(pet => pet.ownerId === parseInt(ownerId));
+        try {
+            const response = await apiClient.get(`/pets/owner/${ownerId}`);
+            return response.data.pets;
+        } catch (error) {
+            throw new Error(error.message || 'Error al obtener mascotas del propietario');
+        }
     },
 
     async createPet(petData) {
-        
-        const pets = await this.getAllPets();
-        const newPet = {
-            id: `P${String(pets.length + 1).padStart(3, '0')}`,
-            ...petData,
-            ownerId: parseInt(petData.ownerId)
-        };
-        
-        return newPet;
+        try {
+            const response = await apiClient.post('/pets', petData);
+            return response.data.pet;
+        } catch (error) {
+            throw new Error(error.message || 'Error al crear mascota');
+        }
     },
 
     async updatePet(id, petData) {
-        
-        const pet = await this.getPetById(id);
-        if (!pet) {
-            throw new Error("Pet not found");
+        try {
+            const response = await apiClient.put(`/pets/${id}`, petData);
+            return response.data.pet;
+        } catch (error) {
+            if (error.message.includes('404') || error.message.includes('no encontrada')) {
+                throw new Error('Mascota no encontrada');
+            }
+            throw new Error(error.message || 'Error al actualizar mascota');
         }
-        
-        const updatedPet = {
-            ...pet,
-            ...petData
-        };
-        
-        return updatedPet;
     },
 
     async deletePet(id) {
-        
-        const pet = await this.getPetById(id);
-        if (!pet) {
-            throw new Error("Pet not found");
+        try {
+            const response = await apiClient.delete(`/pets/${id}`);
+            return { success: true, message: response.message || 'Mascota eliminada exitosamente' };
+        } catch (error) {
+            if (error.message.includes('404') || error.message.includes('no encontrada')) {
+                throw new Error('Mascota no encontrada');
+            }
+            throw new Error(error.message || 'Error al eliminar mascota');
         }
-        
-        return { success: true, message: "Pet deleted successfully" };
+    },
+
+    async validatePet(id) {
+        try {
+            const response = await apiClient.get(`/pets/${id}/validate`);
+            return response.data.isValid;
+        } catch (error) {
+            return false;
+        }
+    },
+
+    async validateOwner(ownerId) {
+        try {
+            const response = await apiClient.get(`/pets/owner/${ownerId}/validate`);
+            return response.data.isValid;
+        } catch (error) {
+            return false;
+        }
     }
 };
