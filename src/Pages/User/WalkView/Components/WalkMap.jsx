@@ -13,15 +13,14 @@ const defaultCenter = {
   lng: -58.3816,
 };
 
-export default function WalkMap({ tripId, walkStatus, onPointAdded, onClear }) {
+export default function WalkMap({ tripId, walkStatus }) {
   const [path, setPath] = useState([]);
   const [directions, setDirections] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Verificar si el mapa está visible y si es interactivo
+  // Verificar si el mapa está visible
   const isMapVisible = WalkTrackingController.isMapVisible(walkStatus);
-  const isMapInteractive = WalkTrackingController.isMapInteractive(walkStatus);
   const mapStatusMessage = WalkTrackingController.getMapStatusMessage(walkStatus);
 
   // Cargar ruta existente al montar el componente
@@ -55,87 +54,6 @@ export default function WalkMap({ tripId, walkStatus, onPointAdded, onClear }) {
     }
   };
 
-  const handleClick = async (event) => {
-    if (!isMapInteractive || !tripId) return;
-
-    const newPoint = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-    
-    try {
-      setError(null);
-      
-      // Geocoding para obtener dirección
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: newPoint }, async (results, status) => {
-        if (status === "OK" && results[0]) {
-          const address = results[0].formatted_address;
-          
-          try {
-            // Guardar punto usando el controller
-            const savedRecord = await WalkTrackingController.saveWalkPoint(
-              tripId, 
-              newPoint.lat, 
-              newPoint.lng, 
-              address
-            );
-            
-            // Actualizar path local
-            const newPath = [...path, newPoint];
-            setPath(newPath);
-            setDirections(null); // Reset para recalcular direcciones
-            
-            // Callback al componente padre
-            onPointAdded?.(savedRecord);
-            
-          } catch (err) {
-            setError('Error guardando punto: ' + err.message);
-          }
-        } else {
-          // Si no se puede hacer geocoding, usar coordenadas
-          try {
-            const savedRecord = await WalkTrackingController.saveWalkPoint(
-              tripId,
-              newPoint.lat,
-              newPoint.lng,
-              `${newPoint.lat.toFixed(6)}, ${newPoint.lng.toFixed(6)}`
-            );
-            
-            const newPath = [...path, newPoint];
-            setPath(newPath);
-            setDirections(null);
-            
-            onPointAdded?.(savedRecord);
-            
-          } catch (err) {
-            setError('Error guardando punto: ' + err.message);
-          }
-        }
-      });
-    } catch (err) {
-      setError('Error procesando click: ' + err.message);
-    }
-  };
-
-  const clearPath = async () => {
-    if (!tripId) return;
-    
-    try {
-      setError(null);
-      
-      // Limpiar datos usando el controller
-      await WalkTrackingController.clearWalkData(tripId);
-      
-      // Limpiar estado local
-      setPath([]);
-      setDirections(null);
-      
-      // Callback al componente padre
-      onClear?.();
-      
-    } catch (err) {
-      setError('Error limpiando datos: ' + err.message);
-    }
-  };
-
   // Si el mapa no es visible según el estado del paseo
   if (!isMapVisible) {
     return (
@@ -155,24 +73,10 @@ export default function WalkMap({ tripId, walkStatus, onPointAdded, onClear }) {
 
   return (
     <div className="w-full">
-      {/* Header con botón para limpiar */}
-      <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FiMapPin className="text-primary" size={16} />
-          <span className="text-sm text-gray-600">{mapStatusMessage}</span>
-        </div>
-        
-        {isMapInteractive && (
-          <button
-            onClick={clearPath}
-            disabled={loading || path.length === 0}
-            className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 
-                       disabled:opacity-50 disabled:cursor-not-allowed text-sm
-                       transition-colors duration-200"
-          >
-            Borrar Ruta
-          </button>
-        )}
+      {/* Header (sin botón de borrar) */}
+      <div className="mb-2 flex items-center gap-2">
+        <FiMapPin className="text-primary" size={16} />
+        <span className="text-sm text-gray-600">{mapStatusMessage}</span>
       </div>
 
       {/* Error message */}
@@ -198,14 +102,13 @@ export default function WalkMap({ tripId, walkStatus, onPointAdded, onClear }) {
             mapContainerStyle={containerStyle}
             center={center}
             zoom={13}
-            onClick={isMapInteractive ? handleClick : undefined}
             options={{
-              disableDefaultUI: !isMapInteractive,
+              disableDefaultUI: true,
               zoomControl: true,
               mapTypeControl: false,
               streetViewControl: false,
               fullscreenControl: false,
-              gestureHandling: isMapInteractive ? 'auto' : 'none'
+              gestureHandling: 'none' // no permite interactuar con clicks
             }}
           >
             {path.length >= 2 && !directions && (
@@ -240,7 +143,7 @@ export default function WalkMap({ tripId, walkStatus, onPointAdded, onClear }) {
               />
             )}
 
-            {/* Marcador de inicio (solo si hay exactamente un punto) */}
+            {/* Marcador de inicio */}
             {path.length === 1 && (
               <Marker
                 position={path[0]}
@@ -248,7 +151,7 @@ export default function WalkMap({ tripId, walkStatus, onPointAdded, onClear }) {
               />
             )}
 
-            {/* Marcador de fin (solo si hay más de un punto y el paseo está finalizado) */}
+            {/* Marcador de fin */}
             {path.length > 1 && walkStatus === 'Finalizado' && (
               <Marker
                 position={path[path.length - 1]}

@@ -88,7 +88,7 @@ const WalkData = ({ tripId, walkStatus, records }) => {
           <p className="font-medium">No hay registros todavía</p>
           <p className="text-sm">
             {walkStatus === 'Activo' 
-              ? 'Haz clic en el mapa para agregar puntos de seguimiento'
+              ? 'Esperando registros de seguimiento...'
               : walkStatus === 'Finalizado'
                 ? 'Este paseo no tuvo puntos de seguimiento'
                 : 'Los registros aparecerán cuando el paseo esté activo'

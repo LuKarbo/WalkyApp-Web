@@ -24,7 +24,7 @@ const WalkView = ({ id }) => {
                 setLoading(false);
                 return;
             }
-            
+
             try {
                 const data = await WalksController.fetchWalkDetails(tripId);
                 setWalkData(data);
@@ -37,19 +37,6 @@ const WalkView = ({ id }) => {
 
         loadWalkData();
     }, [tripId]);
-
-    const handlePointAdded = (record) => {
-        setRecords((prev) => {
-            const updated = [...prev, record];
-            localStorage.setItem("records", JSON.stringify(updated)); // guardo punto de seguimiento
-            return updated;
-        });
-    };
-
-    const handleClearRecords = () => {
-        setRecords([]);
-        localStorage.removeItem("records");
-    };
 
     if (loading) {
         return (
@@ -84,16 +71,14 @@ const WalkView = ({ id }) => {
 
                 {/* WalkMap + WalkData */}
                 <div className="md:col-span-2 flex flex-col gap-4 h-full">
-                    <WalkMap 
-                        tripId={tripId} 
-                        walkStatus={walkData?.status} 
-                        onPointAdded={handlePointAdded} 
-                        onClear={handleClearRecords} 
+                    <WalkMap
+                        tripId={tripId}
+                        walkStatus={walkData?.status}
                     />
-                    <WalkData 
-                        tripId={tripId} 
-                        walkStatus={walkData?.status} 
-                        records={records} 
+                    <WalkData
+                        tripId={tripId}
+                        walkStatus={walkData?.status}
+                        records={records}
                     />
                 </div>
             </div>
