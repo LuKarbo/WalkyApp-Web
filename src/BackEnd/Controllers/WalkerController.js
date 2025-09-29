@@ -31,5 +31,9 @@ export const WalkerController = {
 
     async updateWalkerMercadoPago(walkerId, mercadoPagoData) {
         return await WalkerService.updateWalkerMercadoPago(walkerId, mercadoPagoData);
+    },
+
+    async getWalkerEarnings(walkerId){
+        return await WalkerService.calculateWalkerEarnings(walkerId);
     }
 };

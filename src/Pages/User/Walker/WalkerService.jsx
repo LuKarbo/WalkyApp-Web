@@ -42,17 +42,17 @@ const WalkerService = () => {
                 setLoading(true);
                 setError(null);
                 
-                const [walker, walks, walkerSettings] = await Promise.all([
+                const [walker, walks, walkerSettings, calculatedEarnings] = await Promise.all([
                     WalkerController.fetchWalkerProfile(walkerId),
                     WalksController.fetchWalksByWalker(walkerId),
-                    WalkerController.fetchWalkerSettings(walkerId)
+                    WalkerController.fetchWalkerSettings(walkerId),
+                    WalkerController.getWalkerEarnings(walkerId)
                 ]);
                 
                 setWalkerData(walker);
                 setWalksData(walks);
                 setSettings(walkerSettings);
                 
-                const calculatedEarnings = calculateEarnings(walks, walkerSettings);
                 const calculatedChartData = generateChartData(walks);
                 
                 setEarnings(calculatedEarnings);
