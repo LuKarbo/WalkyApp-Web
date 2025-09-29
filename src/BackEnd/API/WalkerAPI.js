@@ -42,7 +42,9 @@ export const WalkerAPI = {
                 pricePerPet: 15000,
                 hasGPSTracker: false,
                 hasDiscount: false,
-                discountPercentage: 0
+                discountPercentage: 0,
+                hasMercadoPago: false,
+                tokenMercadoPago: null
             };
         } catch (error) {
             console.error(`Error al obtener configuraciones del paseador ${walkerId}:`, error);
@@ -53,12 +55,40 @@ export const WalkerAPI = {
                 hasGPSTracker: false,
                 hasDiscount: false,
                 discountPercentage: 0,
+                hasMercadoPago: false,
+                tokenMercadoPago: null,
                 updatedAt: new Date().toISOString()
             };
         }
     },
 
+    async updateWalkerMercadoPago(walkerId, mercadoPagoData) {
+        
+        try {
+            if (!walkerId) {
+                throw new Error('ID de paseador requerido');
+            }
+
+            if (!mercadoPagoData) {
+                throw new Error('Datos de MercadoPago requeridos');
+            }
+
+            const { hasMercadoPago, tokenMercadoPago } = mercadoPagoData;
+
+            if (hasMercadoPago && (!tokenMercadoPago || tokenMercadoPago.trim() === '')) {
+                throw new Error('Token de MercadoPago es requerido cuando está habilitado');
+            }
+
+            const response = await apiClient.patch(`/walkers/${walkerId}/mercadopago`, mercadoPagoData);
+            return response.data.settings;
+        } catch (error) {
+            console.error(`Error al actualizar MercadoPago del paseador ${walkerId}:`, error);
+            throw new Error(error.message || 'No se pudo actualizar la configuración de MercadoPago');
+        }
+    },
+
     async updateWalkerSettings(walkerId, settings) {
+        
         try {
             if (!walkerId) {
                 throw new Error('ID de paseador requerido');
@@ -69,8 +99,6 @@ export const WalkerAPI = {
             }
 
             const response = await apiClient.put(`/walkers/${walkerId}/settings`, settings);
-            
-            console.log(`Walker ${walkerId} settings updated:`, response.data.settings);
             
             return response.data.settings;
         } catch (error) {

@@ -86,7 +86,9 @@ export const WalkerService = {
             pricePerPet: walkerSettings.pricePerPet || 0,
             hasGPSTracker: walkerSettings.hasGPSTracker || false,
             hasDiscount: walkerSettings.hasDiscount || false,
-            discountPercentage: walkerSettings.discountPercentage || 0
+            discountPercentage: walkerSettings.discountPercentage || 0,
+            hasMercadoPago: walkerSettings.hasMercadoPago || false,
+            tokenMercadoPago: walkerSettings.tokenMercadoPago || null
         };
     },
 
@@ -112,6 +114,10 @@ export const WalkerService = {
             settings.discountPercentage = 0;
         }
 
+        if (settings.hasMercadoPago === false) {
+            settings.tokenMercadoPago = null;
+        }
+
         const updatedSettings = await WalkerDataAccess.updateWalkerSettings(walkerId, settings);
         
         return {
@@ -120,6 +126,38 @@ export const WalkerService = {
             hasGPSTracker: updatedSettings.hasGPSTracker,
             hasDiscount: updatedSettings.hasDiscount,
             discountPercentage: updatedSettings.discountPercentage,
+            hasMercadoPago: updatedSettings.hasMercadoPago,
+            tokenMercadoPago: updatedSettings.tokenMercadoPago,
+            updatedAt: updatedSettings.updatedAt
+        };
+    },
+
+    async updateWalkerMercadoPago(walkerId, mercadoPagoData) {
+        
+        if (!walkerId) {
+            throw new Error("Walker ID is required");
+        }
+
+        if (!mercadoPagoData) {
+            throw new Error("MercadoPago data is required");
+        }
+
+        const { hasMercadoPago, tokenMercadoPago } = mercadoPagoData;
+
+        if (hasMercadoPago && (!tokenMercadoPago || tokenMercadoPago.trim() === '')) {
+            throw new Error("Token de MercadoPago es requerido cuando está habilitado");
+        }
+
+        const settingsToUpdate = {
+            hasMercadoPago, 
+            tokenMercadoPago: hasMercadoPago ? tokenMercadoPago : null
+        };
+
+        const updatedSettings = await WalkerDataAccess.updateWalkerMercadoPago(walkerId, settingsToUpdate);
+
+        return {
+            hasMercadoPago: updatedSettings.hasMercadoPago,
+            tokenMercadoPago: updatedSettings.tokenMercadoPago,
             updatedAt: updatedSettings.updatedAt
         };
     },

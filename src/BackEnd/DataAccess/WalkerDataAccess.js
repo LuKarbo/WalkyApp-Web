@@ -80,5 +80,15 @@ export const WalkerDataAccess = {
             console.error(`DataAccess - Error al validar paseador ${walkerId}:`, error);
             throw error;
         }
+    },
+
+    async updateWalkerMercadoPago(walkerId, mercadoPagoData) {
+        try {
+            return await WalkerAPI.updateWalkerMercadoPago(walkerId, mercadoPagoData);
+        } catch (error) {
+            console.error(`DataAccess - Error al actualizar MercadoPago del paseador ${walkerId}:`, error);
+            throw error;
+        }
     }
+
 };

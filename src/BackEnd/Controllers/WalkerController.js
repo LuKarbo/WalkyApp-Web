@@ -27,5 +27,9 @@ export const WalkerController = {
 
     async updateWalkerPricing(walkerId, pricingData) {
         return await WalkerService.updateWalkerPricing(walkerId, pricingData);
+    },
+
+    async updateWalkerMercadoPago(walkerId, mercadoPagoData) {
+        return await WalkerService.updateWalkerMercadoPago(walkerId, mercadoPagoData);
     }
 };

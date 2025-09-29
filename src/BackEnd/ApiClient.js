@@ -59,7 +59,6 @@ class ApiClient {
     }
 
     async put(endpoint, data = null, options = {}) {
-        console.log(data);
         return this.request(endpoint, {
             ...options,
             method: 'PUT',

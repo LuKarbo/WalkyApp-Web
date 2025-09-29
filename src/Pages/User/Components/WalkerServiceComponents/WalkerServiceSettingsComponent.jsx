@@ -5,10 +5,11 @@ const WalkerServiceSettingsComponent = ({
     settings, 
     onSettingsChange, 
     onSave, 
+    onSaveMercadoPago,
     isSaving 
 }) => {
     const [showAccessToken, setShowAccessToken] = useState(false);
-    const [showPublicKey, setShowPublicKey] = useState(false);
+    const [savingMercadoPago, setSavingMercadoPago] = useState(false);
 
     const handleLocationChange = (e) => {
         onSettingsChange({ location: e.target.value });
@@ -34,15 +35,11 @@ const WalkerServiceSettingsComponent = ({
     };
 
     const handleMercadoPagoToggle = () => {
-        onSettingsChange({ mercadoPagoEnabled: !settings?.mercadoPagoEnabled });
+        onSettingsChange({ hasMercadoPago: !settings?.hasMercadoPago });
     };
 
-    const handleMercadoPagoAccessTokenChange = (e) => {
-        onSettingsChange({ mercadoPagoAccessToken: e.target.value });
-    };
-
-    const handleMercadoPagoPublicKeyChange = (e) => {
-        onSettingsChange({ mercadoPagoPublicKey: e.target.value });
+    const handletokenMercadoPagoChange = (e) => {
+        onSettingsChange({ tokenMercadoPago: e.target.value });
     };
 
     const handleMercadoPagoSandboxToggle = () => {
@@ -50,7 +47,16 @@ const WalkerServiceSettingsComponent = ({
     };
 
     const isMercadoPagoConfigured = () => {
-        return settings.mercadoPagoAccessToken && settings.mercadoPagoPublicKey;
+        return settings.tokenMercadoPago;
+    };
+
+    const handleSaveMercadoPago = async () => {
+        setSavingMercadoPago(true);
+        try {
+            await onSaveMercadoPago();
+        } finally {
+            setSavingMercadoPago(false);
+        }
     };
 
     return (
@@ -185,6 +191,20 @@ const WalkerServiceSettingsComponent = ({
                 </div>
             </div>
 
+            <div className="mt-8 flex justify-end">
+                <button 
+                    onClick={onSave}
+                    disabled={isSaving}
+                    className={`px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold shadow-lg transition-all duration-200 ${
+                        isSaving 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'hover:from-blue-600 hover:to-indigo-700 hover:shadow-xl transform hover:scale-105'
+                    }`}
+                >
+                    {isSaving ? 'Guardando...' : 'Guardar Configuración'}
+                </button>
+            </div>
+
             <div className="mt-8 space-y-6">
                 <div className="border-t border-border dark:border-muted pt-8">
                     <div className="flex items-center mb-6">
@@ -211,24 +231,24 @@ const WalkerServiceSettingsComponent = ({
                     <div className="flex items-center p-4 bg-background dark:bg-foreground rounded-xl mb-6">
                         <FaCreditCard className="text-blue-500 mr-4" />
                         <span className="flex-1 text-foreground dark:text-background font-medium">
-                            {settings.mercadoPagoEnabled ? 'Pagos habilitados' : 'Habilitar cobro automático'}
+                            {settings.hasMercadoPago ? 'Pagos habilitados' : 'Habilitar cobro automático'}
                         </span>
                         <button
                             onClick={handleMercadoPagoToggle}
-                            disabled={isSaving}
+                            disabled={savingMercadoPago}
                             className={`w-16 h-8 rounded-full relative transition-all duration-300 ${
-                                settings.mercadoPagoEnabled ? "bg-blue-500 shadow-lg" : "bg-muted"
-                            } ${isSaving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                settings.hasMercadoPago ? "bg-blue-500 shadow-lg" : "bg-muted"
+                            } ${savingMercadoPago ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
                             <span 
                                 className={`absolute w-6 h-6 bg-white rounded-full top-1 transition-all duration-300 shadow-md ${
-                                    settings.mercadoPagoEnabled ? "right-1 transform scale-110" : "left-1"
+                                    settings.hasMercadoPago ? "right-1 transform scale-110" : "left-1"
                                 }`}
                             />
                         </button>
                     </div>
 
-                    {settings.mercadoPagoEnabled && (
+                    {settings.hasMercadoPago && (
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <label className="block text-lg font-semibold text-background">
@@ -240,11 +260,11 @@ const WalkerServiceSettingsComponent = ({
                                     </div>
                                     <input
                                         type={showAccessToken ? "text" : "password"}
-                                        value={settings.mercadoPagoAccessToken || ''}
-                                        onChange={handleMercadoPagoAccessTokenChange}
+                                        value={settings.tokenMercadoPago || ''}
+                                        onChange={handletokenMercadoPagoChange}
                                         className="w-full pl-12 pr-12 py-4 border border-border dark:border-muted rounded-xl bg-background dark:bg-foreground text-foreground dark:text-background focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="Ingresa tu Access Token de Mercado Pago"
-                                        disabled={isSaving}
+                                        disabled={savingMercadoPago}
                                     />
                                     <button
                                         type="button"
@@ -256,35 +276,6 @@ const WalkerServiceSettingsComponent = ({
                                 </div>
                                 <p className="text-sm text-accent dark:text-muted">
                                     Token que comienza con APP_USR- (para producción) o TEST- (para pruebas)
-                                </p>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="block text-lg font-semibold text-background">
-                                    Public Key
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <FaKey className="text-green-500" />
-                                    </div>
-                                    <input
-                                        type={showPublicKey ? "text" : "password"}
-                                        value={settings.mercadoPagoPublicKey || ''}
-                                        onChange={handleMercadoPagoPublicKeyChange}
-                                        className="w-full pl-12 pr-12 py-4 border border-border dark:border-muted rounded-xl bg-background dark:bg-foreground text-foreground dark:text-background focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                        placeholder="Ingresa tu Public Key de Mercado Pago"
-                                        disabled={isSaving}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPublicKey(!showPublicKey)}
-                                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-accent dark:text-muted hover:text-foreground dark:hover:text-background"
-                                    >
-                                        {showPublicKey ? <FaEyeSlash /> : <FaEye />}
-                                    </button>
-                                </div>
-                                <p className="text-sm text-accent dark:text-muted">
-                                    Clave pública que comienza con APP_USR- (para producción) o TEST- (para pruebas)
                                 </p>
                             </div>
 
@@ -305,10 +296,10 @@ const WalkerServiceSettingsComponent = ({
                                 </div>
                                 <button
                                     onClick={handleMercadoPagoSandboxToggle}
-                                    disabled={isSaving}
+                                    disabled={savingMercadoPago}
                                     className={`w-14 h-7 rounded-full relative transition-all duration-300 ${
                                         settings.mercadoPagoSandbox ? "bg-yellow-500 shadow-lg" : "bg-gray-300"
-                                    } ${isSaving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                    } ${savingMercadoPago ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                                 >
                                     <span 
                                         className={`absolute w-5 h-5 bg-white rounded-full top-1 transition-all duration-300 shadow-md ${
@@ -330,32 +321,32 @@ const WalkerServiceSettingsComponent = ({
                                     <li>5. Para producción usa las credenciales de PROD</li>
                                 </ol>
                             </div>
+
+                            <div className="flex justify-end">
+                                <button 
+                                    onClick={handleSaveMercadoPago}
+                                    disabled={savingMercadoPago || !settings.hasMercadoPago}
+                                    className={`px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl font-semibold shadow-lg transition-all duration-200 ${
+                                        savingMercadoPago || !settings.hasMercadoPago
+                                            ? 'opacity-50 cursor-not-allowed' 
+                                            : 'hover:from-blue-600 hover:to-cyan-700 hover:shadow-xl transform hover:scale-105'
+                                    }`}
+                                >
+                                    {savingMercadoPago ? 'Guardando MercadoPago...' : 'Guardar MercadoPago'}
+                                </button>
+                            </div>
                         </div>
                     )}
 
                     <p className="text-sm text-accent dark:text-muted mt-4">
-                        {settings.mercadoPagoEnabled && isMercadoPagoConfigured()
+                        {settings.hasMercadoPago && isMercadoPagoConfigured()
                             ? 'Los clientes podrán pagar directamente a través de Mercado Pago al precio configurado'
-                            : settings.mercadoPagoEnabled
+                            : settings.hasMercadoPago
                             ? 'Completa la configuración para permitir cobros automáticos'
                             : 'Activa esta opción para permitir cobros automáticos al precio que estableciste'
                         }
                     </p>
                 </div>
-            </div>
-
-            <div className="mt-8 flex justify-end">
-                <button 
-                    onClick={onSave}
-                    disabled={isSaving}
-                    className={`px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold shadow-lg transition-all duration-200 ${
-                        isSaving 
-                            ? 'opacity-50 cursor-not-allowed' 
-                            : 'hover:from-blue-600 hover:to-indigo-700 hover:shadow-xl transform hover:scale-105'
-                    }`}
-                >
-                    {isSaving ? 'Guardando...' : 'Guardar Configuración'}
-                </button>
             </div>
         </div>
     );
