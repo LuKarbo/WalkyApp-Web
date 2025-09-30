@@ -110,8 +110,8 @@ const MyPets = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background dark:bg-foreground p-6">
-                <div className="max-w-7xl mx-auto">
+            <div className="max-w min-h-screen bg-background dark:bg-foreground p-6">
+                <div className="mx-auto">
                     <div className="flex items-center justify-between mb-8">
                         <div className="space-y-2">
                             <div className="h-8 bg-muted/40 rounded w-48"></div>
@@ -143,8 +143,8 @@ const MyPets = () => {
 
     if (error) {
         return (
-            <div className="bg-background dark:bg-foreground p-6">
-                <div className="max-w-7xl mx-auto">
+            <div className="max-w bg-background dark:bg-foreground p-6">
+                <div className="mx-auto">
                     <HeaderPetsComponent 
                         pets={[]} 
                         onAddPet={() => setShowAddModal(true)}
@@ -168,8 +168,8 @@ const MyPets = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background dark:bg-foreground p-6">
-            <div className="max-w-7xl mx-auto">
+        <div className="max-w min-h-screen bg-background dark:bg-foreground p-6">
+            <div className="mx-auto">
                 <HeaderPetsComponent 
                     pets={pets} 
                     onAddPet={() => setShowAddModal(true)}

@@ -66,8 +66,8 @@ const WalkerReviews = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background dark:bg-foreground p-4 md:p-8">
-            <div className="max-w-6xl mx-auto space-y-6">
+        <div className="max-w min-h-screen bg-background dark:bg-foreground p-4 md:p-8">
+            <div className="mx-auto space-y-6">
                 
                 <WalkerReviewsHeader 
                     totalReviews={pagination.totalItems || 0}

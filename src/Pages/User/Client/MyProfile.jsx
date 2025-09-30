@@ -224,57 +224,63 @@ const MyProfile = () => {
             />
             <PersonalDetailsComponent userData={userProfileData} />
 
-            <div className="flex space-x-4 mb-6">
-                <button
-                    onClick={() => setActiveTab("trips")}
-                    className={`${buttonBase} ${activeTab === "trips" ? buttonActive : buttonInactive}`}
-                >
-                    Trips
-                </button>
-                <button
-                    onClick={() => setActiveTab("pets")}
-                    className={`${buttonBase} ${activeTab === "pets" ? buttonActive : buttonInactive}`}
-                >
-                    Pets
-                </button>
-                <button
-                    onClick={() => setActiveTab("reviews")}
-                    className={`${buttonBase} ${activeTab === "reviews" ? buttonActive : buttonInactive}`}
-                >
-                    Reviews
-                </button>
-            </div>
+            {user.role === "client" && (
+                <>
+                    <div className="flex space-x-4 mb-6">
+                        <button
+                            onClick={() => setActiveTab("trips")}
+                            className={`${buttonBase} ${activeTab === "trips" ? buttonActive : buttonInactive}`}
+                        >
+                            Trips
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("pets")}
+                            className={`${buttonBase} ${activeTab === "pets" ? buttonActive : buttonInactive}`}
+                        >
+                            Pets
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("reviews")}
+                            className={`${buttonBase} ${activeTab === "reviews" ? buttonActive : buttonInactive}`}
+                        >
+                            Reviews
+                        </button>
+                    </div>
+                    {activeTab === "trips" && (
+                        <TripsComponent
+                            trips={trips}
+                            onCancel={handleCancelTrip}
+                            onView={(tripId) => navigateToContent("trip", { tripId })}
+                            tripsError={tripsError}
+                            tripsLoading={loadingTrips}
+                        />
+                    )}
 
-            {activeTab === "trips" && (
-                <TripsComponent
-                    trips={trips}
-                    onCancel={handleCancelTrip} 
-                    onView={(tripId) => navigateToContent('trip', { tripId })}
-                    tripsError={tripsError}
-                    tripsLoading={loadingTrips}
-                />
+                    {activeTab === "pets" && (
+                        <PetsComponent
+                            pets={pets}
+                            addButtonClass={`${buttonBase} ${buttonInactive}`}
+                            onAddPet={handleAddPet}
+                            onEditPet={handleEditPet}
+                            onDeletePet={handleDeletePet}
+                            isLoading={loadingPets}
+                            error={petsError}
+                        />
+                    )}
+
+                    {activeTab === "reviews" && (
+                        <ReviewsComponent
+                            reviewsData={reviewsData}
+                            onEditReview={handleEditReview}
+                            onPageChange={handlePageChange}
+                            onSearch={handleSearch}
+                            isLoading={loadingReviews}
+                            error={reviewsError}
+                        />
+                    )}
+                </>
             )}
-            {activeTab === "pets" && (
-                <PetsComponent 
-                    pets={pets}
-                    addButtonClass={`${buttonBase} ${buttonInactive}`}
-                    onAddPet={handleAddPet}
-                    onEditPet={handleEditPet}
-                    onDeletePet={handleDeletePet}
-                    isLoading={loadingPets}
-                    error={petsError}
-                />
-            )}
-            {activeTab === "reviews" && (
-                <ReviewsComponent 
-                    reviewsData={reviewsData}
-                    onEditReview={handleEditReview}
-                    onPageChange={handlePageChange}
-                    onSearch={handleSearch}
-                    isLoading={loadingReviews}
-                    error={reviewsError}
-                />
-            )}
+
         </div>
     );
 };

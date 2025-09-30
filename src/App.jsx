@@ -5,7 +5,9 @@ import Login from "./Pages/Auth/Login.jsx";
 import Register from "./Pages/Auth/Register.jsx";
 import { AuthController } from "./BackEnd/Controllers/AuthController.js";
 import { UserProvider } from "./BackEnd/Context/UserContext";
-import { NavigationProvider } from "./BackEnd/Context/NavigationContext"; 
+import { NavigationProvider } from "./BackEnd/Context/NavigationContext";
+import { HistoryProvider } from "./BackEnd/Context/HistoryContext";
+import { ToastProvider } from "./BackEnd/Context/ToastContext";
 
 const App = () => {
   // Inicializar estados con valores del sessionStorage si existen
@@ -154,43 +156,47 @@ const App = () => {
 
   return (
     <div className={`min-h-screen ${isLightMode ? "" : "dark"}`}>
-      {!user ? (
-        authScreen === "login" ? (
-          <Login
-            onLogin={handleLogin}
-            switchToRegister={() => setAuthScreen("register")}
-          />
+      <ToastProvider>
+        {!user ? (
+          authScreen === "login" ? (
+            <Login
+              onLogin={handleLogin}
+              switchToRegister={() => setAuthScreen("register")}
+            />
+          ) : (
+            <Register
+              onRegister={handleRegister}
+              switchToLogin={() => setAuthScreen("login")}
+            />
+          )
         ) : (
-          <Register
-            onRegister={handleRegister}
-            switchToLogin={() => setAuthScreen("login")}
-          />
-        )
-      ) : (
-        <UserProvider user={user}>
-          <NavigationProvider navigateToContent={navigateToContent}>
-            <div className="flex h-screen bg-background dark:bg-foreground">
-              <Navbar
-                isOpen={isOpen}
-                toggleSidebar={toggleSidebar}
-                isLightMode={isLightMode}
-                toggleLightMode={toggleLightMode}
-                activeItem={activeItem}
-                setActiveItem={setActiveItem}
-                navigateToContent={navigateToContent}
-                user={user}
-                onLogout={handleLogout}
-              />
-              <MainContent 
-                activeItem={activeItem} 
-                contentParams={contentParams}
-                navigateToContent={navigateToContent}
-                isLightMode={isLightMode} 
-              />
-            </div>
-          </NavigationProvider>
-        </UserProvider>
-      )}
+          <UserProvider user={user}>
+            <HistoryProvider>
+              <NavigationProvider navigateToContent={navigateToContent}>
+                <div className="flex h-screen bg-background dark:bg-foreground">
+                  <Navbar
+                    isOpen={isOpen}
+                    toggleSidebar={toggleSidebar}
+                    isLightMode={isLightMode}
+                    toggleLightMode={toggleLightMode}
+                    activeItem={activeItem}
+                    setActiveItem={setActiveItem}
+                    navigateToContent={navigateToContent}
+                    user={user}
+                    onLogout={handleLogout}
+                  />
+                  <MainContent 
+                    activeItem={activeItem} 
+                    contentParams={contentParams}
+                    navigateToContent={navigateToContent}
+                    isLightMode={isLightMode} 
+                  />
+                </div>
+              </NavigationProvider>
+            </HistoryProvider>
+          </UserProvider>
+        )}
+      </ToastProvider>
     </div>
   );
 };

@@ -76,7 +76,10 @@ export const SettingsAPI = {
             hasPhotos: false,
             hasPremiumWalkers: false,
             supportLevel: 'email',
-            cancellationPolicy: 'none'
+            cancellationPolicy: 'none',
+            isActive: true,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
         },
         {
             id: 'bronze',
@@ -98,7 +101,10 @@ export const SettingsAPI = {
             hasPhotos: true,
             hasPremiumWalkers: false,
             supportLevel: 'priority',
-            cancellationPolicy: 'standard'
+            cancellationPolicy: 'standard',
+            isActive: true,
+            createdAt: '2024-06-01T00:00:00Z',
+            updatedAt: '2024-06-01T00:00:00Z'
         },
         {
             id: 'silver',
@@ -124,7 +130,10 @@ export const SettingsAPI = {
             hasPremiumWalkers: true,
             supportLevel: '24/7',
             cancellationPolicy: 'flexible',
-            discountPercentage: 10
+            discountPercentage: 10,
+            isActive: true,
+            createdAt: '2024-06-01T00:00:00Z',
+            updatedAt: '2024-06-01T00:00:00Z'
         },
         {
             id: 'gold',
@@ -157,19 +166,57 @@ export const SettingsAPI = {
             discountPercentage: 20,
             hasEmergencyService: true,
             hasNightWalks: true,
-            hasVetReports: true
+            hasVetReports: true,
+            isActive: true,
+            createdAt: '2024-06-01T00:00:00Z',
+            updatedAt: '2024-06-01T00:00:00Z'
+        },
+        {
+            id: 'platinum',
+            name: 'Platinum',
+            price: 59.99,
+            duration: 'monthly',
+            category: 'exclusive',
+            features: [
+                'Unlimited premium walks',
+                'Personal dedicated walker',
+                'Live video streaming',
+                'Veterinary consultations included',
+                'Pet grooming discounts',
+                'Priority emergency response',
+                'Custom walk schedules',
+                'Monthly health reports'
+            ],
+            description: 'El plan más exclusivo con servicios personalizados',
+            maxWalks: -1,
+            hasGPS: true,
+            hasPhotos: true,
+            hasVideos: true,
+            hasHDVideos: true,
+            hasPremiumWalkers: true,
+            hasVIPWalkers: true,
+            hasPersonalWalker: true,
+            supportLevel: 'dedicated',
+            cancellationPolicy: 'anytime',
+            discountPercentage: 25,
+            hasEmergencyService: true,
+            hasNightWalks: true,
+            hasVetReports: true,
+            hasLiveStreaming: true,
+            hasVetConsultations: true,
+            isActive: false,
+            createdAt: '2024-09-01T00:00:00Z',
+            updatedAt: '2024-09-01T00:00:00Z'
         }
     ],
 
     async getUserSettings(userId) {
-        
         await new Promise(resolve => setTimeout(resolve, 300));
         
         const userIdInt = parseInt(userId);
         const settings = this.userSettings[userIdInt];
         
         if (!settings) {
-            
             return {
                 email: '',
                 notifications: {
@@ -187,7 +234,6 @@ export const SettingsAPI = {
     },
 
     async updateUserSettings(userId, settings) {
-        
         await new Promise(resolve => setTimeout(resolve, 500));
         
         const userIdInt = parseInt(userId);
@@ -203,7 +249,6 @@ export const SettingsAPI = {
     },
 
     async getUserSubscription(userId) {
-        
         await new Promise(resolve => setTimeout(resolve, 200));
         
         const userIdInt = parseInt(userId);
@@ -213,7 +258,6 @@ export const SettingsAPI = {
     },
 
     async updateSubscription(userId, subscriptionData) {
-        
         await new Promise(resolve => setTimeout(resolve, 800));
         
         const userIdInt = parseInt(userId);
@@ -227,10 +271,81 @@ export const SettingsAPI = {
     },
 
     async getSubscriptionPlans() {
-        
         await new Promise(resolve => setTimeout(resolve, 150));
+        return this.subscriptionPlans.filter(plan => plan.isActive);
+    },
+
+    async getAllSubscriptionPlans() {
+        await new Promise(resolve => setTimeout(resolve, 150));
+        return [...this.subscriptionPlans];
+    },
+
+    async getActiveSubscriptionPlans() {
+        await new Promise(resolve => setTimeout(resolve, 150));
+        return this.subscriptionPlans.filter(plan => plan.isActive);
+    },
+
+    async getSubscriptionPlanById(planId) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return this.subscriptionPlans.find(plan => plan.id === planId) || null;
+    },
+
+    async createSubscriptionPlan(planData) {
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        return this.subscriptionPlans;
+        const newPlan = {
+            ...planData,
+            createdAt: planData.createdAt || new Date().toISOString(),
+            updatedAt: planData.updatedAt || new Date().toISOString()
+        };
+
+        this.subscriptionPlans.push(newPlan);
+        return newPlan;
+    },
+
+    async updateSubscriptionPlan(planId, planData) {
+        await new Promise(resolve => setTimeout(resolve, 400));
+        
+        const planIndex = this.subscriptionPlans.findIndex(plan => plan.id === planId);
+        
+        if (planIndex === -1) {
+            throw new Error("Plan no encontrado");
+        }
+
+        this.subscriptionPlans[planIndex] = {
+            ...this.subscriptionPlans[planIndex],
+            ...planData,
+            id: planId,
+            updatedAt: new Date().toISOString()
+        };
+
+        return this.subscriptionPlans[planIndex];
+    },
+
+    async deleteSubscriptionPlan(planId) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        const planIndex = this.subscriptionPlans.findIndex(plan => plan.id === planId);
+        
+        if (planIndex === -1) {
+            throw new Error("Plan no encontrado");
+        }
+
+        this.subscriptionPlans.splice(planIndex, 1);
+        return { message: "Plan eliminado exitosamente" };
+    },
+
+    async getUsersWithPlan(planId) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        const usersWithPlan = [];
+        Object.entries(this.userSubscriptions).forEach(([userId, subscription]) => {
+            if (subscription.plan === planId) {
+                usersWithPlan.push(parseInt(userId));
+            }
+        });
+        
+        return usersWithPlan;
     },
 
     async getSubscriptionStats() {
@@ -241,7 +356,6 @@ export const SettingsAPI = {
             acc[plan.id] = 0;
             return acc;
         }, {});
-
 
         return {
             totalUsers,

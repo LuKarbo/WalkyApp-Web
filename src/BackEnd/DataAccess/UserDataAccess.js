@@ -1,17 +1,23 @@
-// EJEMPLO
 import { UserAPI } from "../API/UserAPI.js";
 
 export const UserDataAccess = {
+    async getAllUsers() {
+        return await UserAPI.getAllUsers();
+    },
+
     async getUserById(id) {
-        // Simplemente hace el pasamanos hacia la API
         return await UserAPI.getUserById(id);
     },
 
-    async updateUserProfile(id, profileData) {
-        return await UserAPI.updateUserProfile(id, profileData);
+    async updateUser(id, userData) {
+        return await UserAPI.updateUser(id, userData);
     },
 
-    async changeUserPassword(id, passwordData) {
-        return await UserAPI.changeUserPassword(id, passwordData);
+    async deleteUser(id) {
+        return await UserAPI.deleteUser(id);
+    },
+
+    async getUserStats() {
+        return await UserAPI.getUserStats();
     }
 };

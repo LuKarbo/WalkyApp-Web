@@ -9,7 +9,19 @@ export const TicketDataAccess = {
         return await TicketAPI.getTicketsByUser(userId);
     },
 
+    async getAllTickets() {
+        return await TicketAPI.getAllTickets();
+    },
+
     async createTicket(ticketData) {
         return await TicketAPI.createTicket(ticketData);
+    },
+
+    async respondToTicket(ticketId, responseData) {
+        return await TicketAPI.respondToTicket(ticketId, responseData);
+    },
+
+    async getTicketStatistics() {
+        return await TicketAPI.getTicketStatistics();
     }
 };

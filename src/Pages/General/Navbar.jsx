@@ -6,6 +6,8 @@ import {
 } from "react-icons/fi";
 
 import { getAllMenuItemsByRole } from '../../BackEnd/Generics/Menu.jsx';
+import { useNavigation } from '../../BackEnd/Context/NavigationContext';
+import { useHistory } from '../../BackEnd/Context/HistoryContext';
 
 const Navbar = ({
     isOpen,
@@ -18,12 +20,18 @@ const Navbar = ({
     user,
     onLogout,
 }) => {
+    const { navigateToContent: navContextNavigate } = useNavigation();
+    const { clearHistory } = useHistory();
 
     const handleMenuClick = (id) => {
         if (id === "logout") {
+            clearHistory();
             onLogout();
         } else {
-            if (navigateToContent) {
+            
+            if (navContextNavigate) {
+                navContextNavigate(id);
+            } else if (navigateToContent) {
                 navigateToContent(id);
             } else {
                 setActiveItem(id);
@@ -40,7 +48,6 @@ const Navbar = ({
             } relative transition-all duration-300 ease-in-out bg-card dark:bg-foreground shadow-lg flex flex-col`}
         >
 
-        {/* Logo */}
         <div className="p-4 flex justify-between items-center">
             <h1
                 className={`${
@@ -57,7 +64,6 @@ const Navbar = ({
             </button>
         </div>
 
-        {/* User Simple Data */}
         <div className="p-4 border-b border-border dark:border-accent">
             <div className="flex items-center space-x-4">
                 <img
@@ -83,9 +89,8 @@ const Navbar = ({
             </div>
         </div>
 
-        {/* Menu */}
         <nav className="p-4 space-y-2 flex-1 overflow-auto">
-            {/* Elementos específicos del rol */}
+            
             {roleItems.map((item) => (
             <button
                 key={item.id}
@@ -102,13 +107,11 @@ const Navbar = ({
             </button>
             ))}
 
-            {/* Separador solo si hay elementos comunes */}
-            {commonItems.length > 0 && (
+            {commonItems?.length > 0 && (
                 <div className="border-t border-border dark:border-accent my-4"></div>
             )}
 
-            {/* Elementos comunes */}
-            {commonItems.map((item) => (
+            {commonItems?.map((item) => (
             <button
                 key={item.id}
                 onClick={() => handleMenuClick(item.id)}
@@ -116,7 +119,9 @@ const Navbar = ({
                 ${
                     activeItem === item.id
                     ? "bg-primary text-white"
-                    : "hover:bg-muted dark:hover:bg-accent text-foreground dark:text-background"
+                    : item.id === "logout" 
+                        ? "hover:bg-destructive hover:text-white text-foreground dark:text-background"
+                        : "hover:bg-muted dark:hover:bg-accent text-foreground dark:text-background"
                 }`}
             >
                 <item.icon size={20} />
@@ -125,7 +130,6 @@ const Navbar = ({
             ))}
         </nav>
 
-        {/* Cambio de Modo Claro/Oscuro */}
         <div className="p-4 border-t border-border dark:border-accent">
             <button
             onClick={toggleLightMode}

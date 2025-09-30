@@ -9,18 +9,23 @@ import MyReviews from '../../Pages/User/Client/MyReviews';
 import Tickets from '../../Pages/User/Tickets';
 import Settings from '../../Pages/User/Client/Settings';
 import JoinToUsFrom from '../../Pages/User/JoinToUs';
-import Notifications from '../../Pages/User/Client/MyNotifications'
+import Notifications from '../../Pages/User/Client/MyNotifications';
 import WalkerWalks from '../../Pages/User/Walker/WalkerWalks';
-import WalkerReviews from '../../Pages/User/Walker/WalkerReviews'
-import WalkerServic from '../../Pages/User/Walker/WalkerService' 
-import WalkView from '../../Pages/User/WalkView/View/WalkView' 
+import WalkerReviews from '../../Pages/User/Walker/WalkerReviews';
+import WalkerServic from '../../Pages/User/Walker/WalkerService';
+import WalkView from '../../Pages/User/WalkView/View/WalkView';
+import SupportWalksView from '../../Pages/Admin/WalksView/AdminWalksView';
+import TicketsAdminView from '../../Pages/Admin/TicketsView/TicketsAdminView';
+import AdminWalks from '../../Pages/Admin/AdminWalks/AdminWalks';
+import AdminPet from '../../Pages/Admin/AdminPet/AdminPet';
+import AdminUsers from '../../Pages/Admin/AdminUsers/AdminUsers';
+import AdminApplications from '../../Pages/Admin/AdminApplicationsManagement/AdminApplicationsManagement';
+import AdminManagement from '../../Pages/Admin/AdminManagement/AdminManagement';
 
 import {
     FiHome,
     FiUsers,
     FiSettings,
-    FiBarChart,
-    FiBookOpen,
     FiClock,
     FiTrendingUp,
     FiMessageSquare,
@@ -36,82 +41,72 @@ import {
     FiMail,
 } from "react-icons/fi";
 
-// Componentes En uso 
+// ----- ADMIN -----
+const AdminUserView = () => <AdminUsers/>;
+const AdminPetView = () => <AdminPet/>;
+const AdminWalksView = () => <AdminWalks/>;
+const AdminApplicationsView = () => <AdminApplications/>;
+const PromotionsView = () => <AdminManagement/>;
+const TicketsGeneral = () => <TicketsAdminView/>; // Usado también en soporte
+
+// ----- CLIENTE -----
 const Home = () => <HomeComponent/>;
-
-const WalkerProfileView = ({ contentParams }) => {
-    return <WalkerProfile id={contentParams} />;
-};
-
-const MyTripsView = () => <MyTrips/>;
-
-const MyWalksWalker = () => <WalkerWalks/>;
-
-const WalkViewComplete = ({ contentParams }) => {
-    console.log({ contentParams })
-    return <WalkView id={contentParams} />
-};
-
-const UserProfile = () => <MyProfile/>;
-const MapChatView  = () => <MapChat/>;
 const SearchWalkerView = () => <SearchWalker/>;
+const MyTripsView = () => <MyTrips/>;
 const MyPetsView = () => <MyPets/>;
-const TicketsView = () => <Tickets/>;
-const SettingsView = () => <Settings/>;
+const TicketsView = () => <Tickets/>; // Usado también en paseador
 const JoinToUs = () => <JoinToUsFrom/>;
-const NotificationsView = () => <Notifications/>;
-
-const WalkerServiceView = () => <WalkerServic/>;
-const WalkerReviewsView = () => <WalkerReviews/>;
-
-// Componentes Ejemplo
-const Statistics = () => <div className="p-6"><h2 className="text-xl font-bold">Estadísticas</h2><p>Gráficos y métricas del sistema</p></div>;
-const Users = () => <div className="p-6"><h2 className="text-xl font-bold">Gestión de Usuarios</h2><p>Lista y administración de usuarios</p></div>;
-const PetsByUser = () => <div className="p-6"><h2 className="text-xl font-bold">Mascotas por Usuario</h2><p>Vista de mascotas registradas</p></div>;
-const WalksByUser = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos por Usuario</h2><p>Historial de paseos</p></div>;
-const RegistrationRequests = () => <div className="p-6"><h2 className="text-xl font-bold">Solicitudes de Alta</h2><p>Solicitudes pendientes de aprobación</p></div>;
-const Promotions = () => <div className="p-6"><h2 className="text-xl font-bold">Promociones</h2><p>Gestión de ofertas y descuentos</p></div>;
-
-const TicketsGeneral = () => <div className="p-6"><h2 className="text-xl font-bold">Tickets de Soporte</h2><p>Gestión de consultas</p></div>;
-
 const MyReviewsView = () => <MyReviews/>;
 
-const ActiveWalks = () => <div className="p-6"><h2 className="text-xl font-bold">Paseos Activos</h2><p>Monitoreo de paseos en curso</p></div>;
+// ----- PASEADOR -----
+const WalkerServiceView = () => <WalkerServic/>;
+const MyWalksWalker = () => <WalkerWalks/>;
+const WalkerReviewsView = () => <WalkerReviews/>;
+/* TicketsView ya definido arriba */
 
+// ----- SOPORTE -----
+const SupportWalks = () => <SupportWalksView/>;
+/* TicketsGeneral ya definido arriba */
 
-// Mapeo de componentes
+// ----- GENERALES -----
+const WalkerProfileView = ({ contentParams }) => <WalkerProfile id={contentParams}/>;
+const WalkViewComplete = ({ contentParams }) => <WalkView id={contentParams}/>;
+const MapChatView  = () => <MapChat/>;
+const NotificationsView = () => <Notifications/>;
+const UserProfile = () => <MyProfile/>; // Usado en todos los roles
+const SettingsView = () => <Settings/>; // Usado en todos los roles
+
+// ==================== MAPEO DE COMPONENTES ====================
 export const menuComponents = {
     // Admin
-    'statistics': Statistics,
-    'users': Users,
-    'pets-by-user': PetsByUser,
-    'walks-by-user': WalksByUser,
-    'registration-requests': RegistrationRequests,
-    'tickets-general': TicketsGeneral,
-    'promotions': Promotions,
+    'users': AdminUserView,
+    'admin-pet': AdminPetView,
+    'admin-walks': AdminWalksView,
+    'registration-requests': AdminApplicationsView,
+    'tickets-general': TicketsGeneral, // También en soporte
+    'promotions': PromotionsView,
+
+    // Soporte
+    'active-walks': SupportWalks,
     
     // Cliente
     'home': Home,
     'search-walker': SearchWalkerView,
     'my-walks': MyTripsView,
     'my-pets': MyPetsView,
-    'tickets': TicketsView,
+    'tickets': TicketsView, // También en paseador
     'join-to-us': JoinToUs,
     'my-reviews': MyReviewsView,
     
     // Paseador
-    'walker-reviews': WalkerReviewsView,
-    'my-walks-walker': MyWalksWalker,
     'walker-service': WalkerServiceView,
+    'my-walks-walker': MyWalksWalker,
+    'walker-reviews': WalkerReviewsView,
     
-    // Soporte
-    'active-walks': ActiveWalks,
-    
-    // General
+    // Generales
     'walker-profile': WalkerProfileView,
     'trip': WalkViewComplete,
     'mapchat': MapChatView,
-
     'notifications': NotificationsView,
     'profile': UserProfile,
     'settings': SettingsView,
@@ -121,13 +116,12 @@ export const menuComponents = {
 export const menuItems = {
     // Menú para Administrador
     admin: [
-        { icon: FiBarChart, label: "Estadísticas", id: "statistics" },
+        { icon: FiTool, label: "Promos & Planes", id: "promotions" },
         { icon: FiUsers, label: "Usuarios", id: "users" },
-        { icon: FiHeart, label: "Mascotas por usuario", id: "pets-by-user" },
-        { icon: FiClock, label: "Paseos por usuario", id: "walks-by-user" },
+        { icon: FiClock, label: "Paseos", id: "admin-walks" },
+        { icon: FiHeart, label: "Mascotas", id: "admin-pet" },
         { icon: FiUserPlus, label: "Solicitudes de Alta", id: "registration-requests" },
         { icon: FiMail, label: "Consultas", id: "tickets-general" },
-        { icon: FiTool, label: "Admin Menu", id: "promotions" },
     ],
     
     // Menú para Cliente
@@ -157,40 +151,69 @@ export const menuItems = {
     ],
 };
 
-export const commonMenuItems = [
-    { icon: FiEdit, label: "Mi Perfil", id: "profile" },
-    { icon: FiBell, label: "Alertas", id: "notifications" },
-    { icon: FiSettings, label: "Ajustes", id: "settings" },
-    { icon: FiLogOut, label: "Logout", id: "logout" },
-];
+// Elementos comunes por rol (diferentes según necesidades)
+export const commonMenuItemsByRole = {
+    admin: [
+        { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+        { icon: FiBell, label: "Alertas", id: "notifications" },
+        { icon: FiSettings, label: "Ajustes", id: "settings" },
+        { icon: FiLogOut, label: "Logout", id: "logout" },
+    ],
+    support: [
+        { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+        { icon: FiBell, label: "Alertas", id: "notifications" },
+        { icon: FiSettings, label: "Ajustes", id: "settings" },
+        { icon: FiLogOut, label: "Logout", id: "logout" },
+    ],
+    client: [
+        { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+        { icon: FiBell, label: "Alertas", id: "notifications" },
+        { icon: FiSettings, label: "Ajustes", id: "settings" },
+        { icon: FiLogOut, label: "Logout", id: "logout" },
+    ],
+    walker: [
+        { icon: FiEdit, label: "Mi Perfil", id: "profile" },
+        { icon: FiBell, label: "Alertas", id: "notifications" },
+        { icon: FiSettings, label: "Ajustes", id: "settings" },
+        { icon: FiLogOut, label: "Logout", id: "logout" },
+    ],
+};
 
 const menuTitles = {
+    // Cliente
     'home': 'Home',
-    'walker-profile': 'Perfil Del Paseador',
-    'trip': 'Info de Paseo',
-    'join-to-us': 'Queres ser un Paseador?',
     'search-walker': 'Buscar Paseador',
+    'my-walks': 'Mis Paseos',
+    'my-pets': 'Mis Mascotas',
+    'my-reviews': 'Mis Reseñas',
+    'join-to-us': 'Queres ser un Paseador?',
+    'tickets': 'Consultas',
+    'mapchat': 'MapChat',
 
-    'statistics': 'Estadísticas',
+    // Paseador
     'walker-service': 'Mi Servicio',
+    'my-walks-walker': 'Mis Paseos',
+    'walker-reviews': 'Mis Reseñas',
+
+    // Admin
     'users': 'Usuarios',
-    'pets-by-user': 'Mascotas por Usuario',
-    'walks-by-user': 'Paseos por Usuario',
+    'admin-pet': 'Mascotas',
+    'admin-walks': 'Paseos',
     'registration-requests': 'Solicitudes de Alta',
     'tickets-general': 'Consultas',
     'promotions': 'Promociones',
-    'my-walks': 'Mis Paseos',
-    'my-walks-walker': 'Mis Paseos',
-    'my-pets': 'Mis Mascotas',
-    'my-account-perms': 'Ser Paseador',
-    'tickets': 'Consultas',
-    'my-reviews': 'Mis Reseñas',
-    'walker-reviews': 'Mis Reseñas',
+
+    // Soporte
     'active-walks': 'Paseos Activos',
-    'notifications': 'Mis Alertas',
+
+    // Generales
+    'walker-profile': 'Perfil Del Paseador',
+    'trip': 'Info de Paseo',
     'profile': 'Mi Perfil',
+    'notifications': 'Mis Alertas',
     'settings': 'Ajustes',
 };
+
 
 export const getComponentById = (id) => {
     return menuComponents[id] || Home;
@@ -204,14 +227,19 @@ export const getMenuItemsByRole = (role) => {
     return menuItems[role] || menuItems.client;
 };
 
-export const getCommonMenuItems = () => {
-    return commonMenuItems;
+export const getCommonMenuItems = (role) => {
+    return commonMenuItemsByRole[role] || commonMenuItemsByRole.client;
 };
 
 export const getAllMenuItemsByRole = (role) => {
     const roleMenuItems = getMenuItemsByRole(role);
     const commonItems = getCommonMenuItems();
     
+    if(role === "support" || role === "admin"){
+        const extras = commonItems.filter(item => item.id === "logout" || item.id === "profile");
+        return {roleItems: roleMenuItems, commonItems: extras}
+    }
+
     return {
         roleItems: roleMenuItems,
         commonItems: commonItems
