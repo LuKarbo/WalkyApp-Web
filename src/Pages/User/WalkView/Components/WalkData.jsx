@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FiActivity, FiMapPin } from "react-icons/fi";
 import { WalkTrackingController } from "../../../../BackEnd/Controllers/WalkTrackingController";
 
-const WalkData = ({ tripId, walkStatus, records }) => {
+const WalkData = ({ tripId, walkStatus }) => {
   const [apiRecords, setApiRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -33,11 +33,8 @@ const WalkData = ({ tripId, walkStatus, records }) => {
     }
   };
 
-  // Combinar registros de localStorage con los de la API
-  const allRecords = [...(records || []), ...apiRecords];
-  
   // Ordenar por fecha descendente
-  const sortedRecords = allRecords
+  const sortedRecords = apiRecords
     .sort((a, b) => new Date(b.timeFull) - new Date(a.timeFull));
 
   // Si el seguimiento no es visible según el estado del paseo

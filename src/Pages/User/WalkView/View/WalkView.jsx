@@ -9,11 +9,6 @@ const WalkView = ({ id }) => {
     const { tripId } = id || {};
     console.log('Trip ID extraído:', tripId);
 
-    const [records, setRecords] = useState(() => {
-        const saved = localStorage.getItem("records");
-        return saved ? JSON.parse(saved) : [];
-    }); // registros del recorrido
-
     const [walkData, setWalkData] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -78,7 +73,6 @@ const WalkView = ({ id }) => {
                     <WalkData
                         tripId={tripId}
                         walkStatus={walkData?.status}
-                        records={records}
                     />
                 </div>
             </div>
