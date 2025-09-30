@@ -5,7 +5,7 @@ export const WalksAPI = {
                 id: "W001",
                 dogName: "Max",
                 walkerId: 1,
-                ownerId: 2,
+                ownerId: 1,
                 walkerName: "Sarah Johnson",
                 startTime: "2024-01-20T10:00:00",
                 endTime: "2024-01-20T11:00:00",
