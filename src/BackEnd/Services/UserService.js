@@ -39,7 +39,9 @@ export const UserService = {
     },
 
     async updateUser(id, userData) {
-        // Validaciones
+        // Validaciones para actualización completa de usuario
+        console.log("UserService.updateUser:", userData);
+
         if (!userData.name || userData.name.trim().length < 2) {
             throw new Error("El nombre debe tener al menos 2 caracteres");
         }
@@ -52,29 +54,57 @@ export const UserService = {
             throw new Error("Rol inválido");
         }
 
-        if (!userData.status || !["active", "inactive"].includes(userData.status)) {
+        const updatedUser = await UserDataAccess.updateUser(id, userData);
+
+        // Transformar respuesta al DTO del frontend
+        return {
+            id: updatedUser.id,
+            fullName: updatedUser.name,
+            email: updatedUser.email.toLowerCase(),
+            role: updatedUser.role,
+            profileImage: updatedUser.profileImage || "https://cdn.example.com/default-avatar.png",
+            phone: updatedUser.phone || "No disponible",
+            location: updatedUser.location || "No disponible",
+            suscription: updatedUser.suscription || "Basic",
+            status: updatedUser.status || "active",
+            joinedDate: updatedUser.joinedDate || new Date().toISOString(),
+            lastLogin: updatedUser.lastLogin || new Date().toISOString()
+        };
+    },
+
+    async updateUserByAdmin(id, adminUserData) {
+        console.log("UserService.updateUserByAdmin:", adminUserData);
+
+        if (!adminUserData.name || adminUserData.name.trim().length < 2) {
+            throw new Error("El nombre debe tener al menos 2 caracteres");
+        }
+
+        if (!adminUserData.role || !["admin", "client", "walker", "support"].includes(adminUserData.role)) {
+            throw new Error("Rol inválido");
+        }
+
+        if (!adminUserData.status || !["active", "inactive"].includes(adminUserData.status)) {
             throw new Error("Estado inválido");
         }
 
-        if (userData.phone && userData.phone.trim() && !/^[\+]?[0-9\-\s\(\)]+$/.test(userData.phone)) {
+        if (adminUserData.phone && !/^[\+]?[0-9\-\s\(\)]+$/.test(adminUserData.phone)) {
             throw new Error("Formato de teléfono inválido");
         }
 
-        // Preparar datos para la API
-        const apiData = {
-            name: userData.name.trim(),
-            email: userData.email.toLowerCase().trim(),
-            role: userData.role,
-            phone: userData.phone?.trim() || "",
-            location: userData.location?.trim() || "",
-            suscription: userData.suscription || "Basic",
-            status: userData.status,
-            profileImage: userData.profileImage
+        // Filtrar solo los campos que el admin puede editar
+        const allowedFields = {
+            name: adminUserData.name.trim(),
+            role: adminUserData.role,
+            status: adminUserData.status,
+            phone: adminUserData.phone ? adminUserData.phone.trim() : "",
+            location: adminUserData.location ? adminUserData.location.trim() : "",
+            profileImage: adminUserData.profileImage || "https://cdn.example.com/default-avatar.png"
         };
 
-        const updatedUser = await UserDataAccess.updateUser(id, apiData);
+        console.log("Campos permitidos para admin:", allowedFields);
 
-        // Transformar respuesta al DTO del frontend
+        const updatedUser = await UserDataAccess.updateUserByAdmin(id, allowedFields);
+
         return {
             id: updatedUser.id,
             fullName: updatedUser.name,
@@ -136,5 +166,35 @@ export const UserService = {
                 role: updatedUser.role
             }
         };
+    },
+
+    async changeUserPassword(userId, passwordData) {
+        // Validaciones
+        if (!userId || typeof userId !== 'number') {
+            throw new Error("ID de usuario inválido");
+        }
+
+        if (!passwordData.currentPassword || passwordData.currentPassword.length < 6) {
+            throw new Error("La contraseña actual debe tener al menos 6 caracteres");
+        }
+
+        if (!passwordData.newPassword || passwordData.newPassword.length < 6) {
+            throw new Error("La nueva contraseña debe tener al menos 6 caracteres");
+        }
+
+        if (passwordData.currentPassword === passwordData.newPassword) {
+            throw new Error("La nueva contraseña debe ser diferente a la actual");
+        }
+
+        try {
+            await UserDataAccess.changeUserPassword(userId, passwordData);
+            return {
+                success: true,
+                message: 'Contraseña cambiada exitosamente'
+            };
+        } catch (error) {
+            console.error('Error in UserService.changeUserPassword:', error);
+            throw error;
+        }
     }
 };

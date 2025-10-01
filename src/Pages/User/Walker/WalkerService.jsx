@@ -7,7 +7,7 @@ import WalkerServiceStatsComponent from "../Components/WalkerServiceComponents/W
 import WalkerServiceEarningsComponent from "../Components/WalkerServiceComponents/WalkerServiceEarningsComponent";
 import WalkerServiceChartComponent from "../Components/WalkerServiceComponents/WalkerServiceChartComponent";
 import WalkerServiceSettingsComponent from "../Components/WalkerServiceComponents/WalkerServiceSettingsComponent";
-import { FaExclamationTriangle, FaCreditCard, FaTimes } from "react-icons/fa";
+import { FaExclamationTriangle, FaCreditCard, FaTimes, FaCheckCircle } from "react-icons/fa";
 
 const WalkerService = () => {
     const user = useUser();
@@ -23,13 +23,16 @@ const WalkerService = () => {
         hasGPSTracker: false,
         hasDiscount: false,
         discountPercentage: 0,
-        mercadoPagoEnabled: false
+        hasMercadoPago: false,
+        tokenMercadoPago: "",
+        mercadoPagoSandbox: false
     });
     
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [saving, setSaving] = useState(false);
     const [showMercadoPagoAlert, setShowMercadoPagoAlert] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         const loadWalkerData = async () => {
@@ -39,25 +42,24 @@ const WalkerService = () => {
                 setLoading(true);
                 setError(null);
                 
-                const [walker, walks, walkerSettings] = await Promise.all([
+                const [walker, walks, walkerSettings, calculatedEarnings] = await Promise.all([
                     WalkerController.fetchWalkerProfile(walkerId),
                     WalksController.fetchWalksByWalker(walkerId),
-                    WalkerController.fetchWalkerSettings(walkerId)
+                    WalkerController.fetchWalkerSettings(walkerId),
+                    WalkerController.getWalkerEarnings(walkerId)
                 ]);
                 
                 setWalkerData(walker);
                 setWalksData(walks);
                 setSettings(walkerSettings);
                 
-                const calculatedEarnings = calculateEarnings(walks, walkerSettings);
                 const calculatedChartData = generateChartData(walks);
                 
                 setEarnings(calculatedEarnings);
                 setChartData(calculatedChartData);
                 
-                const isMercadoPagoConfigured = walkerSettings.mercadoPagoEnabled && 
-                                                walkerSettings.mercadoPagoAccessToken && 
-                                                walkerSettings.mercadoPagoPublicKey;
+                const isMercadoPagoConfigured = walkerSettings.hasMercadoPago &&  
+                                                walkerSettings.tokenMercadoPago;
                 setShowMercadoPagoAlert(!isMercadoPagoConfigured);
                 
             } catch (err) {
@@ -71,6 +73,15 @@ const WalkerService = () => {
         loadWalkerData();
     }, [walkerId]);
 
+    useEffect(() => {
+        if (successMessage) {
+            const timer = setTimeout(() => {
+                setSuccessMessage("");
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage]);
+
     const calculateEarnings = (walks, walkerSettings) => {
         const completedWalks = walks.filter(walk => walk.status === 'Finalizado');
         const basePrice = walkerSettings?.pricePerPet || 15000;
@@ -83,7 +94,6 @@ const WalkerService = () => {
             if (walkDate.getMonth() === currentMonth && walkDate.getFullYear() === currentYear) {
                 let price = walk.price || basePrice;
                 
-                // Aplicar descuento si está activo
                 if (walkerSettings?.hasDiscount && walkerSettings?.discountPercentage > 0) {
                     price = price * (1 - walkerSettings.discountPercentage / 100);
                 }
@@ -96,7 +106,6 @@ const WalkerService = () => {
         const totalEarnings = completedWalks.reduce((total, walk) => {
             let price = walk.price || basePrice;
             
-            // Aplicar descuento si está activo
             if (walkerSettings?.hasDiscount && walkerSettings?.discountPercentage > 0) {
                 price = price * (1 - walkerSettings.discountPercentage / 100);
             }
@@ -154,40 +163,76 @@ const WalkerService = () => {
 
     const handleSettingsChange = (newSettings) => {
         setSettings(prev => ({ ...prev, ...newSettings }));
-        
-        const updatedSettings = { ...settings, ...newSettings };
-        const isMercadoPagoConfigured = updatedSettings.mercadoPagoEnabled && 
-                                        updatedSettings.mercadoPagoAccessToken && 
-                                        updatedSettings.mercadoPagoPublicKey;
-        
-        if (isMercadoPagoConfigured && showMercadoPagoAlert) {
-            setShowMercadoPagoAlert(false);
-        }
     };
 
     const handleSaveSettings = async () => {
         try {
             setSaving(true);
-            const updatedSettings = await WalkerController.updateWalkerSettings(walkerId, settings);
-            setSettings(updatedSettings);
+            setError(null);
+            
+            const settingsToUpdate = {
+                location: settings.location,
+                pricePerPet: settings.pricePerPet,
+                hasDiscount: settings.hasDiscount,
+                discountPercentage: settings.discountPercentage
+            };
+            
+            const updatedSettings = await WalkerController.updateWalkerSettings(walkerId, settingsToUpdate);
+            
+            setSettings(prev => ({
+                ...prev,
+                ...updatedSettings
+            }));
             
             const updatedEarnings = calculateEarnings(walksData, updatedSettings);
             setEarnings(updatedEarnings);
             
-            const isMercadoPagoConfigured = updatedSettings.mercadoPagoEnabled && 
-                                            updatedSettings.mercadoPagoAccessToken && 
-                                            updatedSettings.mercadoPagoPublicKey;
+            setSuccessMessage('Configuración guardada exitosamente');
+        } catch (err) {
+            console.error('Error saving settings:', err);
+            setError('Error al guardar la configuración: ' + (err.message || 'Error desconocido'));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSaveMercadoPago = async () => {
+        try {
+            setError(null);
+
+            if (!settings.hasMercadoPago) {
+                setError('Debes habilitar MercadoPago primero');
+                return;
+            }
+
+            if (!settings.tokenMercadoPago || settings.tokenMercadoPago.trim() === '') {
+                setError('El Access Token es requerido');
+                return;
+            }
+            
+            const mercadoPagoData = {
+                hasMercadoPago: settings.hasMercadoPago,
+                tokenMercadoPago: settings.tokenMercadoPago.trim()
+            };
+            
+            const updatedSettings = await WalkerController.updateWalkerMercadoPago(walkerId, mercadoPagoData);
+            
+            setSettings(prev => ({
+                ...prev,
+                hasMercadoPago: updatedSettings.hasMercadoPago,
+                tokenMercadoPago: updatedSettings.tokenMercadoPago
+            }));
+            
+            const isMercadoPagoConfigured = updatedSettings.hasMercadoPago && updatedSettings.tokenMercadoPago;
             
             if (isMercadoPagoConfigured) {
                 setShowMercadoPagoAlert(false);
             }
             
-            console.log('Configuración guardada exitosamente');
+            setSuccessMessage('Configuración de MercadoPago guardada exitosamente');
         } catch (err) {
-            console.error('Error saving settings:', err);
-            setError('Error al guardar la configuración');
-        } finally {
-            setSaving(false);
+            console.error('Error saving MercadoPago:', err);
+            setError('Error al guardar MercadoPago: ' + (err.message || 'Error desconocido'));
         }
     };
 
@@ -210,7 +255,7 @@ const WalkerService = () => {
         );
     }
 
-    if (error) {
+    if (error && !walkerData) {
         return (
             <div className="w-full min-h-screen p-6 bg-background dark:bg-foreground">
                 <div className="bg-foreground-userProfile p-6 rounded-lg shadow-lg">
@@ -227,6 +272,42 @@ const WalkerService = () => {
     return (
         <div className="max-w min-h-screen p-6 bg-background dark:bg-foreground">
             <div className="mx-auto space-y-6">
+                
+                {successMessage && (
+                    <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 dark:from-green-500/20 dark:to-emerald-500/20 border-l-4 border-green-500 p-6 rounded-lg shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-2 bg-green-500 rounded-full">
+                                <FaCheckCircle className="text-white text-xl" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-green-800 dark:text-green-200 font-semibold">
+                                    {successMessage}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="bg-gradient-to-r from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 border-l-4 border-red-500 p-6 rounded-lg shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-2 bg-red-500 rounded-full">
+                                <FaExclamationTriangle className="text-white text-xl" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-red-800 dark:text-red-200 font-semibold">
+                                    {error}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setError(null)}
+                                className="text-red-500 hover:text-red-700 transition-all duration-200 p-1 rounded-full hover:bg-red-100"
+                            >
+                                <FaTimes />
+                            </button>
+                        </div>
+                    </div>
+                )}
                 
                 {showMercadoPagoAlert && (
                     <div className="bg-gradient-to-r from-warning/10 to-yellow-red/10 dark:from-warning/20 dark:to-yellow-red/20 border-l-4 border-warning p-6 rounded-lg shadow-lg animate-pulse">
@@ -289,6 +370,7 @@ const WalkerService = () => {
                         settings={settings}
                         onSettingsChange={handleSettingsChange}
                         onSave={handleSaveSettings}
+                        onSaveMercadoPago={handleSaveMercadoPago}
                         isSaving={saving}
                     />
                 </div>

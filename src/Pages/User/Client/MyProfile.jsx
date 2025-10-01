@@ -39,14 +39,14 @@ const MyProfile = () => {
         try {
             if (!user?.id) return;
             
-            const fullProfile = await UserController.fetchUserProfile(user.id);
-            
+            const fullProfile = await UserController.fetchUserById(user.id);
+
             setUserProfileData({
                 id: fullProfile.id,
                 name: fullProfile.fullName || "X",
                 email: fullProfile.email || "sin-email@example.com",
                 avatar: fullProfile.profileImage || "X",
-                joinedDate: fullProfile.createdAt || new Date().toISOString(),
+                joinedDate: fullProfile.joinedDate || new Date().toISOString(),
                 rol: fullProfile.role || "No disponible",
                 contact: fullProfile.phone || "No disponible",
                 suscription: user?.suscription || "No Disponible",
@@ -150,7 +150,15 @@ const MyProfile = () => {
 
     const handleUpdateProfile = async (updatedData) => {
         try {
-            await UserController.updateUserProfile(user.id, updatedData);
+            console.log("updateData My profile");
+            console.log(updatedData.avatar);
+            user.name = updatedData.name;
+            user.phone = updatedData.phone;
+            user.location = updatedData.location;
+            user.profileImage = updatedData.avatar;
+            console.log("updateData user");
+            console.log(user.profileImage);
+            await UserController.updateUser(user.id, user);
             
             setRefreshTrigger(prev => prev + 1);
             

@@ -9,9 +9,9 @@ const AdminPlansSection = ({
         onToggleStatus, 
         loading 
     }) => {
-        const freePlan = plans.find(plan => plan.id === "free");
-        const activePlans = plans.filter(plan => plan.isActive && plan.id !== "free");
-        const inactivePlans = plans.filter(plan => !plan.isActive && plan.id !== "free");
+        const freePlan = plans.find(plan => plan.plan_id === "free");
+        const activePlans = plans.filter(plan => plan.is_active && plan.plan_id !== "free");
+        const inactivePlans = plans.filter(plan => !plan.is_active && plan.plan_id !== "free");
 
     return (
         <div className="space-y-8">
@@ -47,15 +47,17 @@ const AdminPlansSection = ({
                         </span>
                     </div>
                     
-                    <PlanCard
-                        plan={freePlan}
-                        onEdit={() => {}}
-                        onDelete={() => {}}
-                        onToggleStatus={() => {}}
-                        loading={false}
-                        isActive={true}
-                        isEditable={false}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <PlanCard
+                            plan={freePlan}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
+                            onToggleStatus={() => {}}
+                            loading={false}
+                            isActive={true}
+                            isEditable={false}
+                        />
+                    </div>
                 </div>
             )}
 
@@ -71,7 +73,7 @@ const AdminPlansSection = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {activePlans.map((plan) => (
                             <PlanCard
-                                key={plan.id}
+                                key={plan.id || plan.plan_id}
                                 plan={plan}
                                 onEdit={onEditPlan}
                                 onDelete={onDeletePlan}
@@ -97,7 +99,7 @@ const AdminPlansSection = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {inactivePlans.map((plan) => (
                             <PlanCard
-                                key={plan.id}
+                                key={plan.id || plan.plan_id}
                                 plan={plan}
                                 onEdit={onEditPlan}
                                 onDelete={onDeletePlan}
@@ -111,7 +113,7 @@ const AdminPlansSection = ({
                 </div>
             )}
 
-            {plans.filter(p => p.id !== "free").length === 0 && (
+            {plans.filter(p => p.plan_id !== "free").length === 0 && (
                 <div className="text-center py-16">
                     <div className="bg-white/50 dark:bg-foreground/50 backdrop-blur-sm rounded-3xl p-12 max-w-md mx-auto shadow-xl">
                         <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-success/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -125,7 +127,8 @@ const AdminPlansSection = ({
                         </p>
                         <button
                             onClick={onCreatePlan}
-                            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200"
+                            disabled={loading}
+                            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200 disabled:opacity-50"
                         >
                             Crear Primer Plan
                         </button>

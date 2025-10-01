@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { FaEnvelope } from 'react-icons/fa';
+import { FaEnvelope, FaUser, FaCalendarAlt, FaCrown } from 'react-icons/fa';
 import { useUser } from '../../../BackEnd/Context/UserContext';
 import { SettingsController } from '../../../BackEnd/Controllers/SettingsController';
+import { UserController } from '../../../BackEnd/Controllers/UserController';
 import SubscriptionModal from '../Modals/SettingsModals/SubscriptionModal';
 import SettingNotificationComponent from '../Components/SettingsComponents/SettingNotificationComponent';
 import SettingSubscriptionComponent from '../Components/SettingsComponents/SettingSubscriptionComponent';
@@ -19,6 +20,13 @@ const Settings = () => {
         }
     });
     const [subscription, setSubscription] = useState(null);
+    const [userProfile, setUserProfile] = useState({
+        name: '',
+        phone: '',
+        location: '',
+        joinedDate: null,
+        lastLogin: null
+    });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
@@ -34,6 +42,19 @@ const Settings = () => {
                 
                 setSettings(userSettings);
                 setSubscription(userSubscription);
+                
+                if (user?.id) {
+                    var userData = await UserController.fetchUserById(user.id);
+                    
+                    setUserProfile({
+                        name: userData?.fullName || '',
+                        phone: userData?.phone || '',
+                        location: userData?.location || '',
+                        joinedDate: userData?.joinedDate || null,
+                        lastLogin: userData?.lastLogin || null
+                    });
+                    
+                }
             } catch (error) {
                 console.error('Error loading settings:', error);
             } finally {
@@ -44,7 +65,7 @@ const Settings = () => {
         if (user?.id) {
             loadSettings();
         }
-    }, [user?.id]);
+    }, [user]);
 
     const handleEmailChange = (e) => {
         setSettings(prev => ({
@@ -90,7 +111,6 @@ const Settings = () => {
 
             console.log('Configuraciones guardadas exitosamente:', updatedSettings);
             
-            
         } catch (error) {
             console.error('Error saving settings:', error);
         } finally {
@@ -109,6 +129,16 @@ const Settings = () => {
     const handleSubscriptionUpdate = (newSubscription) => {
         setSubscription(newSubscription);
         closeSubscriptionModal();
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
     };
 
     if (loading) {
@@ -143,9 +173,65 @@ const Settings = () => {
                     
                     <div className="bg-background dark:bg-foreground rounded-2xl shadow-xl p-8 border border-border dark:border-muted">
                         <div className="flex items-center mb-6">
+                            <FaUser className="text-3xl text-primary mr-4" />
+                            <h2 className="text-2xl font-bold text-foreground dark:text-background">
+                                Información de Perfil
+                            </h2>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-foreground dark:text-background mb-2">
+                                        Nombre Completo
+                                    </label>
+                                    <div className="p-3 border border-border dark:border-muted rounded-xl bg-muted/20 dark:bg-accent/10 text-foreground dark:text-background">
+                                        {userProfile.name || 'No especificado'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-foreground dark:text-background mb-2">
+                                        Teléfono
+                                    </label>
+                                    <div className="p-3 border border-border dark:border-muted rounded-xl bg-muted/20 dark:bg-accent/10 text-foreground dark:text-background">
+                                        {userProfile.phone || 'No especificado'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-foreground dark:text-background mb-2">
+                                    Ubicación
+                                </label>
+                                <div className="p-3 border border-border dark:border-muted rounded-xl bg-muted/20 dark:bg-accent/10 text-foreground dark:text-background">
+                                    {userProfile.location || 'No especificado'}
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-foreground dark:text-background mb-2">
+                                        Fecha de Registro
+                                    </label>
+                                    <div className="p-3 border border-border dark:border-muted rounded-xl bg-muted/20 dark:bg-accent/10 text-foreground dark:text-background">
+                                        {formatDate(userProfile.joinedDate)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-foreground dark:text-background mb-2">
+                                        Último Acceso
+                                    </label>
+                                    <div className="p-3 border border-border dark:border-muted rounded-xl bg-muted/20 dark:bg-accent/10 text-foreground dark:text-background">
+                                        {formatDate(userProfile.lastLogin)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-background dark:bg-foreground rounded-2xl shadow-xl p-8 border border-border dark:border-muted">
+                        <div className="flex items-center mb-6">
                             <FaEnvelope className="text-3xl text-primary mr-4" />
                             <h2 className="text-2xl font-bold text-foreground dark:text-background">
-                                Información de Cuenta
+                                Configuración de Cuenta
                             </h2>
                         </div>
 
@@ -160,14 +246,17 @@ const Settings = () => {
                                 className="w-full p-4 border border-border dark:border-muted rounded-xl bg-background dark:bg-foreground text-foreground dark:text-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                 placeholder="tu-email@ejemplo.com"
                             />
+                            <p className="text-sm text-accent dark:text-muted mt-2">
+                                Este correo se utilizará para enviarte notificaciones importantes sobre tu cuenta y servicios.
+                            </p>
                         </div>
                     </div>
-
-                    <SettingNotificationComponent
-                        settings={settings}
-                        onToggleNotification={toggleNotification}
-                    />
                 </div>
+
+                <SettingNotificationComponent
+                    settings={settings}
+                    onToggleNotification={toggleNotification}
+                />
 
                 <div className="flex justify-center">
                     <button

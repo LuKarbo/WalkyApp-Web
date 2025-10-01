@@ -11,12 +11,13 @@ export const SettingsService = {
         return {
             email: userSettings.email || '',
             notifications: {
-                walkStatus: userSettings.notifications?.walkStatus ?? true,
-                announcements: userSettings.notifications?.announcements ?? true,
-                subscription: userSettings.notifications?.subscription ?? true,
-                messages: userSettings.notifications?.messages ?? true,
-                systemAlerts: userSettings.notifications?.systemAlerts ?? true
-            }
+                walkStatus: userSettings.notifications?.walkStatus ?? userSettings.notification_walk_status ?? true,
+                announcements: userSettings.notifications?.announcements ?? userSettings.notification_announcements ?? true,
+                subscription: userSettings.notifications?.subscription ?? userSettings.notification_subscription ?? true,
+                messages: userSettings.notifications?.messages ?? userSettings.notification_messages ?? true,
+                systemAlerts: userSettings.notifications?.systemAlerts ?? userSettings.notification_system_alerts ?? true
+            },
+            updatedAt: userSettings.updated_at || userSettings.updatedAt
         };
     },
 
@@ -41,8 +42,14 @@ export const SettingsService = {
         
         return {
             email: updatedSettings.email,
-            notifications: updatedSettings.notifications,
-            updatedAt: updatedSettings.updatedAt
+            notifications: {
+                walkStatus: updatedSettings.notifications?.walkStatus ?? updatedSettings.notification_walk_status,
+                announcements: updatedSettings.notifications?.announcements ?? updatedSettings.notification_announcements,
+                subscription: updatedSettings.notifications?.subscription ?? updatedSettings.notification_subscription,
+                messages: updatedSettings.notifications?.messages ?? updatedSettings.notification_messages,
+                systemAlerts: updatedSettings.notifications?.systemAlerts ?? updatedSettings.notification_system_alerts
+            },
+            updatedAt: updatedSettings.updated_at || updatedSettings.updatedAt
         };
     },
 
@@ -62,15 +69,15 @@ export const SettingsService = {
             };
         }
 
-        const isActive = subscription.expiryDate ? 
-            new Date(subscription.expiryDate) > new Date() : 
-            subscription.isActive;
+        const isActive = subscription.expiry_date ? 
+            new Date(subscription.expiry_date) > new Date() : 
+            subscription.is_active ?? subscription.isActive ?? true;
 
         return {
             plan: subscription.plan,
-            expiryDate: subscription.expiryDate,
+            expiryDate: subscription.expiry_date || subscription.expiryDate,
             isActive: isActive,
-            startDate: subscription.startDate
+            startDate: subscription.start_date || subscription.startDate
         };
     },
 
@@ -84,9 +91,9 @@ export const SettingsService = {
         }
 
         const availablePlans = await this.getActiveSubscriptionPlans();
-        const selectedPlan = availablePlans.find(plan => plan.id === planId);
+        const selectedPlan = availablePlans.find(plan => (plan.plan_id || plan.id) === planId);
         
-        if (!selectedPlan) {
+        if (!selectedPlan && planId !== 'free') {
             throw new Error("Invalid plan selected");
         }
 
@@ -95,34 +102,50 @@ export const SettingsService = {
         if (currentSubscription?.plan === planId) {
             return {
                 plan: currentSubscription.plan,
-                expiryDate: currentSubscription.expiryDate,
-                isActive: currentSubscription.isActive,
-                startDate: currentSubscription.startDate
+                expiryDate: currentSubscription.expiry_date || currentSubscription.expiryDate,
+                isActive: currentSubscription.is_active ?? currentSubscription.isActive,
+                startDate: currentSubscription.start_date || currentSubscription.startDate
             };
         }
 
         let expiryDate = null;
-        let startDate = new Date();
+        let startDate = new Date().toISOString();
 
-        if (planId !== 'free') {
+        if (planId !== 'free' && selectedPlan) {
             expiryDate = new Date();
-            expiryDate.setMonth(expiryDate.getMonth() + 1);
+            switch (selectedPlan.duration) {
+                case 'weekly':
+                    expiryDate.setDate(expiryDate.getDate() + 7);
+                    break;
+                case 'monthly':
+                    expiryDate.setMonth(expiryDate.getMonth() + 1);
+                    break;
+                case 'yearly':
+                    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+                    break;
+                case 'forever':
+                    expiryDate = null;
+                    break;
+                default:
+                    expiryDate.setMonth(expiryDate.getMonth() + 1);
+            }
+            expiryDate = expiryDate ? expiryDate.toISOString() : null;
         }
 
         const subscriptionData = {
             plan: planId,
-            expiryDate: expiryDate,
-            isActive: true,
-            startDate: startDate
+            expiry_date: expiryDate,
+            is_active: true,
+            start_date: startDate
         };
 
         const updatedSubscription = await SettingsDataAccess.updateSubscription(userId, subscriptionData);
 
         return {
             plan: updatedSubscription.plan,
-            expiryDate: updatedSubscription.expiryDate,
-            isActive: updatedSubscription.isActive,
-            startDate: updatedSubscription.startDate
+            expiryDate: updatedSubscription.expiry_date || updatedSubscription.expiryDate,
+            isActive: updatedSubscription.is_active ?? updatedSubscription.isActive,
+            startDate: updatedSubscription.start_date || updatedSubscription.startDate
         };
     },
 
@@ -151,12 +174,12 @@ export const SettingsService = {
     },
 
     async createSubscriptionPlan(planData) {
-        if (!planData.id || !planData.name || planData.price === undefined) {
-            throw new Error("ID, nombre y precio son requeridos");
+        if (!planData.plan_id || !planData.name || planData.price === undefined) {
+            throw new Error("plan_id, nombre y precio son requeridos");
         }
 
-        if (planData.id.length < 3) {
-            throw new Error("El ID debe tener al menos 3 caracteres");
+        if (planData.plan_id.length < 3) {
+            throw new Error("El plan_id debe tener al menos 3 caracteres");
         }
 
         if (planData.name.length < 3) {
@@ -171,25 +194,47 @@ export const SettingsService = {
             throw new Error("Debe incluir al menos una característica");
         }
 
-        const existingPlan = await SettingsDataAccess.getSubscriptionPlanById(planData.id);
-        if (existingPlan) {
-            throw new Error("Ya existe un plan con este ID");
+        if (planData.max_walks < -1) {
+            throw new Error("El número máximo de paseos no puede ser menor a -1 (usa -1 para ilimitado)");
         }
 
-        if (planData.isActive) {
+        try {
+            const existingPlan = await SettingsDataAccess.getSubscriptionPlanById(planData.plan_id);
+            if (existingPlan) {
+                throw new Error("Ya existe un plan con este ID");
+            }
+        } catch (error) {
+            if (!error.message.includes('Plan not found') && 
+                !error.message.includes('Plan no encontrado') &&
+                !error.message.includes('404')) {
+                throw error;
+            }
+        }
+
+        if (planData.is_active || planData.isActive) {
             const activePlans = await SettingsDataAccess.getActiveSubscriptionPlans();
-            const activeCount = activePlans.filter(plan => plan.id !== 'free').length;
+            const activeCount = activePlans.filter(plan => (plan.plan_id || plan.id) !== 'free').length;
             if (activeCount >= 3) {
                 throw new Error("Solo se pueden tener máximo 3 planes activos (además del plan gratuito)");
             }
         }
 
-        const newPlan = await SettingsDataAccess.createSubscriptionPlan({
-            ...planData,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        });
+        const newPlanData = {
+            plan_id: planData.plan_id,
+            name: planData.name,
+            price: planData.price,
+            duration: planData.duration || 'monthly',
+            category: planData.category || 'standard',
+            description: planData.description || '',
+            max_walks: planData.max_walks || 0,
+            features: planData.features,
+            support_level: planData.support_level || 'email',
+            cancellation_policy: planData.cancellation_policy || 'none',
+            discount_percentage: planData.discount_percentage || 0,
+            is_active: planData.is_active || planData.isActive || false
+        };
 
+        const newPlan = await SettingsDataAccess.createSubscriptionPlan(newPlanData);
         return newPlan;
     },
 
@@ -219,19 +264,20 @@ export const SettingsService = {
             throw new Error("Debe incluir al menos una característica");
         }
 
-        if (planData.isActive === true && !existingPlan.isActive) {
+        if (planData.max_walks !== undefined && planData.max_walks < -1) {
+            throw new Error("El número máximo de paseos no puede ser menor a -1 (usa -1 para ilimitado)");
+        }
+
+        const isActivating = (planData.is_active === true || planData.isActive === true) && !existingPlan.is_active;
+        if (isActivating) {
             const activePlans = await SettingsDataAccess.getActiveSubscriptionPlans();
-            const activeCount = activePlans.filter(plan => plan.id !== 'free').length;
+            const activeCount = activePlans.filter(plan => (plan.plan_id || plan.id) !== 'free').length;
             if (activeCount >= 3) {
                 throw new Error("Solo se pueden tener máximo 3 planes activos (además del plan gratuito)");
             }
         }
 
-        const updatedPlan = await SettingsDataAccess.updateSubscriptionPlan(planId, {
-            ...planData,
-            updatedAt: new Date().toISOString()
-        });
-
+        const updatedPlan = await SettingsDataAccess.updateSubscriptionPlan(planId, planData);
         return updatedPlan;
     },
 
@@ -273,19 +319,15 @@ export const SettingsService = {
             throw new Error("Plan no encontrado");
         }
 
-        if (!existingPlan.isActive) {
+        if (!existingPlan.is_active) {
             const activePlans = await SettingsDataAccess.getActiveSubscriptionPlans();
-            const activeCount = activePlans.filter(plan => plan.id !== 'free').length;
+            const activeCount = activePlans.filter(plan => (plan.plan_id || plan.id) !== 'free').length;
             if (activeCount >= 3) {
                 throw new Error("Solo se pueden tener máximo 3 planes activos (además del plan gratuito)");
             }
         }
 
-        const updatedPlan = await SettingsDataAccess.updateSubscriptionPlan(planId, {
-            isActive: !existingPlan.isActive,
-            updatedAt: new Date().toISOString()
-        });
-
+        const updatedPlan = await SettingsDataAccess.togglePlanStatus(planId);
         return updatedPlan;
     },
 
@@ -294,7 +336,7 @@ export const SettingsService = {
         const currentPlan = await this.getSubscriptionPlanById(currentSubscription.plan);
         const newPlan = await this.getSubscriptionPlanById(newPlanId);
 
-        const planHierarchy = { free: 0, bronze: 1, silver: 2, gold: 3 };
+        const planHierarchy = { free: 0, bronze: 1, silver: 2, gold: 3, platinum: 4 };
         
         return {
             isUpgrade: planHierarchy[newPlanId] > planHierarchy[currentSubscription.plan],
@@ -327,8 +369,16 @@ export const SettingsService = {
     calculateProrationAmount(currentPlan, newPlan, daysRemaining) {
         if (!currentPlan || !newPlan) return 0;
         
-        const dailyRateCurrent = currentPlan.price / 30;
-        const dailyRateNew = newPlan.price / 30;
+        let daysInPeriod = 30;
+        switch (currentPlan.duration) {
+            case 'weekly': daysInPeriod = 7; break;
+            case 'yearly': daysInPeriod = 365; break;
+            case 'monthly': 
+            default: daysInPeriod = 30; break;
+        }
+        
+        const dailyRateCurrent = currentPlan.price / daysInPeriod;
+        const dailyRateNew = newPlan.price / daysInPeriod;
         
         return (dailyRateNew - dailyRateCurrent) * daysRemaining;
     },

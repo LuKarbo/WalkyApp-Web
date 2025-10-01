@@ -13,9 +13,54 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, loading, isActive, i
     };
 
     const formatPrice = (price) => {
-        if (price === 0) return "Gratis";
-        return `$${price.toFixed(2)}`;
+        const numericPrice = Number(price);
+        if (numericPrice === 0) return "Gratis";
+        return `${numericPrice.toFixed(2)}`;
     };
+
+    const calculateDiscountedPrice = (price, discountPercentage) => {
+        const numericPrice = Number(price);
+        const discount = Number(discountPercentage) || 0;
+        if (discount > 0) {
+            return numericPrice - (numericPrice * discount / 100);
+        }
+        return numericPrice;
+    };
+
+    const hasDiscount = plan.discount_percentage > 0;
+    const originalPrice = Number(plan.price);
+    const discountedPrice = calculateDiscountedPrice(plan.price, plan.discount_percentage);
+
+    // Normalizar características desde diferentes formatos
+    const normalizeFeatures = (features) => {
+        if (!features) return [];
+        
+        if (Array.isArray(features)) {
+            return features.filter(f => f && f.trim());
+        }
+        
+        if (typeof features === 'string') {
+            try {
+                const parsed = JSON.parse(features);
+                if (Array.isArray(parsed)) {
+                    return parsed.filter(f => f && f.trim());
+                }
+            } catch {
+                return [features];
+            }
+        }
+        
+        if (typeof features === 'object') {
+            // Si es un objeto con boolean values, extraer solo los true
+            return Object.entries(features)
+                .filter(([key, value]) => value === true)
+                .map(([key]) => key.replace(/_/g, " "));
+        }
+        
+        return [];
+    };
+
+    const featureList = normalizeFeatures(plan.features);
 
     return (
         <div
@@ -41,7 +86,19 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, loading, isActive, i
                             {isActive ? "Activo" : "Inactivo"}
                         </span>
 
-                        <div className="text-2xl font-bold">{formatPrice(plan.price)}</div>
+                        {hasDiscount ? (
+                            <div className="flex flex-col items-end">
+                                <div className="text-sm line-through opacity-60">
+                                    {formatPrice(originalPrice)}
+                                </div>
+                                <div className="text-2xl font-bold">
+                                    {formatPrice(discountedPrice)}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-2xl font-bold">{formatPrice(plan.price)}</div>
+                        )}
+                        
                         {plan.price > 0 && <div className="text-xs opacity-90">/{plan.duration}</div>}
                     </div>
                 </div>
@@ -58,27 +115,38 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, loading, isActive, i
 
                 <div className="mb-4">
                     <h5 className="text-sm font-semibold text-foreground dark:text-background mb-2">
-                        Características ({plan.features?.length || 0})
+                        Características ({featureList.length || 0})
                     </h5>
                     <div className="space-y-1 max-h-24 overflow-y-auto">
-                        {plan.features?.slice(0, 3).map((feature, index) => (
+                        {featureList.slice(0, 3).map((feature, index) => (
                             <div key={index} className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0"></div>
-                                <span className="text-xs text-accent dark:text-muted line-clamp-1">{feature}</span>
+                                <span className="text-xs text-accent dark:text-muted line-clamp-1 capitalize">{feature}</span>
                             </div>
                         ))}
-                        {plan.features?.length > 3 && (
+                        {featureList.length > 3 && (
                             <span className="text-xs text-accent dark:text-muted italic">
-                                +{plan.features.length - 3} más...
+                                +{featureList.length - 3} más...
+                            </span>
+                        )}
+                        {featureList.length === 0 && (
+                            <span className="text-xs text-accent dark:text-muted italic">
+                                Sin características definidas
                             </span>
                         )}
                     </div>
                 </div>
 
-                {plan.createdAt && (
+                <div className="text-xs text-accent dark:text-muted mb-4">
+                    <p><strong>Max Paseos:</strong> {plan.max_walks === -1 ? 'Ilimitados' : plan.max_walks}</p>
+                    <p><strong>Soporte:</strong> {plan.support_level}</p>
+                    <p><strong>Cancelación:</strong> {plan.cancellation_policy}</p>
+                </div>
+
+                {plan.created_at && (
                     <div className="text-xs text-accent dark:text-muted mb-4">
-                        <p>Creado: {new Date(plan.createdAt).toLocaleDateString()}</p>
-                        <p>Actualizado: {new Date(plan.updatedAt).toLocaleDateString()}</p>
+                        <p>Creado: {new Date(plan.created_at).toLocaleDateString()}</p>
+                        <p>Actualizado: {new Date(plan.updated_at).toLocaleDateString()}</p>
                     </div>
                 )}
 
@@ -94,7 +162,7 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, loading, isActive, i
                         </button>
 
                         <button
-                            onClick={() => onToggleStatus(plan.id)}
+                            onClick={() => onToggleStatus(plan.plan_id)}
                             disabled={loading}
                             className={`flex items-center justify-center p-2 rounded-lg border-2 transition-all duration-200 disabled:opacity-50 ${
                                 isActive
@@ -107,7 +175,7 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, loading, isActive, i
                         </button>
 
                         <button
-                            onClick={() => onDelete(plan.id)}
+                            onClick={() => onDelete(plan.plan_id)}
                             disabled={loading}
                             className="flex items-center justify-center p-2 rounded-lg border-2 border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-all duration-200 disabled:opacity-50"
                             title="Eliminar"

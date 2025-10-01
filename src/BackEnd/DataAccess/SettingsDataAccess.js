@@ -45,7 +45,23 @@ export const SettingsDataAccess = {
         return await SettingsAPI.deleteSubscriptionPlan(planId);
     },
 
+    async togglePlanStatus(planId) {
+        return await SettingsAPI.togglePlanStatus(planId);
+    },
+
     async getUsersWithPlan(planId) {
         return await SettingsAPI.getUsersWithPlan(planId);
+    },
+
+    async getSubscriptionStats() {
+        return await SettingsAPI.getSubscriptionStats();
+    },
+
+    async getPlanFeatures(planId) {
+        return await SettingsAPI.getPlanFeatures(planId);
+    },
+
+    async validatePlanTransition(fromPlanId, toPlanId) {
+        return await SettingsAPI.validatePlanTransition(fromPlanId, toPlanId);
     }
 };

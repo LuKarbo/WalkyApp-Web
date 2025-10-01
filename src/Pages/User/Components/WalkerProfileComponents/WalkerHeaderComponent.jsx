@@ -1,5 +1,5 @@
 import { AiOutlineStar } from "react-icons/ai";
-import { MdVerified, MdOutlineCancel, MdLocationOn, MdWork } from "react-icons/md";
+import { MdGpsFixed, MdGpsOff, MdLocationOn, MdWork } from "react-icons/md";
 
 const WalkerHeaderComponent = ({ 
     walkerData, 
@@ -20,9 +20,9 @@ const WalkerHeaderComponent = ({
                         alt={walkerData.fullName}
                         className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-primary/20"
                     />
-                    {walkerData.verified && (
+                    {walkerData.hasGPSTracking && (
                         <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-2">
-                            <MdVerified className="text-white w-6 h-6" />
+                            <MdGpsFixed className="text-white w-6 h-6" />
                         </div>
                     )}
                 </div>
@@ -33,10 +33,10 @@ const WalkerHeaderComponent = ({
                         <h1 className="text-3xl font-bold text-foreground dark:text-background">
                             {walkerData.fullName}
                         </h1>
-                        {walkerData.verified ? (
-                            <MdVerified className="text-green-500 w-6 h-6" />
+                        {walkerData.hasGPSTracker ? (
+                            <MdGpsFixed className="text-green-500 w-6 h-6" />
                         ) : (
-                            <MdOutlineCancel className="text-gray-400 w-6 h-6" />
+                            <MdGpsOff className="text-gray-400 w-6 h-6" />
                         )}
                     </div>
 
@@ -63,22 +63,6 @@ const WalkerHeaderComponent = ({
                         <span className="text-accent dark:text-muted">
                             {walkerData.location}
                         </span>
-                    </div>
-
-                    <div className="mb-4">
-                        <h3 className="text-sm font-semibold text-foreground dark:text-background mb-2">
-                            Especialidades:
-                        </h3>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                            {walkerData.specialties.map((specialty, index) => (
-                                <span
-                                    key={index}
-                                    className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full border border-primary/20"
-                                >
-                                    {specialty}
-                                </span>
-                            ))}
-                        </div>
                     </div>
 
                     <div className="flex justify-center md:justify-start mt-6">

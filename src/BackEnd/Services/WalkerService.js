@@ -2,51 +2,76 @@ import { WalkerDataAccess } from "../DataAccess/WalkerDataAccess.js";
 
 export const WalkerService = {
     async getWalkersForHome() {
-        const walkers = await WalkerDataAccess.getAllWalkers();
+        try {
+            const walkers = await WalkerDataAccess.getAllWalkers();
 
-        const walkersDTO = walkers.map(walker => ({
-            id: walker.id,
-            name: walker.name,
-            rating: walker.rating,
-            experience: walker.experience,
-            specialties: walker.specialties,
-            image: walker.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-            location: walker.location,
-            verified: walker.verified
-        }));
+            const realWalkers = walkers.filter(walker => !walker.isPlaceholder);
 
-        const walkerPlaceholder = {
-            id: 6,
-            isPlaceholder: true,
-            title: "¿Eres paseador?",
-            subtitle: "¡Únete a nosotros!",
-            description: "Esperamos tu gran servicio para completar nuestro equipo",
-            image: "https://images.unsplash.com/photo-1560807707-8cc77767d783"
-        };
+            const walkersDTO = realWalkers.map(walker => ({
+                ...walker
+            }));
 
-        return [...walkersDTO, walkerPlaceholder];
+            const topWalkers = walkersDTO.sort((a, b) => b.rating - a.rating).slice(0, 5);
+
+            const walkerPlaceholder = {
+                id: 6,
+                isPlaceholder: true,
+                title: "¿Eres paseador?",
+                subtitle: "¡Únete a nosotros!",
+                description: "Esperamos tu gran servicio para completar nuestro equipo",
+                image: "https://images.unsplash.com/photo-1560807707-8cc77767d783"
+            };
+
+            return [...topWalkers, walkerPlaceholder];
+        } catch (error) {
+            console.error('Service - Error al obtener paseadores para home:', error);
+            
+            return [{
+                id: 6,
+                isPlaceholder: true,
+                title: "¿Eres paseador?",
+                subtitle: "¡Únete a nosotros!",
+                description: "Esperamos tu gran servicio para completar nuestro equipo",
+                image: "https://images.unsplash.com/photo-1560807707-8cc77767d783"
+            }];
+        }
+    },
+
+    async getAllWalkers() {
+        try {
+            const walkers = await WalkerDataAccess.getAllWalkers();
+
+            const realWalkers = walkers.filter(walker => !walker.isPlaceholder);
+
+            const walkersDTO = realWalkers.map(walker => ({
+                ...walker
+            }));
+
+            return [...walkersDTO];
+        } catch (error) {
+            console.error('Service - Error al obtener paseadores para home:', error);
+            
+            return [];
+        }
     },
 
     async getWalkerProfile(id) {
-        const walker = await WalkerDataAccess.getWalkerById(id);
-        
-        if (!walker) {
-            throw new Error("Walker not found");
+        try {
+            const walker = await WalkerDataAccess.getWalkerById(id);
+            
+            if (!walker) {
+                throw new Error("Walker not found");
+            }
+
+            const walkerProfileDTO = {
+                ...walker
+            };
+
+            return walkerProfileDTO;
+        } catch (error) {
+            console.error(`Service - Error al obtener perfil del paseador ${id}:`, error);
+            throw error;
         }
-
-        // Transformar los datos para el perfil
-        const walkerProfileDTO = {
-            id: walker.id,
-            fullName: walker.name,
-            rating: walker.rating,
-            experienceYears: walker.experience,
-            specialties: walker.specialties.split(', '),
-            profileImage: walker.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-            location: walker.location,
-            verified: walker.verified
-        };
-
-        return walkerProfileDTO;
     },
 
     async getWalkerSettings(walkerId) {
@@ -61,7 +86,9 @@ export const WalkerService = {
             pricePerPet: walkerSettings.pricePerPet || 0,
             hasGPSTracker: walkerSettings.hasGPSTracker || false,
             hasDiscount: walkerSettings.hasDiscount || false,
-            discountPercentage: walkerSettings.discountPercentage || 0
+            discountPercentage: walkerSettings.discountPercentage || 0,
+            hasMercadoPago: walkerSettings.hasMercadoPago || false,
+            tokenMercadoPago: walkerSettings.tokenMercadoPago || null
         };
     },
 
@@ -87,6 +114,10 @@ export const WalkerService = {
             settings.discountPercentage = 0;
         }
 
+        if (settings.hasMercadoPago === false) {
+            settings.tokenMercadoPago = null;
+        }
+
         const updatedSettings = await WalkerDataAccess.updateWalkerSettings(walkerId, settings);
         
         return {
@@ -95,6 +126,38 @@ export const WalkerService = {
             hasGPSTracker: updatedSettings.hasGPSTracker,
             hasDiscount: updatedSettings.hasDiscount,
             discountPercentage: updatedSettings.discountPercentage,
+            hasMercadoPago: updatedSettings.hasMercadoPago,
+            tokenMercadoPago: updatedSettings.tokenMercadoPago,
+            updatedAt: updatedSettings.updatedAt
+        };
+    },
+
+    async updateWalkerMercadoPago(walkerId, mercadoPagoData) {
+        
+        if (!walkerId) {
+            throw new Error("Walker ID is required");
+        }
+
+        if (!mercadoPagoData) {
+            throw new Error("MercadoPago data is required");
+        }
+
+        const { hasMercadoPago, tokenMercadoPago } = mercadoPagoData;
+
+        if (hasMercadoPago && (!tokenMercadoPago || tokenMercadoPago.trim() === '')) {
+            throw new Error("Token de MercadoPago es requerido cuando está habilitado");
+        }
+
+        const settingsToUpdate = {
+            hasMercadoPago, 
+            tokenMercadoPago: hasMercadoPago ? tokenMercadoPago : null
+        };
+
+        const updatedSettings = await WalkerDataAccess.updateWalkerMercadoPago(walkerId, settingsToUpdate);
+
+        return {
+            hasMercadoPago: updatedSettings.hasMercadoPago,
+            tokenMercadoPago: updatedSettings.tokenMercadoPago,
             updatedAt: updatedSettings.updatedAt
         };
     },
@@ -181,8 +244,9 @@ export const WalkerService = {
         };
     },
 
-    async calculateWalkerEarnings(walkerId, walks) {
-        if (!walkerId || !walks) {
+    async calculateWalkerEarnings(walkerId) {
+    try {
+        if (!walkerId) {
             return {
                 monthly: 0,
                 total: 0,
@@ -190,42 +254,21 @@ export const WalkerService = {
             };
         }
 
-        const walkerSettings = await this.getWalkerSettings(walkerId);
-        const defaultPrice = walkerSettings.pricePerPet || 15000;
-
-        const completedWalks = walks.filter(walk => walk.status === 'Finalizado');
-        
-        const monthlyEarnings = completedWalks.reduce((total, walk) => {
-            const walkDate = new Date(walk.startTime);
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-            
-            if (walkDate.getMonth() === currentMonth && walkDate.getFullYear() === currentYear) {
-                let price = walk.price || defaultPrice;
-                
-                if (walkerSettings.hasDiscount && walkerSettings.discountPercentage > 0) {
-                    price = price * (1 - walkerSettings.discountPercentage / 100);
-                }
-                
-                return total + price;
-            }
-            return total;
-        }, 0);
-        
-        const totalEarnings = completedWalks.reduce((total, walk) => {
-            let price = walk.price || defaultPrice;
-            
-            if (walkerSettings.hasDiscount && walkerSettings.discountPercentage > 0) {
-                price = price * (1 - walkerSettings.discountPercentage / 100);
-            }
-            
-            return total + price;
-        }, 0);
+        const earnings = await WalkerDataAccess.getWalkerEarnings(walkerId);
         
         return {
-            monthly: monthlyEarnings,
-            total: totalEarnings,
-            completedWalks: completedWalks.length
+            monthly: earnings.monthly,
+            total: earnings.total,
+            completedWalks: earnings.completedWalks
+        };
+    } catch (error) {
+        console.error(`Service - Error al calcular ganancias del paseador ${walkerId}:`, error);
+        
+        return {
+            monthly: 0,
+            total: 0,
+            completedWalks: 0
         };
     }
+}
 };

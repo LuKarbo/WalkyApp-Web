@@ -1,368 +1,235 @@
+import apiClient from '../ApiClient.js';
+
 export const SettingsAPI = {
-    
-    userSettings: {
-        1: {
-            email: 'juan.perez@example.com',
-            notifications: {
-                walkStatus: true,
-                announcements: true,
-                subscription: false,
-                messages: true,
-                systemAlerts: true
-            },
-            updatedAt: '2025-01-15T10:30:00Z'
-        },
-        2: {
-            email: 'maria.garcia@example.com',
-            notifications: {
-                walkStatus: true,
-                announcements: false,
-                subscription: true,
-                messages: true,
-                systemAlerts: false
-            },
-            updatedAt: '2025-01-10T15:45:00Z'
-        },
-        3: {
-            email: 'carlos.lopez@example.com',
-            notifications: {
-                walkStatus: false,
-                announcements: true,
-                subscription: true,
-                messages: false,
-                systemAlerts: true
-            },
-            updatedAt: '2025-01-12T09:20:00Z'
-        }
-    },
-
-    userSubscriptions: {
-        1: {
-            plan: 'silver',
-            startDate: '2024-12-01T00:00:00Z',
-            expiryDate: '2025-01-01T00:00:00Z',
-            isActive: true
-        },
-        2: {
-            plan: 'bronze',
-            startDate: '2024-11-15T00:00:00Z',
-            expiryDate: '2025-02-15T00:00:00Z',
-            isActive: true
-        },
-        3: {
-            plan: 'free',
-            startDate: null,
-            expiryDate: null,
-            isActive: true
-        }
-    },
-
-    subscriptionPlans: [
-        {
-            id: 'free',
-            name: 'Free Plan',
-            price: 0,
-            duration: 'forever',
-            category: 'basic',
-            features: [
-                'Up to 2 walks per month',
-                'Basic walkers',
-                'Email support',
-                'Basic notifications'
-            ],
-            description: 'Perfecto para comenzar y probar nuestros servicios básicos',
-            maxWalks: 2,
-            hasGPS: false,
-            hasPhotos: false,
-            hasPremiumWalkers: false,
-            supportLevel: 'email',
-            cancellationPolicy: 'none',
-            isActive: true,
-            createdAt: '2024-01-01T00:00:00Z',
-            updatedAt: '2024-01-01T00:00:00Z'
-        },
-        {
-            id: 'bronze',
-            name: 'Bronze',
-            price: 9.99,
-            duration: 'monthly',
-            category: 'standard',
-            features: [
-                'Up to 8 walks per month',
-                'Real-time GPS tracking',
-                'Walk photos',
-                'Verified walkers',
-                'Priority support',
-                'Activity reports'
-            ],
-            description: 'Ideal para mascotas que necesitan paseos regulares con seguimiento',
-            maxWalks: 8,
-            hasGPS: true,
-            hasPhotos: true,
-            hasPremiumWalkers: false,
-            supportLevel: 'priority',
-            cancellationPolicy: 'standard',
-            isActive: true,
-            createdAt: '2024-06-01T00:00:00Z',
-            updatedAt: '2024-06-01T00:00:00Z'
-        },
-        {
-            id: 'silver',
-            name: 'Silver',
-            price: 19.99,
-            duration: 'monthly',
-            category: 'premium',
-            features: [
-                'Up to 15 walks per month',
-                'Premium walkers access',
-                'Real-time GPS tracking',
-                'Photos and videos',
-                'Free cancellation 24h',
-                '24/7 support',
-                'Detailed reports',
-                '10% discount on extras'
-            ],
-            description: 'La opción más popular con acceso premium y beneficios exclusivos',
-            maxWalks: 15,
-            hasGPS: true,
-            hasPhotos: true,
-            hasVideos: true,
-            hasPremiumWalkers: true,
-            supportLevel: '24/7',
-            cancellationPolicy: 'flexible',
-            discountPercentage: 10,
-            isActive: true,
-            createdAt: '2024-06-01T00:00:00Z',
-            updatedAt: '2024-06-01T00:00:00Z'
-        },
-        {
-            id: 'gold',
-            name: 'Gold',
-            price: 39.99,
-            duration: 'monthly',
-            category: 'vip',
-            features: [
-                'Unlimited walks',
-                'VIP walker access',
-                'Premium GPS with history',
-                'HD videos',
-                'Free cancellation anytime',
-                'Dedicated 24/7 support',
-                'Monthly vet reports',
-                '20% discount on extras',
-                'Emergency service',
-                'Night walks available'
-            ],
-            description: 'El plan más completo para el máximo cuidado de tu mascota',
-            maxWalks: -1, 
-            hasGPS: true,
-            hasPhotos: true,
-            hasVideos: true,
-            hasHDVideos: true,
-            hasPremiumWalkers: true,
-            hasVIPWalkers: true,
-            supportLevel: 'dedicated',
-            cancellationPolicy: 'anytime',
-            discountPercentage: 20,
-            hasEmergencyService: true,
-            hasNightWalks: true,
-            hasVetReports: true,
-            isActive: true,
-            createdAt: '2024-06-01T00:00:00Z',
-            updatedAt: '2024-06-01T00:00:00Z'
-        },
-        {
-            id: 'platinum',
-            name: 'Platinum',
-            price: 59.99,
-            duration: 'monthly',
-            category: 'exclusive',
-            features: [
-                'Unlimited premium walks',
-                'Personal dedicated walker',
-                'Live video streaming',
-                'Veterinary consultations included',
-                'Pet grooming discounts',
-                'Priority emergency response',
-                'Custom walk schedules',
-                'Monthly health reports'
-            ],
-            description: 'El plan más exclusivo con servicios personalizados',
-            maxWalks: -1,
-            hasGPS: true,
-            hasPhotos: true,
-            hasVideos: true,
-            hasHDVideos: true,
-            hasPremiumWalkers: true,
-            hasVIPWalkers: true,
-            hasPersonalWalker: true,
-            supportLevel: 'dedicated',
-            cancellationPolicy: 'anytime',
-            discountPercentage: 25,
-            hasEmergencyService: true,
-            hasNightWalks: true,
-            hasVetReports: true,
-            hasLiveStreaming: true,
-            hasVetConsultations: true,
-            isActive: false,
-            createdAt: '2024-09-01T00:00:00Z',
-            updatedAt: '2024-09-01T00:00:00Z'
-        }
-    ],
-
     async getUserSettings(userId) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        const userIdInt = parseInt(userId);
-        const settings = this.userSettings[userIdInt];
-        
-        if (!settings) {
-            return {
-                email: '',
-                notifications: {
-                    walkStatus: true,
-                    announcements: true,
-                    subscription: true,
-                    messages: true,
-                    systemAlerts: true
-                },
-                updatedAt: new Date().toISOString()
-            };
+        try {
+            if (!userId) {
+                throw new Error('ID de usuario requerido');
+            }
+
+            const response = await apiClient.get(`/settings/users/${userId}`);
+            return response.data.settings || null;
+        } catch (error) {
+            console.error(`Error al obtener configuraciones del usuario ${userId}:`, error);
+            throw error;
         }
-        
-        return settings;
     },
 
     async updateUserSettings(userId, settings) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const userIdInt = parseInt(userId);
-        const currentSettings = this.userSettings[userIdInt] || {};
+        try {
+            if (!userId) {
+                throw new Error('ID de usuario requerido');
+            }
 
-        this.userSettings[userIdInt] = {
-            ...currentSettings,
-            ...settings,
-            updatedAt: new Date().toISOString()
-        };
-        
-        return this.userSettings[userIdInt];
+            if (!settings) {
+                throw new Error('Datos de configuración requeridos');
+            }
+
+            const response = await apiClient.put(`/settings/users/${userId}`, settings);
+            return response.data.settings || null;
+        } catch (error) {
+            console.error(`Error al actualizar configuraciones del usuario ${userId}:`, error);
+            throw error;
+        }
     },
 
     async getUserSubscription(userId) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        const userIdInt = parseInt(userId);
-        const subscription = this.userSubscriptions[userIdInt];
-        
-        return subscription || null;
+        try {
+            if (!userId) {
+                throw new Error('ID de usuario requerido');
+            }
+
+            const response = await apiClient.get(`/settings/users/${userId}/subscription`);
+            return response.data.subscription || null;
+        } catch (error) {
+            console.error(`Error al obtener suscripción del usuario ${userId}:`, error);
+            if (error.message && error.message.includes('404')) {
+                return null;
+            }
+            throw error;
+        }
     },
 
     async updateSubscription(userId, subscriptionData) {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const userIdInt = parseInt(userId);
-        
-        this.userSubscriptions[userIdInt] = {
-            ...subscriptionData,
-            updatedAt: new Date().toISOString()
-        };
-        
-        return this.userSubscriptions[userIdInt];
+        try {
+            if (!userId) {
+                throw new Error('ID de usuario requerido');
+            }
+
+            if (!subscriptionData) {
+                throw new Error('Datos de suscripción requeridos');
+            }
+
+            const response = await apiClient.put(`/settings/users/${userId}/subscription`, subscriptionData);
+            return response.data.subscription || null;
+        } catch (error) {
+            console.error(`Error al actualizar suscripción del usuario ${userId}:`, error);
+            throw error;
+        }
     },
 
     async getSubscriptionPlans() {
-        await new Promise(resolve => setTimeout(resolve, 150));
-        return this.subscriptionPlans.filter(plan => plan.isActive);
+        try {
+            const response = await apiClient.get('/settings/subscription-plans?active=true');
+            return response.data.plans || [];
+        } catch (error) {
+            console.error('Error al obtener planes de suscripción activos:', error);
+            throw error;
+        }
     },
 
     async getAllSubscriptionPlans() {
-        await new Promise(resolve => setTimeout(resolve, 150));
-        return [...this.subscriptionPlans];
+        try {
+            const response = await apiClient.get('/settings/subscription-plans/all');
+            return response.data.plans || [];
+        } catch (error) {
+            console.error('Error al obtener todos los planes de suscripción:', error);
+            throw error;
+        }
     },
 
     async getActiveSubscriptionPlans() {
-        await new Promise(resolve => setTimeout(resolve, 150));
-        return this.subscriptionPlans.filter(plan => plan.isActive);
+        try {
+            const response = await apiClient.get('/settings/subscription-plans/active');
+            return response.data.plans || [];
+        } catch (error) {
+            console.error('Error al obtener planes de suscripción activos:', error);
+            throw error;
+        }
     },
 
     async getSubscriptionPlanById(planId) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        return this.subscriptionPlans.find(plan => plan.id === planId) || null;
+        try {
+            if (!planId) {
+                throw new Error('ID de plan requerido');
+            }
+
+            const response = await apiClient.get(`/settings/subscription-plans/${planId}`);
+            return response.data.plan || null;
+        } catch (error) {
+            console.error(`Error al obtener plan ${planId}:`, error);
+            if (error.message && error.message.includes('404')) {
+                return null;
+            }
+            throw error;
+        }
     },
 
     async createSubscriptionPlan(planData) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const newPlan = {
-            ...planData,
-            createdAt: planData.createdAt || new Date().toISOString(),
-            updatedAt: planData.updatedAt || new Date().toISOString()
-        };
+        try {
+            if (!planData) {
+                throw new Error('Datos de plan requeridos');
+            }
 
-        this.subscriptionPlans.push(newPlan);
-        return newPlan;
+            const { plan_id, name, price, features } = planData;
+
+            if (!plan_id || !name || price === undefined || !features) {
+                throw new Error('plan_id, name, price y features son requeridos');
+            }
+
+            const response = await apiClient.post('/settings/subscription-plans', planData);
+            return response.data.plan || null;
+        } catch (error) {
+            console.error('Error al crear plan de suscripción:', error);
+            throw error;
+        }
     },
 
     async updateSubscriptionPlan(planId, planData) {
-        await new Promise(resolve => setTimeout(resolve, 400));
-        
-        const planIndex = this.subscriptionPlans.findIndex(plan => plan.id === planId);
-        
-        if (planIndex === -1) {
-            throw new Error("Plan no encontrado");
+        try {
+            if (!planId) {
+                throw new Error('ID de plan requerido');
+            }
+
+            if (!planData) {
+                throw new Error('Datos de plan requeridos');
+            }
+
+            const response = await apiClient.put(`/settings/subscription-plans/${planId}`, planData);
+            return response.data.plan || null;
+        } catch (error) {
+            console.error(`Error al actualizar plan ${planId}:`, error);
+            throw error;
         }
-
-        this.subscriptionPlans[planIndex] = {
-            ...this.subscriptionPlans[planIndex],
-            ...planData,
-            id: planId,
-            updatedAt: new Date().toISOString()
-        };
-
-        return this.subscriptionPlans[planIndex];
     },
 
     async deleteSubscriptionPlan(planId) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        const planIndex = this.subscriptionPlans.findIndex(plan => plan.id === planId);
-        
-        if (planIndex === -1) {
-            throw new Error("Plan no encontrado");
-        }
+        try {
+            if (!planId) {
+                throw new Error('ID de plan requerido');
+            }
 
-        this.subscriptionPlans.splice(planIndex, 1);
-        return { message: "Plan eliminado exitosamente" };
+            const response = await apiClient.delete(`/settings/subscription-plans/${planId}`);
+            return response.data || { message: 'Plan eliminado exitosamente' };
+        } catch (error) {
+            console.error(`Error al eliminar plan ${planId}:`, error);
+            throw error;
+        }
+    },
+
+    async togglePlanStatus(planId) {
+        try {
+            if (!planId) {
+                throw new Error('ID de plan requerido');
+            }
+
+            const response = await apiClient.patch(`/settings/subscription-plans/${planId}/toggle-status`);
+            return response.data.plan || null;
+        } catch (error) {
+            console.error(`Error al cambiar estado del plan ${planId}:`, error);
+            throw error;
+        }
     },
 
     async getUsersWithPlan(planId) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        const usersWithPlan = [];
-        Object.entries(this.userSubscriptions).forEach(([userId, subscription]) => {
-            if (subscription.plan === planId) {
-                usersWithPlan.push(parseInt(userId));
+        try {
+            if (!planId) {
+                throw new Error('ID de plan requerido');
             }
-        });
-        
-        return usersWithPlan;
+
+            const response = await apiClient.get(`/settings/subscription-plans/${planId}/users`);
+            return response.data.users || [];
+        } catch (error) {
+            console.error(`Error al obtener usuarios con plan ${planId}:`, error);
+            throw error;
+        }
     },
 
     async getSubscriptionStats() {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const totalUsers = Object.keys(this.userSubscriptions).length;
-        const planCounts = this.subscriptionPlans.reduce((acc, plan) => {
-            acc[plan.id] = 0;
-            return acc;
-        }, {});
+        try {
+            const response = await apiClient.get('/settings/subscription-stats');
+            return response.data.stats || null;
+        } catch (error) {
+            console.error('Error al obtener estadísticas de suscripciones:', error);
+            throw error;
+        }
+    },
 
-        return {
-            totalUsers,
-            planDistribution: planCounts,
-            mostPopularPlan: Object.keys(planCounts).reduce((a, b) => 
-                planCounts[a] > planCounts[b] ? a : b
-            )
-        };
+    async getPlanFeatures(planId) {
+        try {
+            if (!planId) {
+                throw new Error('ID de plan requerido');
+            }
+
+            const response = await apiClient.get(`/settings/subscription-plans/${planId}/features`);
+            return response.data.features || null;
+        } catch (error) {
+            console.error(`Error al obtener características del plan ${planId}:`, error);
+            throw error;
+        }
+    },
+
+    async validatePlanTransition(fromPlanId, toPlanId) {
+        try {
+            if (!toPlanId) {
+                throw new Error('ID de plan destino requerido');
+            }
+
+            const response = await apiClient.get(`/settings/plan-transition/${fromPlanId || 'free'}/${toPlanId}/validate`);
+            return response.data.validation || null;
+        } catch (error) {
+            console.error(`Error al validar transición de plan ${fromPlanId} a ${toPlanId}:`, error);
+            throw error;
+        }
     }
 };

@@ -1,42 +1,73 @@
 import { useState, useEffect } from "react";
-import { FiX, FiDollarSign, FiType, FiFileText, FiToggleLeft, FiToggleRight, FiPlus, FiTrash2, FiTag } from "react-icons/fi";
+import { FiX, FiDollarSign, FiType, FiFileText, FiToggleLeft, FiToggleRight, FiPlus, FiTrash2, FiTag, FiClock, FiLayers } from "react-icons/fi";
 
 const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCount }) => {
     const [formData, setFormData] = useState({
-        id: '',
+        plan_id: '',
         name: '',
         price: 0,
         duration: 'monthly',
         category: 'standard',
         description: '',
+        max_walks: 0,
         features: [''],
-        isActive: false
+        support_level: 'email',
+        cancellation_policy: 'none',
+        discount_percentage: 0,
+        is_active: false
     });
 
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (planData) {
+            let normalizedFeatures = [''];
+            if (planData.features) {
+                if (Array.isArray(planData.features)) {
+                    normalizedFeatures = planData.features.length > 0 ? [...planData.features] : [''];
+                } else if (typeof planData.features === 'string') {
+                    try {
+                        const parsedFeatures = JSON.parse(planData.features);
+                        normalizedFeatures = Array.isArray(parsedFeatures) && parsedFeatures.length > 0 ? parsedFeatures : [''];
+                    } catch {
+                        normalizedFeatures = [planData.features];
+                    }
+                } else if (typeof planData.features === 'object') {
+                    normalizedFeatures = Object.entries(planData.features)
+                        .filter(([key, value]) => value === true)
+                        .map(([key]) => key.replace(/_/g, ' '));
+                    if (normalizedFeatures.length === 0) normalizedFeatures = [''];
+                }
+            }
+
             setFormData({
-                id: planData.id || '',
+                plan_id: planData.plan_id || '',
                 name: planData.name || '',
-                price: planData.price || 0,
+                price: Number(planData.price) || 0,
                 duration: planData.duration || 'monthly',
                 category: planData.category || 'standard',
                 description: planData.description || '',
-                features: planData.features?.length ? [...planData.features] : [''],
-                isActive: planData.isActive || false
+                max_walks: Number(planData.max_walks) || 0,
+                features: normalizedFeatures,
+                support_level: planData.support_level || 'email',
+                cancellation_policy: planData.cancellation_policy || 'none',
+                discount_percentage: Number(planData.discount_percentage) || 0,
+                is_active: Boolean(planData.is_active)
             });
         } else {
             setFormData({
-                id: '',
+                plan_id: '',
                 name: '',
                 price: 0,
                 duration: 'monthly',
                 category: 'standard',
                 description: '',
+                max_walks: 0,
                 features: [''],
-                isActive: false
+                support_level: 'email',
+                cancellation_policy: 'none',
+                discount_percentage: 0,
+                is_active: false
             });
         }
         setErrors({});
@@ -45,9 +76,9 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
     const validateForm = () => {
         const newErrors = {};
 
-        if (!formData.id.trim()) newErrors.id = 'El ID es requerido';
-        else if (formData.id.length < 3) newErrors.id = 'El ID debe tener al menos 3 caracteres';
-        else if (!/^[a-zA-Z0-9_-]+$/.test(formData.id)) newErrors.id = 'El ID solo puede contener letras, números, guiones y guiones bajos';
+        if (!formData.plan_id.trim()) newErrors.plan_id = 'El ID del plan es requerido';
+        else if (formData.plan_id.length < 3) newErrors.plan_id = 'El ID debe tener al menos 3 caracteres';
+        else if (!/^[a-zA-Z0-9_-]+$/.test(formData.plan_id)) newErrors.plan_id = 'El ID solo puede contener letras, números, guiones y guiones bajos';
 
         if (!formData.name.trim()) newErrors.name = 'El nombre es requerido';
         else if (formData.name.length < 3) newErrors.name = 'El nombre debe tener al menos 3 caracteres';
@@ -57,11 +88,17 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
         if (!formData.description.trim()) newErrors.description = 'La descripción es requerida';
         else if (formData.description.length > 500) newErrors.description = 'La descripción no puede tener más de 500 caracteres';
 
+        if (formData.max_walks < -1) newErrors.max_walks = 'El número de paseos no puede ser menor a -1 (usa -1 para ilimitado)';
+
         const validFeatures = formData.features.filter(feature => feature.trim());
         if (validFeatures.length === 0) newErrors.features = 'Debe incluir al menos una característica';
 
-        if (formData.isActive && !planData?.isActive && activePlansCount >= 3) {
-            newErrors.isActive = 'Solo se pueden tener máximo 3 planes activos (además del plan gratuito)';
+        if (formData.discount_percentage < 0 || formData.discount_percentage > 100) {
+            newErrors.discount_percentage = 'El descuento debe estar entre 0 y 100%';
+        }
+
+        if (formData.is_active && !planData?.is_active && activePlansCount >= 3) {
+            newErrors.is_active = 'Solo se pueden tener máximo 3 planes activos (además del plan gratuito)';
         }
 
         setErrors(newErrors);
@@ -82,15 +119,20 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
     };
 
     const removeFeature = (index) => {
-        const newFeatures = formData.features.filter((_, i) => i !== index);
-        setFormData(prev => ({ ...prev, features: newFeatures }));
+        if (formData.features.length > 1) {
+            const newFeatures = formData.features.filter((_, i) => i !== index);
+            setFormData(prev => ({ ...prev, features: newFeatures }));
+        }
     };
 
     const handleSubmit = () => {
         if (validateForm()) {
             const dataToSave = {
                 ...formData,
-                features: formData.features.filter(feature => feature.trim())
+                features: formData.features.filter(feature => feature.trim()),
+                price: Number(formData.price),
+                max_walks: Number(formData.max_walks),
+                discount_percentage: Number(formData.discount_percentage)
             };
             onSave(dataToSave);
         }
@@ -98,7 +140,7 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
 
     if (!isOpen) return null;
 
-    const canActivate = !formData.isActive && (planData?.isActive || activePlansCount < 3);
+    const canActivate = !formData.is_active && (planData?.is_active || activePlansCount < 3);
     const isEditing = !!planData;
 
     const categories = [
@@ -112,19 +154,34 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
     const durations = [
         { value: 'monthly', label: 'Mensual' },
         { value: 'yearly', label: 'Anual' },
-        { value: 'weekly', label: 'Semanal' }
+        { value: 'weekly', label: 'Semanal' },
+        { value: 'forever', label: 'Permanente' }
+    ];
+
+    const supportLevels = [
+        { value: 'email', label: 'Email' },
+        { value: 'priority', label: 'Prioritario' },
+        { value: '24/7', label: '24/7' },
+        { value: 'dedicated', label: 'Dedicado' }
+    ];
+
+    const cancellationPolicies = [
+        { value: 'none', label: 'Sin cancelación' },
+        { value: 'standard', label: 'Estándar (24h)' },
+        { value: 'flexible', label: 'Flexible (2h)' },
+        { value: 'anytime', label: 'Cualquier momento' }
     ];
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white/50 dark:bg-foreground/50 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl">
+            <div className="bg-white/95 dark:bg-foreground/95 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
 
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold">{isEditing ? 'Editar Plan' : 'Crear Plan'}</h2>
                             <p className="text-white/80 text-sm mt-1">
-                                {isEditing ? 'Modifica la información del plan' : 'Crea un nuevo plan de suscripción'}
+                                {isEditing ? 'Modifica la información del plan de suscripción' : 'Crea un nuevo plan de suscripción'}
                             </p>
                         </div>
                         <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition-colors">
@@ -141,15 +198,15 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
                             </label>
                             <input
                                 type="text"
-                                value={formData.id}
-                                onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value.toLowerCase() }))}
+                                value={formData.plan_id}
+                                onChange={(e) => setFormData(prev => ({ ...prev, plan_id: e.target.value.toLowerCase() }))}
                                 disabled={isEditing}
                                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-0 bg-white/50 dark:bg-foreground/50 text-foreground dark:text-background transition-all duration-200 ${
                                     isEditing ? 'opacity-50 cursor-not-allowed' : ''
-                                } ${errors.id ? 'border-danger focus:border-danger' : 'border-gray-200 focus:border-primary'}`}
+                                } ${errors.plan_id ? 'border-danger focus:border-danger' : 'border-gray-200 focus:border-primary'}`}
                                 placeholder="ej: premium-plus"
                             />
-                            {errors.id && <p className="text-danger text-sm mt-1">{errors.id}</p>}
+                            {errors.plan_id && <p className="text-danger text-sm mt-1">{errors.plan_id}</p>}
                             {isEditing && <p className="text-xs text-accent dark:text-muted mt-1">El ID no se puede modificar después de crear el plan</p>}
                         </div>
                         <div>
@@ -169,7 +226,7 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div>
                             <label className="flex items-center gap-2 text-sm font-medium text-foreground dark:text-background mb-2">
                                 <FiDollarSign size={16} /> Precio
@@ -208,6 +265,66 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
                             >
                                 {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                             </select>
+                        </div>
+
+                        <div>
+                            <label className="flex items-center gap-2 text-sm font-medium text-foreground dark:text-background mb-2">
+                                <FiLayers size={16} /> Max Paseos
+                            </label>
+                            <input
+                                type="number"
+                                min="-1"
+                                value={formData.max_walks}
+                                onChange={(e) => setFormData(prev => ({ ...prev, max_walks: parseInt(e.target.value) || 0 }))}
+                                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-0 bg-white/50 dark:bg-foreground/50 text-foreground dark:text-background transition-all duration-200 ${
+                                    errors.max_walks ? 'border-danger focus:border-danger' : 'border-gray-200 focus:border-primary'
+                                }`}
+                                placeholder="-1 para ilimitado"
+                            />
+                            {errors.max_walks && <p className="text-danger text-sm mt-1">{errors.max_walks}</p>}
+                            <p className="text-xs text-accent dark:text-muted mt-1">-1 para paseos ilimitados</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label className="text-sm font-medium text-foreground dark:text-background mb-2 block">Nivel de Soporte</label>
+                            <select
+                                value={formData.support_level}
+                                onChange={(e) => setFormData(prev => ({ ...prev, support_level: e.target.value }))}
+                                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary focus:ring-0 bg-white/50 dark:bg-foreground/50 text-foreground dark:text-background transition-all duration-200"
+                            >
+                                {supportLevels.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="text-sm font-medium text-foreground dark:text-background mb-2 block">Política de Cancelación</label>
+                            <select
+                                value={formData.cancellation_policy}
+                                onChange={(e) => setFormData(prev => ({ ...prev, cancellation_policy: e.target.value }))}
+                                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary focus:ring-0 bg-white/50 dark:bg-foreground/50 text-foreground dark:text-background transition-all duration-200"
+                            >
+                                {cancellationPolicies.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="flex items-center gap-2 text-sm font-medium text-foreground dark:text-background mb-2">
+                                % Descuento
+                            </label>
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={formData.discount_percentage}
+                                onChange={(e) => setFormData(prev => ({ ...prev, discount_percentage: parseInt(e.target.value) || 0 }))}
+                                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-0 bg-white/50 dark:bg-foreground/50 text-foreground dark:text-background transition-all duration-200 ${
+                                    errors.discount_percentage ? 'border-danger focus:border-danger' : 'border-gray-200 focus:border-primary'
+                                }`}
+                                placeholder="0"
+                            />
+                            {errors.discount_percentage && <p className="text-danger text-sm mt-1">{errors.discount_percentage}</p>}
                         </div>
                     </div>
 
@@ -270,8 +387,8 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
                     <div>
                         <label className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl bg-white/50 dark:bg-foreground/50">
                             <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-full ${formData.isActive ? 'bg-success/20' : 'bg-gray-200'}`}>
-                                    {formData.isActive
+                                <div className={`p-2 rounded-full ${formData.is_active ? 'bg-success/20' : 'bg-gray-200'}`}>
+                                    {formData.is_active
                                         ? <FiToggleRight className="text-success" size={20} />
                                         : <FiToggleLeft className="text-gray-500" size={20} />
                                     }
@@ -279,21 +396,21 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
                                 <div>
                                     <h4 className="font-medium text-foreground dark:text-background">Plan Activo</h4>
                                     <p className="text-sm text-accent dark:text-muted">
-                                        {formData.isActive ? 'Disponible para los usuarios' : 'No visible para los usuarios'}
+                                        {formData.is_active ? 'Disponible para los usuarios' : 'No visible para los usuarios'}
                                     </p>
                                 </div>
                             </div>
                             <button
                                 type="button"
-                                onClick={() => { if (canActivate || formData.isActive) setFormData(prev => ({ ...prev, isActive: !prev.isActive })); }}
-                                disabled={!canActivate && !formData.isActive}
-                                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 ${formData.isActive ? 'bg-success' : 'bg-gray-300'} ${(!canActivate && !formData.isActive) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                onClick={() => { if (canActivate || formData.is_active) setFormData(prev => ({ ...prev, is_active: !prev.is_active })); }}
+                                disabled={!canActivate && !formData.is_active}
+                                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 ${formData.is_active ? 'bg-success' : 'bg-gray-300'} ${(!canActivate && !formData.is_active) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                             >
-                                <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ${formData.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                                <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ${formData.is_active ? 'translate-x-6' : 'translate-x-1'}`} />
                             </button>
                         </label>
-                        {errors.isActive && <p className="text-danger text-sm mt-1">{errors.isActive}</p>}
-                        {!canActivate && !formData.isActive && (
+                        {errors.is_active && <p className="text-danger text-sm mt-1">{errors.is_active}</p>}
+                        {!canActivate && !formData.is_active && (
                             <p className="text-warning text-sm mt-1">
                                 No se puede activar: ya hay 3 planes activos (máximo permitido, además del plan gratuito)
                             </p>
@@ -305,7 +422,8 @@ const PlanModal = ({ isOpen, onClose, onSave, planData, isLoading, activePlansCo
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-2.5 text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors duration-200"
+                        disabled={isLoading}
+                        className="px-6 py-2.5 text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors duration-200 disabled:opacity-50"
                     >
                         Cancelar
                     </button>

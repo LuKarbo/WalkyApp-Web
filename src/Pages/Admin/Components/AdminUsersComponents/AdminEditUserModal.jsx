@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
-import { FiX, FiUser, FiMail, FiPhone, FiMapPin, FiShield, FiUserCheck, FiCreditCard, FiCamera } from "react-icons/fi";
+import { FiX, FiUser, FiPhone, FiMapPin, FiShield, FiUserCheck, FiCamera } from "react-icons/fi";
 
 const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
     const [formData, setFormData] = useState({
         name: "",
-        email: "",
         role: "",
         phone: "",
         location: "",
-        suscription: "",
         status: "",
         profileImage: ""
     });
@@ -19,11 +17,9 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
         if (isOpen && userData) {
             setFormData({
                 name: userData.fullName || "",
-                email: userData.email || "",
                 role: userData.role || "client",
                 phone: userData.phone && userData.phone !== "No disponible" ? userData.phone : "",
                 location: userData.location && userData.location !== "No disponible" ? userData.location : "",
-                suscription: userData.suscription || "Basic",
                 status: userData.status || "active",
                 profileImage: userData.profileImage || profileImageOptions[0]
             });
@@ -47,13 +43,6 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
         { value: "client", label: "Cliente" },
         { value: "walker", label: "Paseador" },
         { value: "support", label: "Soporte" }
-    ];
-
-    const subscriptionOptions = [
-        { value: "Basic", label: "Basic" },
-        { value: "Premium", label: "Premium" },
-        { value: "Professional", label: "Professional" },
-        { value: "Staff", label: "Staff" }
     ];
 
     const statusOptions = [
@@ -90,12 +79,6 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
             newErrors.name = "El nombre es obligatorio";
         }
 
-        if (!formData.email.trim()) {
-            newErrors.email = "El email es obligatorio";
-        } else if (!formData.email.includes("@")) {
-            newErrors.email = "Email inválido";
-        }
-
         if (!formData.role) {
             newErrors.role = "El rol es obligatorio";
         }
@@ -119,13 +102,12 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
             return;
         }
 
+        // Solo enviamos los campos que el admin puede editar
         const updatedUserData = {
             name: formData.name.trim(),
-            email: formData.email.toLowerCase().trim(),
             role: formData.role,
             phone: formData.phone.trim(),
             location: formData.location.trim(),
-            suscription: formData.suscription,
             status: formData.status,
             profileImage: formData.profileImage
         };
@@ -136,11 +118,9 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
     const handleClose = () => {
         setFormData({
             name: "",
-            email: "",
             role: "",
             phone: "",
             location: "",
-            suscription: "",
             status: "",
             profileImage: ""
         });
@@ -178,6 +158,7 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
 
+                    {/* Información del usuario (solo lectura) */}
                     <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20">
                         <div className="flex items-center space-x-4">
                             <img
@@ -188,7 +169,7 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
                             <div>
                                 <h3 className="font-semibold text-foreground dark:text-background">{userData.fullName}</h3>
                                 <p className="text-sm text-accent dark:text-muted">
-                                    {userData.email} • {userData.role}
+                                    {userData.email} • {userData.suscription}
                                 </p>
                                 <p className="text-xs text-blue-600 font-medium">
                                     Estado: {userData.status === 'active' ? 'Activo' : 'Inactivo'}
@@ -197,6 +178,7 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
                         </div>
                     </div>
 
+                    {/* Selección de imagen de perfil */}
                     <div>
                         <label className="block text-sm font-medium text-foreground dark:text-background mb-3">
                             <FiCamera className="inline mr-2" />
@@ -233,6 +215,7 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         
+                        {/* Nombre completo */}
                         <div>
                             <label className="block text-sm font-medium text-foreground dark:text-background mb-2">
                                 <FiUser className="inline mr-2" />
@@ -253,26 +236,7 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
                             )}
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-foreground dark:text-background mb-2">
-                                <FiMail className="inline mr-2" />
-                                Email *
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-lg bg-background dark:bg-foreground text-foreground dark:text-background focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.email ? 'border-red-500' : 'border-border dark:border-muted'
-                                }`}
-                                placeholder="email@ejemplo.com"
-                            />
-                            {errors.email && (
-                                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                            )}
-                        </div>
-
+                        {/* Rol */}
                         <div>
                             <label className="block text-sm font-medium text-foreground dark:text-background mb-2">
                                 <FiShield className="inline mr-2" />
@@ -297,6 +261,7 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
                             )}
                         </div>
 
+                        {/* Estado */}
                         <div>
                             <label className="block text-sm font-medium text-foreground dark:text-background mb-2">
                                 <FiUserCheck className="inline mr-2" />
@@ -321,6 +286,7 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
                             )}
                         </div>
 
+                        {/* Teléfono */}
                         <div>
                             <label className="block text-sm font-medium text-foreground dark:text-background mb-2">
                                 <FiPhone className="inline mr-2" />
@@ -340,27 +306,9 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
                                 <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
                             )}
                         </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-foreground dark:text-background mb-2">
-                                <FiCreditCard className="inline mr-2" />
-                                Suscripción
-                            </label>
-                            <select
-                                name="suscription"
-                                value={formData.suscription}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border border-border dark:border-muted rounded-lg bg-background dark:bg-foreground text-foreground dark:text-background focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                {subscriptionOptions.map(option => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
                     </div>
 
+                    {/* Ubicación */}
                     <div>
                         <label className="block text-sm font-medium text-foreground dark:text-background mb-2">
                             <FiMapPin className="inline mr-2" />
@@ -381,7 +329,7 @@ const AdminEditUserModal = ({ isOpen, onClose, userData, onSave }) => {
                             ⚠️ Vista de Administrador
                         </p>
                         <p className="text-yellow-600 dark:text-yellow-300 text-xs mt-1">
-                            Estás editando información de usuario. Los cambios se aplicarán inmediatamente y podrían afectar el acceso del usuario.
+                            Solo puedes editar: imagen, nombre, rol, estado, teléfono y ubicación. El email y suscripción no son modificables.
                         </p>
                     </div>
 

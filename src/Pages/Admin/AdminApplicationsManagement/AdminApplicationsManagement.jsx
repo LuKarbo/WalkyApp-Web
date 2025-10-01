@@ -110,10 +110,6 @@ const AdminApplicationsManagement = () => {
                 adminNotes
             );
 
-            if (reviewAction === 'approve') {
-                await UserController.promoteUserToWalker(selectedApplication.userId);
-            }
-
             await loadApplications();
             await loadStats();
 

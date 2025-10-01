@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { MdClose, MdLocationOn, MdAccessTime, MdPets, MdVerified } from "react-icons/md";
+import { MdClose, MdLocationOn, MdAccessTime, MdPets, MdGpsFixed, MdGpsOff } from "react-icons/md";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { PetsController } from '../../../BackEnd/Controllers/PetsController';
 import { WalksController } from '../../../BackEnd/Controllers/WalksController';
+import { WalkerController } from '../../../BackEnd/Controllers/WalkerController';
 import { useUser } from '../../../BackEnd/Context/UserContext';
 
 const GetServiceModal = ({ 
@@ -18,19 +19,28 @@ const GetServiceModal = ({
     const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false);
     const [loadingPets, setLoadingPets] = useState(true);
+    const [loadingWalkerData, setLoadingWalkerData] = useState(false);
     const [error, setError] = useState(null);
+    const [walkerSettings, setWalkerSettings] = useState(null);
 
     const user = useUser();
     const userId = user?.id;
 
-    const pricePerPet = walker?.pricePerPet || 15000;
-    const hasGPSTracking = walker?.hasGPSTracking || true;
+    // Usar datos del walker o valores por defecto
+    const pricePerPet = walkerSettings?.pricePerPet || walker?.pricePerPet || 15000;
+    const hasGPSTracking = walkerSettings?.hasGPSTracker || walker?.hasGPSTracker || false;
 
     useEffect(() => {
         if (isOpen && userId) {
             loadUserPets();
         }
     }, [isOpen, userId]);
+
+    useEffect(() => {
+        if (isOpen && walker?.id) {
+            loadWalkerSettings();
+        }
+    }, [isOpen, walker]);
 
     const loadUserPets = async () => {
         try {
@@ -39,10 +49,29 @@ const GetServiceModal = ({
             const userPets = await PetsController.fetchPetsByOwner(userId);
             setPets(userPets);
         } catch (err) {
-            setError('Error loading pets: ' + err.message);
+            setError('Error cargando mascotas: ' + err.message);
             console.error('Error loading pets:', err);
         } finally {
             setLoadingPets(false);
+        }
+    };
+
+    const loadWalkerSettings = async () => {
+        try {
+            setLoadingWalkerData(true);
+            const settings = await WalkerController.fetchWalkerSettings(walker.id);
+            setWalkerSettings(settings);
+        } catch (err) {
+            console.error('Error loading walker settings:', err);
+            
+            setWalkerSettings({
+                pricePerPet: 15000,
+                hasGPSTracker: false,
+                hasDiscount: false,
+                discountPercentage: 0
+            });
+        } finally {
+            setLoadingWalkerData(false);
         }
     };
 
@@ -54,51 +83,20 @@ const GetServiceModal = ({
         );
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        if (selectedPets.length === 0) {
-            setError('Debe seleccionar al menos una mascota');
-            return;
+    const calculateFinalPrice = () => {
+        const basePrice = pricePerPet * selectedPets.length;
+        if (walkerSettings?.hasDiscount && walkerSettings?.discountPercentage > 0) {
+            const discountAmount = basePrice * (walkerSettings.discountPercentage / 100);
+            return basePrice - discountAmount;
         }
-
-        if (!walkDate || !walkTime) {
-            setError('Debe seleccionar fecha y hora');
-            return;
-        }
-
-        try {
-            setLoading(true);
-            setError(null);
-
-            const walkRequest = {
-                walkerId: walker.id,
-                ownerId: userId,
-                petIds: selectedPets,
-                scheduledDateTime: `${walkDate}T${walkTime}`,
-                description: description,
-                totalPrice: selectedPets.length * pricePerPet,
-                status: 'Pending'
-            };
-
-            await WalksController.createWalkRequest(walkRequest);
-            
-            onRequestSent && onRequestSent();
-            onClose();
-            
-            setSelectedPets([]);
-            setWalkDate('');
-            setWalkTime('');
-            setDescription('');
-        } catch (err) {
-            setError('Error creating walk request: ' + err.message);
-            console.error('Error creating walk request:', err);
-        } finally {
-            setLoading(false);
-        }
+        return basePrice;
     };
 
-    const totalPrice = selectedPets.length * pricePerPet;
+    const handleSubmit = async (e) => {
+        console.log("SOlicitud Enviada")
+    };
+
+    const totalPrice = calculateFinalPrice();
 
     if (!isOpen) return null;
 
@@ -135,13 +133,15 @@ const GetServiceModal = ({
                                 <h3 className="text-xl font-semibold text-foreground dark:text-background">
                                     {walker?.name}
                                 </h3>
-                                {walker?.verified && (
-                                    <MdVerified className="text-green-500 w-5 h-5" />
+                                {hasGPSTracking ? (
+                                    <MdGpsFixed className="text-green-500 w-5 h-5" />
+                                ) : (
+                                    <MdGpsOff className="text-gray-400 w-5 h-5" />
                                 )}
                             </div>
                             <div className="flex items-center space-x-1 text-accent dark:text-muted">
                                 <FaMapMarkerAlt className="w-4 h-4" />
-                                <span>{walker?.location}</span>
+                                <span>{walker?.location || 'Ubicación no disponible'}</span>
                             </div>
                             <p className="text-sm text-accent dark:text-muted mt-1">
                                 {walker?.experience}
@@ -151,16 +151,37 @@ const GetServiceModal = ({
 
                     <div className="mt-4 grid grid-cols-2 gap-4">
                         <div className="bg-primary/10 p-3 rounded-lg">
-                            <p className="text-sm text-accent dark:text-muted">Precio por mascota</p>
-                            <p className="text-lg font-semibold text-foreground dark:text-background">
-                                ${pricePerPet.toLocaleString()}
-                            </p>
+                            <div className="flex flex-col">
+                                <p className="text-sm text-accent dark:text-muted">Precio por mascota</p>
+                                {loadingWalkerData ? (
+                                    <p className="text-lg font-semibold text-foreground dark:text-background">
+                                        Cargando...
+                                    </p>
+                                ) : (
+                                    <>
+                                        <p className="text-lg font-semibold text-foreground dark:text-background">
+                                            ${pricePerPet.toLocaleString()}
+                                        </p>
+                                        {walkerSettings?.hasDiscount && walkerSettings?.discountPercentage > 0 && (
+                                            <p className="text-sm text-green-600 font-medium">
+                                                {walkerSettings.discountPercentage}% descuento aplicado
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <div className="bg-primary/10 p-3 rounded-lg">
                             <p className="text-sm text-accent dark:text-muted">Rastreo GPS</p>
-                            <p className="text-lg font-semibold text-green-500">
-                                {hasGPSTracking ? '✓ Activo' : '✗ No disponible'}
-                            </p>
+                            {loadingWalkerData ? (
+                                <p className="text-lg font-semibold text-foreground dark:text-background">
+                                    Cargando...
+                                </p>
+                            ) : (
+                                <p className={`text-lg font-semibold ${hasGPSTracking ? 'text-green-500' : 'text-gray-500'}`}>
+                                    {hasGPSTracking ? '✓ Activo' : '✗ No disponible'}
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -199,6 +220,9 @@ const GetServiceModal = ({
                                                 src={pet.image}
                                                 alt={pet.name}
                                                 className="w-12 h-12 rounded-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = "https://images.unsplash.com/photo-1601758228041-f3b2795255f1";
+                                                }}
                                             />
                                             <div className="flex-1">
                                                 <p className="font-semibold text-foreground dark:text-background">
@@ -267,7 +291,7 @@ const GetServiceModal = ({
                         />
                     </div>
 
-                    {selectedPets.length > 0 && (
+                    {selectedPets.length > 0 && !loadingWalkerData && (
                         <div className="mb-6 p-4 bg-primary/10 rounded-lg">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-foreground dark:text-background">
@@ -277,6 +301,16 @@ const GetServiceModal = ({
                                     ${(selectedPets.length * pricePerPet).toLocaleString()}
                                 </span>
                             </div>
+                            
+                            {walkerSettings?.hasDiscount && walkerSettings?.discountPercentage > 0 && (
+                                <div className="flex justify-between items-center mb-2 text-green-600">
+                                    <span>Descuento ({walkerSettings.discountPercentage}%)</span>
+                                    <span>
+                                        -${((selectedPets.length * pricePerPet * walkerSettings.discountPercentage) / 100).toLocaleString()}
+                                    </span>
+                                </div>
+                            )}
+                            
                             <div className="border-t border-primary/20 pt-2">
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-semibold text-foreground dark:text-background">
@@ -300,10 +334,12 @@ const GetServiceModal = ({
                         </button>
                         <button
                             type="submit"
-                            disabled={loading || selectedPets.length === 0}
+                            disabled={loading || selectedPets.length === 0 || loadingWalkerData}
                             className="flex-1 py-3 px-4 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Enviando...' : `Solicitar Paseo - $${totalPrice.toLocaleString()}`}
+                            {loading ? 'Enviando...' : 
+                                loadingWalkerData ? 'Cargando...' : 
+                                `Solicitar Paseo - $${totalPrice.toLocaleString()}`}
                         </button>
                     </div>
                 </form>

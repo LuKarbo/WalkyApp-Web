@@ -7,12 +7,13 @@ import WalkerReviewsComponent from "../Components/WalkerProfileComponents/Walker
 import GetServiceModal from "../Modals/GetServiceModal";
 
 const WalkerProfile = ({ id }) => {
-    console.log(id);
+    
     const { walkerId } = id || {};
-    console.log(walkerId);
+    
     const { navigateToContent } = useNavigation();
     
     const [walkerData, setWalkerData] = useState(null);
+    const [walkerSettings, setWalkerSettings] = useState(null);
     const [loadingWalker, setLoadingWalker] = useState(true);
     const [walkerError, setWalkerError] = useState(null);
     
@@ -33,8 +34,23 @@ const WalkerProfile = ({ id }) => {
             setWalkerError(null);
             if (!walkerId) return;
             
-            const data = await WalkerController.fetchWalkerProfile(walkerId);
-            setWalkerData(data);
+            const [walkerProfile, walkerConfig] = await Promise.all([
+                WalkerController.fetchWalkerProfile(walkerId),
+                WalkerController.fetchWalkerSettings(walkerId).catch(err => {
+                    console.warn('Error loading walker settings:', err);
+                    
+                    return {
+                        pricePerPet: 15000,
+                        hasGPSTracker: false,
+                        hasDiscount: false,
+                        discountPercentage: 0,
+                        location: 'Ubicación no disponible'
+                    };
+                })
+            ]);
+            
+            setWalkerData(walkerProfile);
+            setWalkerSettings(walkerConfig);
         } catch (err) {
             console.error("Error loading walker data:", err);
             setWalkerError("Error al cargar la información del paseador.");
@@ -54,18 +70,24 @@ const WalkerProfile = ({ id }) => {
         } catch (err) {
             console.error("Error loading walker reviews:", err);
             setReviewsError("Error al cargar las reseñas del paseador.");
+            
+            setReviewsData({ reviews: [], pagination: {} });
         } finally {
             setLoadingReviews(false);
         }
     }, [walkerId]);
 
     useEffect(() => {
-        loadWalkerData();
-    }, [loadWalkerData]);
+        if (walkerId) {
+            loadWalkerData();
+        }
+    }, [loadWalkerData, walkerId]);
 
     useEffect(() => {
-        loadWalkerReviews(currentPage, searchTerm);
-    }, [loadWalkerReviews, currentPage, searchTerm]);
+        if (walkerId) {
+            loadWalkerReviews(currentPage, searchTerm);
+        }
+    }, [loadWalkerReviews, currentPage, searchTerm, walkerId]);
 
     const handleSearch = (search) => {
         setSearchTerm(search);
@@ -90,6 +112,7 @@ const WalkerProfile = ({ id }) => {
 
     const handleRequestSent = () => {
         console.log('Solicitud de paseo enviada exitosamente');
+        setIsModalOpen(false);
     };
 
     if (loadingWalker) {
@@ -121,12 +144,33 @@ const WalkerProfile = ({ id }) => {
 
     const averageRating = reviewsData.reviews.length > 0 
         ? (reviewsData.reviews.reduce((sum, review) => sum + review.rating, 0) / reviewsData.reviews.length).toFixed(1)
-        : walkerData.rating;
+        : (walkerData.rating || '0.0');
 
+    const completeWalkerData = {
+        ...walkerData,
+        
+        pricePerPet: walkerSettings?.pricePerPet || walkerData.pricePerPet || 15000,
+        hasGPSTracking: walkerSettings?.hasGPSTracker || walkerData.hasGPSTracking || false,
+        location: walkerSettings?.location || walkerData.location || 'Ubicación no disponible',
+        hasDiscount: walkerSettings?.hasDiscount || false,
+        discountPercentage: walkerSettings?.discountPercentage || 0
+    };
+    
     return (
         <div className="w-full h-full p-6 bg-background dark:bg-foreground">
             <WalkerHeaderComponent
-                walkerData={walkerData}
+                walkerData={{
+                    id: completeWalkerData.id,
+                    fullName: completeWalkerData.name,
+                    profileImage: completeWalkerData.image,
+                    location: completeWalkerData.location,
+                    verified: completeWalkerData.verified,
+                    experienceYears: completeWalkerData.experience?.replace(' years', '') + ' años de experiencia',
+                    pricePerPet: completeWalkerData.pricePerPet,
+                    hasGPSTracker: completeWalkerData.hasGPSTracking,
+                    hasDiscount: completeWalkerData.hasDiscount,
+                    discountPercentage: completeWalkerData.discountPercentage
+                }}
                 averageRating={averageRating}
                 reviewsCount={reviewsData.reviews.length}
                 onRequestWalk={handleRequestWalk}
@@ -146,14 +190,16 @@ const WalkerProfile = ({ id }) => {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 walker={{
-                    id: walkerData.id,
-                    name: walkerData.fullName,
-                    image: walkerData.profileImage,
-                    location: walkerData.location,
-                    verified: walkerData.verified,
-                    experience: `${walkerData.experienceYears} años de experiencia`,
-                    pricePerPet: walkerData.pricePerPet || 15000,
-                    hasGPSTracking: walkerData.hasGPSTracking || true
+                    id: completeWalkerData.id,
+                    name: completeWalkerData.name,
+                    image: completeWalkerData.image,
+                    location: completeWalkerData.location,
+                    verified: completeWalkerData.verified,
+                    experience: completeWalkerData.experience?.replace(' years', '') + ' años de experiencia',
+                    pricePerPet: completeWalkerData.pricePerPet,
+                    hasGPSTracker: completeWalkerData.hasGPSTracking,
+                    hasDiscount: completeWalkerData.hasDiscount,
+                    discountPercentage: completeWalkerData.discountPercentage
                 }}
                 onRequestSent={handleRequestSent}
             />

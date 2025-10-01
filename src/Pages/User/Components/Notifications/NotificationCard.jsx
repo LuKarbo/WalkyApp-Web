@@ -65,12 +65,12 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
     return (
         <div className={`
             relative overflow-hidden rounded-xl transition-all duration-300 hover:shadow-lg border-l-4
-            ${getTypeColor(notification.type)}
+            ${getTypeColor(notification?.type)}
             ${!notification.read ? 'shadow-md' : 'shadow-sm'}
             border border-primary/20 bg-background dark:bg-foreground
         `}>
             
-            {!notification.read && (
+            {!notification?.read && (
                 <div className="absolute top-3 right-3 w-3 h-3 bg-primary rounded-full animate-pulse" />
             )}
 

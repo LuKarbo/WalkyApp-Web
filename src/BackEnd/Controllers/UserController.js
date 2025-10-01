@@ -28,6 +28,15 @@ export const UserController = {
         }
     },
 
+    async updateUserByAdmin(id, adminUserData) {
+        try {
+            return await UserService.updateUserByAdmin(id, adminUserData);
+        } catch (error) {
+            console.error('Error in UserController.updateUserByAdmin:', error);
+            throw error;
+        }
+    },
+
     async deleteUser(id) {
         try {
             return await UserService.deleteUser(id);
@@ -51,6 +60,15 @@ export const UserController = {
             return await UserService.promoteUserToWalker(userId);
         } catch (error) {
             console.error('Error in UserController.promoteUserToWalker:', error);
+            throw error;
+        }
+    },
+
+    async changeUserPassword(userId, passwordData) {
+        try {
+            return await UserService.changeUserPassword(userId, passwordData);
+        } catch (error) {
+            console.error('Error in UserController.changeUserPassword:', error);
             throw error;
         }
     }

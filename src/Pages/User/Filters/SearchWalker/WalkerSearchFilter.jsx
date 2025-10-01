@@ -1,5 +1,5 @@
 import { AiOutlineStar, AiOutlineSearch, AiOutlineFilter } from "react-icons/ai";
-import { MdVerified, MdClear } from "react-icons/md";
+import { MdGpsFixed, MdClear } from "react-icons/md";
 
 const WalkerSearchFilter = ({ 
     search, 
@@ -8,8 +8,9 @@ const WalkerSearchFilter = ({
     setLocation, 
     rating, 
     setRating, 
-    verified, 
-    setVerified, 
+    hasGps, 
+    setHasGps, 
+    availableLocations,
     showFilters, 
     setShowFilters, 
     clearFilters 
@@ -51,10 +52,11 @@ const WalkerSearchFilter = ({
                             onChange={(e) => setLocation(e.target.value)}
                         >
                             <option value="">Todas las localidades</option>
-                            <option value="Buenos Aires">Buenos Aires</option>
-                            <option value="Córdoba">Córdoba</option>
-                            <option value="Rosario">Rosario</option>
-                            <option value="Mendoza">Mendoza</option>
+                            {availableLocations.map((loc) => (
+                                <option key={loc} value={loc}>
+                                    {loc}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -79,21 +81,20 @@ const WalkerSearchFilter = ({
                         </div>
                     </div>
 
-                    {/* Verified Filter */}
                     <div>
                         <label className="block text-sm font-medium text-foreground dark:text-background mb-2">
-                            Verificación
+                            Ubicación GPS
                         </label>
                         <label className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg hover:bg-primary/5 transition-all">
                             <input
                                 type="checkbox"
-                                checked={verified}
-                                onChange={(e) => setVerified(e.target.checked)}
+                                checked={hasGps}
+                                onChange={(e) => setHasGps(e.target.checked)}
                                 className="w-4 h-4 text-primary rounded border-primary/30 focus:ring-primary/20"
                             />
                             <span className="text-sm font-medium text-foreground dark:text-background flex items-center space-x-1">
-                                <MdVerified className="text-primary" />
-                                <span>Solo verificados</span>
+                                <MdGpsFixed className="text-primary" />
+                                <span>Con GPS</span>
                             </span>
                         </label>
                     </div>
