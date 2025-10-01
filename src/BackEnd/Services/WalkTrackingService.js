@@ -2,98 +2,99 @@ import { WalkTrackingDataAccess } from "../DataAccess/WalkTrackingDataAccess.js"
 
 export const WalkTrackingService = {
     async getWalkRoute(tripId) {
-        const route = await WalkTrackingDataAccess.getWalkRoute(tripId);
+        const mapData = await WalkTrackingDataAccess.getWalkRoute(tripId);
         
-        // Retornamos la ruta tal como viene de la API
-        return route.map(point => ({
-            lat: point.lat,
-            lng: point.lng
+        if (!mapData.hasMap || !mapData.locations || mapData.locations.length === 0) {
+            return [];
+        }
+        
+        return mapData.locations.map(location => ({
+            lat: location.lat,
+            lng: location.lng
         }));
-    },
-
-    async saveWalkPoint(tripId, lat, lng, address) {
-        const pointData = {
-            tripId,
-            lat,
-            lng, 
-            address: address || 'Dirección no disponible'
-        };
-
-        const savedPoint = await WalkTrackingDataAccess.saveWalkPoint(pointData);
-        
-        // Retornamos en formato DTO para la UI
-        return {
-            id: savedPoint.id,
-            time: new Date(savedPoint.timestamp).toLocaleTimeString('es-AR', {
-                hour: '2-digit',
-                minute: '2-digit'
-            }),
-            timeFull: savedPoint.timestamp,
-            address: savedPoint.address,
-            lat: savedPoint.lat,
-            lng: savedPoint.lng
-        };
     },
 
     async getWalkRecords(tripId) {
         const records = await WalkTrackingDataAccess.getWalkRecords(tripId);
-        
-        // Transformamos a DTO para la UI
-        return records.map(record => ({
-            id: record.id,
-            time: record.time,
-            timeFull: record.timeFull,
-            address: record.address,
-            lat: record.lat,
-            lng: record.lng
-        }));
+        return records;
     },
 
-    async clearWalkData(tripId) {
-        return await WalkTrackingDataAccess.clearWalkData(tripId);
+    async checkMapAvailability(tripId) {
+        const mapData = await WalkTrackingDataAccess.getWalkRoute(tripId);
+        
+        return {
+            hasMap: mapData.hasMap,
+            mapId: mapData.mapId,
+            locationCount: mapData.locations ? mapData.locations.length : 0
+        };
     },
 
     // Validar si el mapa está visible según el estado del paseo
     validateMapVisible(walkStatus) {
-        const visibleStatuses = ['Activo', 'Finalizado'];
-        return visibleStatuses.includes(walkStatus);
+        const visibleStatuses = ['activo', 'finalizado'];
+        return visibleStatuses.includes(walkStatus?.toLowerCase());
     },
 
     // Validar si se puede interactuar con el mapa según el estado del paseo
     validateMapInteractive(walkStatus) {
-        const interactiveStatuses = ['Activo'];
-        return interactiveStatuses.includes(walkStatus);
+        const interactiveStatuses = ['activo'];
+        return interactiveStatuses.includes(walkStatus?.toLowerCase());
     },
 
     // Validar si se pueden mostrar los datos de seguimiento según el estado del paseo
     validateTrackingVisible(walkStatus) {
-        const visibleStatuses = ['Activo', 'Finalizado'];
-        return visibleStatuses.includes(walkStatus);
+        const visibleStatuses = ['activo', 'finalizado'];
+        return visibleStatuses.includes(walkStatus?.toLowerCase());
     },
 
     getMapStatusMessage(walkStatus) {
-        switch (walkStatus) {
-            case 'Activo':
-                return 'Mapa activo - Haz clic para agregar puntos';
-            case 'Finalizado':
+        if (!walkStatus) return 'Estado del paseo desconocido';
+        
+        switch (walkStatus.toLowerCase()) {
+            case 'activo':
+                return 'Mapa activo - Seguimiento en tiempo real';
+            case 'finalizado':
                 return 'Mapa del paseo completado - Solo lectura';
+            case 'agendado':
+                return 'El mapa se mostrará cuando el paseo esté activo';
+            case 'solicitado':
+                return 'Paseo pendiente de confirmación';
+            case 'esperando_pago':
+            case 'esperando pago':
+                return 'Esperando confirmación de pago';
+            case 'rechazado':
+                return 'El paseo fue rechazado';
+            case 'cancelado':
+                return 'El paseo fue cancelado';
             default:
                 return 'El mapa se mostrará cuando el paseo esté activo';
         }
     },
 
     getTrackingStatusMessage(walkStatus) {
-        switch (walkStatus) {
-            case 'Activo':
+        if (!walkStatus) return 'Estado del paseo desconocido';
+        
+        switch (walkStatus.toLowerCase()) {
+            case 'activo':
                 return 'Seguimiento en tiempo real';
-            case 'Finalizado':
+            case 'finalizado':
                 return 'Resumen del paseo completado';
+            case 'agendado':
+                return 'Los datos de seguimiento aparecerán cuando el paseo esté activo';
+            case 'solicitado':
+                return 'Paseo pendiente de confirmación';
+            case 'esperando_pago':
+            case 'esperando pago':
+                return 'Esperando confirmación de pago';
+            case 'rechazado':
+                return 'El paseo fue rechazado';
+            case 'cancelado':
+                return 'El paseo fue cancelado';
             default:
                 return 'Los datos de seguimiento aparecerán cuando el paseo esté activo';
         }
     },
 
-    // Validaciones de negocio
     validateCoordinates(lat, lng) {
         if (typeof lat !== 'number' || typeof lng !== 'number') {
             throw new Error('Las coordenadas deben ser números');

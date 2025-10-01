@@ -5,27 +5,27 @@ export const WalkTrackingDataAccess = {
         if (!tripId) {
             throw new Error("El ID del paseo es requerido");
         }
-        return await WalkTrackingAPI.getWalkRoute(tripId);
-    },
-
-    async saveWalkPoint(pointData) {
-        if (!pointData.tripId || !pointData.lat || !pointData.lng) {
-            throw new Error("El ID del paseo, latitud y longitud son requeridos");
+        
+        const response = await WalkTrackingAPI.getWalkRoute(tripId);
+        
+        if (!response || typeof response.hasMap === 'undefined') {
+            throw new Error("Respuesta inválida del servidor");
         }
-        return await WalkTrackingAPI.saveWalkPoint(pointData);
+        
+        return response;
     },
 
     async getWalkRecords(tripId) {
         if (!tripId) {
             throw new Error("El ID del paseo es requerido");
         }
-        return await WalkTrackingAPI.getWalkRecords(tripId);
-    },
-
-    async clearWalkData(tripId) {
-        if (!tripId) {
-            throw new Error("El ID del paseo es requerido");
+        
+        const records = await WalkTrackingAPI.getWalkRecords(tripId);
+        
+        if (!Array.isArray(records)) {
+            throw new Error("Respuesta inválida del servidor");
         }
-        return await WalkTrackingAPI.clearWalkData(tripId);
+        
+        return records;
     }
 };

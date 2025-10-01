@@ -2,20 +2,24 @@ import { ChatDataAccess } from "../DataAccess/ChatDataAccess.js";
 
 export const ChatService = {
     async getChatMessages(tripId) {
-        const messages = await ChatDataAccess.getChatMessages(tripId);
+        const chatData = await ChatDataAccess.getChatMessages(tripId);
+        
+        if (!chatData || !chatData.messages || chatData.messages.length === 0) {
+            return [];
+        }
         
         // Transformamos los datos a DTO para la UI
-        return messages.map(message => ({
+        return chatData.messages.map(message => ({
             id: message.id,
-            text: message.message,
+            text: message.content,
             sender: message.senderType,
             senderName: message.senderName,
-            timestamp: message.timestamp,
-            time: new Date(message.timestamp).toLocaleTimeString('es-AR', {
+            timestamp: message.sentAt,
+            time: new Date(message.sentAt).toLocaleTimeString('es-AR', {
                 hour: '2-digit',
                 minute: '2-digit'
             }),
-            read: message.read
+            read: message.isRead
         }));
     },
 
@@ -24,10 +28,13 @@ export const ChatService = {
             throw new Error("El mensaje no puede estar vacío");
         }
 
+        // Validar longitud del mensaje
+        this.validateMessageLength(messageText);
+
         const messageData = {
             tripId: tripId,
             senderId: userId,
-            senderType: userType, // 'owner' or 'walker'
+            senderType: userType,
             senderName: userName,
             message: messageText.trim()
         };
@@ -37,15 +44,15 @@ export const ChatService = {
         // Retornamos en formato DTO
         return {
             id: sentMessage.id,
-            text: sentMessage.message,
+            text: sentMessage.content,
             sender: sentMessage.senderType,
             senderName: sentMessage.senderName,
-            timestamp: sentMessage.timestamp,
-            time: new Date(sentMessage.timestamp).toLocaleTimeString('es-AR', {
+            timestamp: sentMessage.sentAt,
+            time: new Date(sentMessage.sentAt).toLocaleTimeString('es-AR', {
                 hour: '2-digit',
                 minute: '2-digit'
             }),
-            read: sentMessage.read
+            read: sentMessage.isRead
         };
     },
 
@@ -84,30 +91,39 @@ export const ChatService = {
 
     // Validar si el chat se puede mostrar según el estado del paseo
     validateChatVisible(walkStatus) {
-        const visibleStatuses = ['Activo', 'Finalizado'];
-        return visibleStatuses.includes(walkStatus);
+        if (!walkStatus) return false;
+        
+        const visibleStatuses = ['activo', 'finalizado'];
+        return visibleStatuses.includes(walkStatus.toLowerCase());
     },
 
     // Validar si se pueden enviar mensajes según el estado del paseo
     validateCanSendMessages(walkStatus) {
-        const sendableStatuses = ['Activo'];
-        return sendableStatuses.includes(walkStatus);
+        if (!walkStatus) return false;
+        
+        const sendableStatuses = ['activo'];
+        return sendableStatuses.includes(walkStatus.toLowerCase());
     },
 
     getChatStatusMessage(walkStatus) {
-        switch (walkStatus) {
-            case 'Agendado':
+        if (!walkStatus) return 'Estado del paseo desconocido';
+        
+        switch (walkStatus.toLowerCase()) {
+            case 'agendado':
                 return 'El chat se habilitará cuando el paseo esté activo';
-            case 'Finalizado':
+            case 'finalizado':
                 return 'El paseo ha finalizado. Solo lectura';
-            case 'Rechazado':
+            case 'rechazado':
                 return 'El paseo fue rechazado';
-            case 'Solicitado':
+            case 'solicitado':
                 return 'El paseo está pendiente de confirmación';
-            case 'Esperando pago':
+            case 'esperando_pago':
+            case 'esperando pago':
                 return 'El paseo está esperando confirmación de pago';
-            case 'Activo':
+            case 'activo':
                 return 'Chat activo';
+            case 'cancelado':
+                return 'El paseo fue cancelado';
             default:
                 return 'Estado del paseo no reconocido';
         }

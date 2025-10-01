@@ -1,108 +1,160 @@
 export const ChatAPI = {
     async getChatMessages(tripId) {
-        // Simulamos datos de chat por tripId
         const mockChats = {
-            "W001": [
-                {
-                    id: "MSG001",
-                    tripId: "W001",
-                    senderId: 3,
-                    senderType: "owner",
-                    senderName: "María García",
-                    message: "Hola, ¿cómo va el paseo con Max?",
-                    timestamp: "2024-01-20T10:15:00",
-                    read: true
-                },
-                {
-                    id: "MSG002",
-                    tripId: "W001",
-                    senderId: 1,
-                    senderType: "walker",
-                    senderName: "Sarah Johnson",
-                    message: "¡Todo perfecto! Max está muy contento y enérgico",
-                    timestamp: "2024-01-20T10:17:00",
-                    read: true
-                },
-                {
-                    id: "MSG003",
-                    tripId: "W001",
-                    senderId: 3,
-                    senderType: "owner", 
-                    senderName: "María García",
-                    message: "Genial, muchas gracias por cuidarlo tan bien",
-                    timestamp: "2024-01-20T10:20:00",
-                    read: false
-                }
-            ],
-            "W002": [
-                {
-                    id: "MSG004",
-                    tripId: "W002",
-                    senderId: 3,
-                    senderType: "owner",
-                    senderName: "María García", 
-                    message: "¿A qué hora comenzamos el paseo?",
-                    timestamp: "2024-01-20T11:00:00",
-                    read: false
-                }
-            ],
-            "W003": [
-                {
-                    id: "MSG005",
-                    tripId: "W003",
-                    senderId: 3,
-                    senderType: "owner",
-                    senderName: "María García",
-                    message: "Hola, ¿cómo va el paseo con Mimi?",
-                    timestamp: "2024-01-20T10:15:00",
-                    read: true
-                },
-                {
-                    id: "MSG006",
-                    tripId: "W003",
-                    senderId: 1,
-                    senderType: "walker",
-                    senderName: "María García",
-                    message: "¡Todo perfecto! Como yo nadie te va a cuidar a Mimi",
-                    timestamp: "2024-01-20T10:17:00",
-                    read: true
-                },
-                {
-                    id: "MSG007",
-                    tripId: "W003",
-                    senderId: 3,
-                    senderType: "owner", 
-                    senderName: "María García",
-                    message: "Genial, sos mi heroe!",
-                    timestamp: "2024-01-20T10:20:00",
-                    read: false
-                }
-            ],
+            "1": {
+                chatId: 1,
+                messages: [
+                    {
+                        id: 1,
+                        senderId: 2,
+                        senderName: "María Cliente",
+                        senderType: "owner",
+                        content: "Hola Sarah, ¿todo listo para el paseo de Max?",
+                        sentAt: "2024-01-20T09:45:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 2,
+                        senderId: 6,
+                        senderName: "Sarah Johnson",
+                        senderType: "walker",
+                        content: "¡Hola María! Sí, estoy llegando al punto de encuentro. Max se ve muy emocionado",
+                        sentAt: "2024-01-20T09:50:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 3,
+                        senderId: 6,
+                        senderName: "Sarah Johnson",
+                        senderType: "walker",
+                        content: "Comenzamos el paseo. Max está muy activo hoy",
+                        sentAt: "2024-01-20T10:05:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 4,
+                        senderId: 6,
+                        senderName: "Sarah Johnson",
+                        senderType: "walker",
+                        content: "Todo perfecto, Max ha hecho ejercicio y socializado con otros perros",
+                        sentAt: "2024-01-20T10:30:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 5,
+                        senderId: 6,
+                        senderName: "Sarah Johnson",
+                        senderType: "walker",
+                        content: "Regresando a casa. Max está feliz pero cansado",
+                        sentAt: "2024-01-20T10:55:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 6,
+                        senderId: 2,
+                        senderName: "María Cliente",
+                        senderType: "owner",
+                        content: "¡Perfecto! Muchas gracias Sarah, Max se ve muy contento",
+                        sentAt: "2024-01-20T11:05:00.000Z",
+                        isRead: false
+                    }
+                ]
+            },
+            "2": {
+                chatId: 2,
+                messages: [
+                    {
+                        id: 7,
+                        senderId: 2,
+                        senderName: "María Cliente",
+                        senderType: "owner",
+                        content: "¿A qué hora comenzamos el paseo?",
+                        sentAt: "2024-01-20T11:00:00.000Z",
+                        isRead: false
+                    },
+                    {
+                        id: 8,
+                        senderId: 7,
+                        senderName: "Mike Wilson",
+                        senderType: "walker",
+                        content: "Hola María, puedo estar allí a las 11:30",
+                        sentAt: "2024-01-20T11:15:00.000Z",
+                        isRead: true
+                    }
+                ]
+            },
+            "3": {
+                chatId: 3,
+                messages: [
+                    {
+                        id: 9,
+                        senderId: 6,
+                        senderName: "Sarah Johnson",
+                        senderType: "owner",
+                        content: "Hola Emma, ¿cómo va todo con Bella?",
+                        sentAt: "2024-01-20T14:15:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 10,
+                        senderId: 8,
+                        senderName: "Emma Davis",
+                        senderType: "walker",
+                        content: "Todo excelente, Bella está disfrutando mucho del parque",
+                        sentAt: "2024-01-20T14:20:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 11,
+                        senderId: 8,
+                        senderName: "Emma Davis",
+                        senderType: "walker",
+                        content: "Le encanta explorar los nuevos olores",
+                        sentAt: "2024-01-20T14:45:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 12,
+                        senderId: 8,
+                        senderName: "Emma Davis",
+                        senderType: "walker",
+                        content: "Ya volvemos, Bella se portó increíble",
+                        sentAt: "2024-01-20T15:20:00.000Z",
+                        isRead: true
+                    },
+                    {
+                        id: 13,
+                        senderId: 6,
+                        senderName: "Sarah Johnson",
+                        senderType: "owner",
+                        content: "¡Gracias Emma! Bella parece muy relajada",
+                        sentAt: "2024-01-20T15:30:00.000Z",
+                        isRead: false
+                    }
+                ]
+            }
         };
-
-        // Simulamos delay de red
-        await new Promise(resolve => setTimeout(resolve, 300));
         
-        return mockChats[tripId] || [];
+        return mockChats[tripId] || {
+            chatId: null,
+            messages: []
+        };
     },
 
     async sendMessage(messageData) {
         console.log('Enviando mensaje:', messageData);
         
-        // Simulamos creación de mensaje
+        // Simular llamada a sp_walk_chat_send_message
+        // En producción esto llamaría: POST /api/walks/:walkId/chat/messages
         const newMessage = {
-            id: `MSG${String(Date.now()).slice(-6)}`,
-            tripId: messageData.tripId,
+            id: Date.now(),
             senderId: messageData.senderId,
-            senderType: messageData.senderType,
             senderName: messageData.senderName,
-            message: messageData.message,
-            timestamp: new Date().toISOString(),
-            read: false
+            senderType: messageData.senderType,
+            content: messageData.message,
+            sentAt: new Date().toISOString(),
+            isRead: false
         };
-
-        // Simulamos delay de envío
-        await new Promise(resolve => setTimeout(resolve, 200));
         
         console.log('Mensaje enviado:', newMessage);
         return newMessage;
@@ -111,16 +163,25 @@ export const ChatAPI = {
     async markMessagesAsRead(tripId, userId) {
         console.log(`Marcando mensajes como leídos para el paseo ${tripId}, usuario ${userId}`);
         
-        // Simulamos marcado como leído
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Simular llamada a sp_walk_chat_mark_read
+        // En producción esto llamaría: PUT /api/walks/:walkId/chat/messages/read
         
-        return { success: true, tripId, userId, markedAt: new Date().toISOString() };
+        return { 
+            success: true, 
+            messagesMarked: Math.floor(Math.random() * 3) + 1,
+            tripId, 
+            userId 
+        };
     },
 
     async getUnreadCount(userId) {
-        // Simulamos conteo de mensajes no leídos
-        await new Promise(resolve => setTimeout(resolve, 150));
+        console.log(`Obteniendo mensajes no leídos para usuario ${userId}`);
         
-        return Math.floor(Math.random() * 5); // Número aleatorio para demo
+        // Simular llamada a sp_walk_chat_unread_count
+        // En producción esto llamaría: GET /api/users/:userId/chat/unread-count
+        
+        return { 
+            unreadCount: Math.floor(Math.random() * 5) 
+        };
     }
 };

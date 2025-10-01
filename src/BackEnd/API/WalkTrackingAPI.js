@@ -1,93 +1,109 @@
 export const WalkTrackingAPI = {
     async getWalkRoute(tripId) {
-        // Simulamos datos de rutas por tripId
-        const mockRoutes = {
-            "W001": [
-                { lat: -34.6037, lng: -58.3816 }, // Buenos Aires centro
-                { lat: -34.6047, lng: -58.3826 }, // Plaza San Martín
-                { lat: -34.6057, lng: -58.3836 }, // Puerto Madero
-            ],
-            "W003": [
-                { lat: -34.6037, lng: -58.3816 },
-                { lat: -34.6020, lng: -58.3800 }, // Recoleta
-                { lat: -34.6010, lng: -58.3790 }, // Retiro
-                { lat: -34.6000, lng: -58.3780 }, // Palermo
-            ]
+        const mockMaps = {
+            "1": {
+                hasMap: true,
+                mapId: 1,
+                walkId: 1,
+                locations: [
+                    {
+                        id: 1,
+                        lat: -34.575300,
+                        lng: -58.414200,
+                        elevation: 25.5,
+                        address: "Av. del Libertador 1500, Palermo, Buenos Aires",
+                        recordedAt: "2024-01-20T10:05:00.000Z"
+                    },
+                    {
+                        id: 2,
+                        lat: -34.575800,
+                        lng: -58.413900,
+                        elevation: 26.0,
+                        address: "Av. del Libertador 1650, Palermo, Buenos Aires",
+                        recordedAt: "2024-01-20T10:10:00.000Z"
+                    },
+                    {
+                        id: 3,
+                        lat: -34.576200,
+                        lng: -58.413500,
+                        elevation: 26.2,
+                        address: "Av. del Libertador 1800, Palermo, Buenos Aires",
+                        recordedAt: "2024-01-20T10:15:00.000Z"
+                    }
+                ]
+            },
+            "3": {
+                hasMap: true,
+                mapId: 3,
+                walkId: 3,
+                locations: [
+                    {
+                        id: 10,
+                        lat: -32.944600,
+                        lng: -60.650700,
+                        elevation: 28.0,
+                        address: "Av. Pellegrini 1000, Rosario, Santa Fe",
+                        recordedAt: "2024-01-20T14:00:00.000Z"
+                    },
+                    {
+                        id: 11,
+                        lat: -32.945100,
+                        lng: -60.650300,
+                        elevation: 27.8,
+                        address: "Av. Pellegrini 1200, Rosario, Santa Fe",
+                        recordedAt: "2024-01-20T14:05:00.000Z"
+                    }
+                ]
+            },
+            "2": {
+                hasMap: false,
+                mapId: null,
+                walkId: 2,
+                locations: []
+            }
         };
-
-        // Simulamos delay de red
-        await new Promise(resolve => setTimeout(resolve, 300));
         
-        return mockRoutes[tripId] || [];
+        return mockMaps[tripId] || {
+            hasMap: false,
+            mapId: null,
+            walkId: tripId,
+            locations: []
+        };
     },
 
-    async saveWalkPoint(pointData) {
-        console.log('Guardando punto de seguimiento:', pointData);
+    async saveNewLocation(walkId, lat, lng) {
+        console.log('Guardando nueva ubicación:', { walkId, lat, lng });
         
-        // Simulamos guardado
-        const savedPoint = {
-            id: `POINT${String(Date.now()).slice(-6)}`,
-            tripId: pointData.tripId,
-            lat: pointData.lat,
-            lng: pointData.lng,
-            address: pointData.address,
-            timestamp: new Date().toISOString(),
-            order: pointData.order || 0
+        const savedLocation = {
+            id: Date.now(),
+            lat: lat,
+            lng: lng,
+            elevation: 0, 
+            address: 'Dirección calculada por el backend',
+            recordedAt: new Date().toISOString()
         };
-
-        // Simulamos delay de guardado
-        await new Promise(resolve => setTimeout(resolve, 200));
         
-        console.log('Punto guardado:', savedPoint);
-        return savedPoint;
+        console.log('Ubicación guardada:', savedLocation);
+        return savedLocation;
     },
 
     async getWalkRecords(tripId) {
-        // Simulamos datos de registros por tripId
-        const mockRecords = {
-            "W001": [
-                {
-                    id: "REC001",
-                    tripId: "W001",
-                    time: "10:15",
-                    timeFull: "2024-01-20T10:15:00",
-                    address: "Av. Corrientes 1000, Buenos Aires",
-                    lat: -34.6037,
-                    lng: -58.3816
-                },
-                {
-                    id: "REC002", 
-                    tripId: "W001",
-                    time: "10:25",
-                    timeFull: "2024-01-20T10:25:00", 
-                    address: "Plaza San Martín, Retiro",
-                    lat: -34.6047,
-                    lng: -58.3826
-                }
-            ],
-            "W003": [
-                {
-                    id: "REC003",
-                    tripId: "W003",
-                    time: "14:30",
-                    timeFull: "2024-01-20T14:30:00",
-                    address: "Recoleta Cemetery, Buenos Aires",
-                    lat: -34.6020,
-                    lng: -58.3800
-                }
-            ]
-        };
-
-        await new Promise(resolve => setTimeout(resolve, 250));
-        return mockRecords[tripId] || [];
-    },
-
-    async clearWalkData(tripId) {
-        console.log(`Limpiando datos del paseo ${tripId}`);
+        const mapData = await this.getWalkRoute(tripId);
         
-        // Simulamos limpieza
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        return { success: true, tripId, clearedAt: new Date().toISOString() };
+        if (!mapData.hasMap || mapData.locations.length === 0) {
+            return [];
+        }
+
+        return mapData.locations.map(location => ({
+            id: location.id,
+            time: new Date(location.recordedAt).toLocaleTimeString('es-AR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }),
+            timeFull: location.recordedAt,
+            address: location.address,
+            lat: location.lat,
+            lng: location.lng
+        }));
     }
 };

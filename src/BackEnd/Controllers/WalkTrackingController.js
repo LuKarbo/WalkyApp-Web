@@ -10,18 +10,6 @@ export const WalkTrackingController = {
         }
     },
 
-    async saveWalkPoint(tripId, lat, lng, address) {
-        try {
-            // Validaciones
-            WalkTrackingService.validateCoordinates(lat, lng);
-            
-            return await WalkTrackingService.saveWalkPoint(tripId, lat, lng, address);
-        } catch (error) {
-            console.error('Error guardando punto del paseo:', error);
-            throw new Error('Error al guardar punto del paseo: ' + error.message);
-        }
-    },
-
     async fetchWalkRecords(tripId) {
         try {
             return await WalkTrackingService.getWalkRecords(tripId);
@@ -31,12 +19,12 @@ export const WalkTrackingController = {
         }
     },
 
-    async clearWalkData(tripId) {
+    async checkMapAvailability(tripId) {
         try {
-            return await WalkTrackingService.clearWalkData(tripId);
+            return await WalkTrackingService.checkMapAvailability(tripId);
         } catch (error) {
-            console.error('Error limpiando datos del paseo:', error);
-            throw new Error('Error al limpiar datos del paseo: ' + error.message);
+            console.error('Error verificando disponibilidad del mapa:', error);
+            throw new Error('Error al verificar disponibilidad del mapa: ' + error.message);
         }
     },
 

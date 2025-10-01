@@ -84,9 +84,9 @@ const WalkData = ({ tripId, walkStatus }) => {
           <FiMapPin size={32} className="mx-auto mb-2 text-gray-400" />
           <p className="font-medium">No hay registros todavía</p>
           <p className="text-sm">
-            {walkStatus === 'Activo' 
+            {walkStatus?.toLowerCase() === 'activo' 
               ? 'Esperando registros de seguimiento...'
-              : walkStatus === 'Finalizado'
+              : walkStatus?.toLowerCase() === 'finalizado'
                 ? 'Este paseo no tuvo puntos de seguimiento'
                 : 'Los registros aparecerán cuando el paseo esté activo'
             }
@@ -98,7 +98,7 @@ const WalkData = ({ tripId, walkStatus }) => {
             <div 
               key={record.id || index} 
               className={`border-b pb-2 border-gray-200 ${
-                walkStatus === 'Finalizado' ? 'opacity-75' : ''
+                walkStatus?.toLowerCase() === 'finalizado' ? 'opacity-75' : ''
               }`}
             >
               <div className="flex items-start gap-2">
@@ -118,7 +118,7 @@ const WalkData = ({ tripId, walkStatus }) => {
       )}
 
       {/* Footer info for completed walks */}
-      {walkStatus === 'Finalizado' && sortedRecords.length > 0 && (
+      {walkStatus?.toLowerCase() === 'finalizado' && sortedRecords.length > 0 && (
         <div className="mt-3 pt-2 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center">
             Paseo completado - {sortedRecords.length} punto{sortedRecords.length !== 1 ? 's' : ''} registrado{sortedRecords.length !== 1 ? 's' : ''}

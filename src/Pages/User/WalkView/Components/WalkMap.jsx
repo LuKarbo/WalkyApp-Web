@@ -135,9 +135,9 @@ export default function WalkMap({ tripId, walkStatus }) {
                 options={{
                   directions: directions,
                   polylineOptions: {
-                    strokeColor: walkStatus === 'Finalizado' ? "#94a3b8" : "#4ade80",
+                    strokeColor: walkStatus?.toLowerCase() === 'finalizado' ? "#94a3b8" : "#4ade80",
+                    strokeOpacity: walkStatus?.toLowerCase() === 'finalizado' ? 0.7 : 1,
                     strokeWeight: 5,
-                    strokeOpacity: walkStatus === 'Finalizado' ? 0.7 : 1
                   },
                 }}
               />
@@ -152,7 +152,7 @@ export default function WalkMap({ tripId, walkStatus }) {
             )}
 
             {/* Marcador de fin */}
-            {path.length > 1 && walkStatus === 'Finalizado' && (
+            {path.length > 1 && walkStatus?.toLowerCase() === 'finalizado' && (
               <Marker
                 position={path[path.length - 1]}
                 icon="http://maps.google.com/mapfiles/ms/icons/red-dot.png"
