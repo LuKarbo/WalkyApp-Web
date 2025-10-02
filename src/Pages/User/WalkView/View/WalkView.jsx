@@ -12,7 +12,6 @@ const WalkView = ({ id }) => {
     const [walkData, setWalkData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Cargar datos del paseo
     useEffect(() => {
         const loadWalkData = async () => {
             if (!tripId) {
@@ -45,35 +44,36 @@ const WalkView = ({ id }) => {
     }
 
     return (
-        <div className="w-full h-full p-6 bg-background dark:bg-foreground overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                        ID: {tripId}
-                    </p>
-                    {walkData && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Estado: {walkData.status}
-                        </p>
-                    )}
-                </div>
-            </div>
-
-            <div className="mx-auto px-4 py-8 min-h-[80vh] grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Chat Component */}
-                <WalkChat tripId={tripId} walkStatus={walkData?.status} />
-
-                {/* WalkMap + WalkData */}
-                <div className="md:col-span-2 flex flex-col gap-4 h-full">
-                    <WalkMap
-                        tripId={tripId}
-                        walkStatus={walkData?.status}
-                    />
-                    <WalkData
-                        tripId={tripId}
-                        walkStatus={walkData?.status}
-                    />
+        <div className="w-full h-full bg-background dark:bg-foreground p-6">
+            <div className="max-h-[850px] mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+                    
+                    <div className="lg:col-span-3 h-full overflow-hidden">
+                        <div className="h-full overflow-y-auto">
+                            <WalkChat tripId={tripId} walkStatus={walkData?.status} />
+                        </div>
+                    </div>
+                    
+                    <div className="lg:col-span-9 flex flex-col gap-6 h-full">
+                        
+                        <div className="flex-[3]">
+                            <div className="">
+                                <WalkMap
+                                    tripId={tripId}
+                                    walkStatus={walkData?.status}
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="flex-[2]">
+                            <div className="">
+                                <WalkData
+                                    tripId={tripId}
+                                    walkStatus={walkData?.status}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
