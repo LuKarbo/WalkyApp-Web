@@ -3,6 +3,7 @@ import { FiCalendar } from "react-icons/fi";
 import { WalksController } from '../../../BackEnd/Controllers/WalksController';
 import { useUser } from '../../../BackEnd/Context/UserContext';
 import { useNavigation } from '../../../BackEnd/Context/NavigationContext';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import WalkerWalksHeaderComponent from '../Components/WalkerWalksComponents/WalkerWalksHeaderComponent';
 import WalkerWalksCardComponent from '../Components/WalkerWalksComponents/WalkerWalksCardComponent';
@@ -36,6 +37,7 @@ const WalkerWalks = () => {
     const user = useUser();
     const walkerId = user?.id;
     const { navigateToContent } = useNavigation();
+    const { success, error: errorToast, info } = useToast();
 
     useEffect(() => {
         const loadWalks = async () => {
@@ -49,6 +51,10 @@ const WalkerWalks = () => {
                 setWalks(walksData);
             } catch (err) {
                 setError('Error loading walks: ' + err.message);
+                errorToast('No se pudieron cargar los paseos', {
+                    title: 'Error',
+                    duration: 4000
+                });
             } finally {
                 setLoading(false);
             }
@@ -80,6 +86,10 @@ const WalkerWalks = () => {
     const handleAcceptWalk = (walk) => {
         if (!canAcceptWalk()) {
             setError(`No puedes aceptar más paseos. Límite máximo: ${MAX_ACCEPTED_WALKS} paseos aceptados simultáneamente.`);
+            errorToast("No se pudo aceptar el paseo", {
+                title: 'Error',
+                duration: 4000
+            });
             return;
         }
         
@@ -107,8 +117,16 @@ const WalkerWalks = () => {
             ));
             setShowAcceptModal(false);
             setSelectedWalk(null);
+            success('Paseo aceptado correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
             setError('Error accepting walk: ' + err.message);
+            errorToast('No se pudo aceptar el paseo', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setActionLoading(false);
         }
@@ -132,8 +150,16 @@ const WalkerWalks = () => {
             ));
             setShowRejectModal(false);
             setSelectedWalk(null);
+            info('Paseo rechazado correctamente', {
+                title: 'Información',
+                duration: 4000
+            });
         } catch (err) {
             setError('Error rejecting walk: ' + err.message);
+            errorToast('No se pudo rechazar el paseo', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setActionLoading(false);
         }
@@ -162,8 +188,16 @@ const WalkerWalks = () => {
             ));
             setShowFinishWalkModal(false);
             setSelectedWalk(null);
+            success('Paseo finalizado correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
             setError('Error finishing walk: ' + err.message);
+            errorToast('No se pudo finalizar el paseo', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setActionLoading(false);
         }
@@ -204,8 +238,16 @@ const WalkerWalks = () => {
             ));
             setShowStartWalkModal(false);
             setSelectedWalk(null);
+            success('Paseo iniciado correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
             setError('Error starting walk: ' + err.message);
+            errorToast('No se pudo iniciar el paseo', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setActionLoading(false);
         }

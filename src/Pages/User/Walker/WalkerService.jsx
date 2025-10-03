@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../../../BackEnd/Context/UserContext";
+import { useToast } from "../../../BackEnd/Context/ToastContext";
 import { WalkerController } from "../../../BackEnd/Controllers/WalkerController";
 import { WalksController } from "../../../BackEnd/Controllers/WalksController";
 import WalkerServiceHeaderComponent from "../Components/WalkerServiceComponents/WalkerServiceHeaderComponent";
@@ -12,6 +13,7 @@ import { FaExclamationTriangle, FaCreditCard, FaTimes } from "react-icons/fa";
 const WalkerService = () => {
     const user = useUser();
     const walkerId = user?.id;
+    const { success, error: errorToast } = useToast();
     
     const [walkerData, setWalkerData] = useState(null);
     const [walksData, setWalksData] = useState([]);
@@ -61,8 +63,11 @@ const WalkerService = () => {
                 setShowMercadoPagoAlert(!isMercadoPagoConfigured);
                 
             } catch (err) {
-                console.error("Error loading walker data:", err);
                 setError("Error al cargar la información del paseador.");
+                errorToast('No se pudo cargar la información del paseador', {
+                    title: 'Error',
+                    duration: 4000
+                });
             } finally {
                 setLoading(false);
             }
@@ -182,10 +187,16 @@ const WalkerService = () => {
                 setShowMercadoPagoAlert(false);
             }
             
-            console.log('Configuración guardada exitosamente');
+            success('Configuración guardada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
-            console.error('Error saving settings:', err);
             setError('Error al guardar la configuración');
+            errorToast('No se pudo guardar la configuración', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setSaving(false);
         }

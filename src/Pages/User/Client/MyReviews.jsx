@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useUser } from "../../../BackEnd/Context/UserContext";
+import { useToast } from "../../../BackEnd/Context/ToastContext";
 import { ReviewsController } from "../../../BackEnd/Controllers/ReviewsController";
 import ReviewsHeader from "../Components/MyReviews/ReviewsHeader";
 import ReviewsList from "../Components/MyReviews/ReviewsList";
@@ -18,6 +19,7 @@ const MyReviews = () => {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const user = useUser();
+    const { success, error: errorToast } = useToast();
 
     const loadReviews = useCallback(async (page = 1, search = "") => {
         try {
@@ -26,18 +28,25 @@ const MyReviews = () => {
             
             if (!user?.id) {
                 setError("No se pudo obtener la información del usuario");
+                errorToast("No se pudo obtener la información del usuario", {
+                    title: 'Error',
+                    duration: 4000
+                });
                 return;
             }
 
             const data = await ReviewsController.fetchReviewsByUser(user.id, page, 6, search);
             setReviewsData(data);
         } catch (err) {
-            console.error("Error loading reviews:", err);
             setError("Error al cargar las reseñas. Por favor, intenta de nuevo.");
+            errorToast("No se pudieron cargar las reseñas", {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setIsLoading(false);
         }
-    }, [user?.id]);
+    }, [user?.id, errorToast]);
 
     useEffect(() => {
         loadReviews(currentPage, searchTerm);
@@ -65,18 +74,15 @@ const MyReviews = () => {
             setSelectedReview(null);
             setRefreshTrigger(prev => prev + 1);
             
-            if (window.showNotification) {
-                window.showNotification("Reseña actualizada correctamente", "success");
-            } else {
-                alert("Reseña actualizada correctamente");
-            }
-        } catch (error) {
-            console.error("Error updating review:", error);
-            if (window.showNotification) {
-                window.showNotification(`Error al actualizar la reseña: ${error.message}`, "error");
-            } else {
-                alert(`Error al actualizar la reseña: ${error.message}`);
-            }
+            success("Reseña actualizada correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo actualizar la reseña", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaEnvelope } from 'react-icons/fa';
 import { useUser } from '../../../BackEnd/Context/UserContext';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 import { SettingsController } from '../../../BackEnd/Controllers/SettingsController';
 import SubscriptionModal from '../Modals/SettingsModals/SubscriptionModal';
 import SettingNotificationComponent from '../Components/SettingsComponents/SettingNotificationComponent';
@@ -8,6 +9,7 @@ import SettingSubscriptionComponent from '../Components/SettingsComponents/Setti
 
 const Settings = () => {
     const user = useUser();
+    const { success, error: errorToast } = useToast();
     const [settings, setSettings] = useState({
         email: '',
         notifications: {
@@ -35,7 +37,10 @@ const Settings = () => {
                 setSettings(userSettings);
                 setSubscription(userSubscription);
             } catch (error) {
-                console.error('Error loading settings:', error);
+                errorToast('No se pudieron cargar las configuraciones', {
+                    title: 'Error',
+                    duration: 4000
+                });
             } finally {
                 setLoading(false);
             }
@@ -44,7 +49,7 @@ const Settings = () => {
         if (user?.id) {
             loadSettings();
         }
-    }, [user?.id]);
+    }, [user?.id, errorToast]);
 
     const handleEmailChange = (e) => {
         setSettings(prev => ({
@@ -88,11 +93,16 @@ const Settings = () => {
                 notifications: updatedSettings.notifications
             }));
 
-            console.log('Configuraciones guardadas exitosamente:', updatedSettings);
-            
+            success('Configuraciones guardadas correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
             
         } catch (error) {
-            console.error('Error saving settings:', error);
+            errorToast('No se pudieron guardar las configuraciones', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setSaving(false);
         }

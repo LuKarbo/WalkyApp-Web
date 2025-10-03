@@ -5,6 +5,7 @@ import { WalkerController } from '../../../BackEnd/Controllers/WalkerController'
 import { PetsController } from '../../../BackEnd/Controllers/PetsController';
 import { useUser } from '../../../BackEnd/Context/UserContext';
 import { useNavigation } from '../../../BackEnd/Context/NavigationContext';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import MyTripsHeaderComponent from '../Components/MyTripsComponents/MyTripsHeaderComponent';
 import MyTripsCardComponent from '../Components/MyTripsComponents/MyTripsCardComponent';
@@ -43,6 +44,7 @@ const MyTrips = () => {
     const user = useUser();
     const userId = user?.id;
     const { navigateToContent } = useNavigation();
+    const { success, error: errorToast } = useToast();
 
     useEffect(() => {
         const loadTrips = async () => {
@@ -56,14 +58,17 @@ const MyTrips = () => {
                 setTrips(tripsData);
             } catch (err) {
                 setError('Error loading trips: ' + err.message);
-                console.error('Error loading trips:', err);
+                errorToast("No se pudieron cargar los paseos", {
+                    title: 'Error',
+                    duration: 4000
+                });
             } finally {
                 setLoading(false);
             }
         };
 
         loadTrips();
-    }, [userId]);
+    }, [userId, errorToast]);
 
     useEffect(() => {
         if (showCreateForm && userId) {
@@ -87,10 +92,18 @@ const MyTrips = () => {
                     ? { ...trip, status: 'Rechazado' }
                     : trip
             ));
+            success("El paseo fue cancelado correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
             setShowCancelModal(false);
             setTripToCancel(null);
         } catch (err) {
             setError('Error cancelling trip: ' + err.message);
+            errorToast("No se pudo cancelar el paseo", {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setCancelLoading(false);
         }
@@ -117,10 +130,18 @@ const MyTrips = () => {
                     ? { ...trip, status: 'Agendado' }
                     : trip
             ));
+            success("El paseo fue pagado correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
             setShowPaymentModal(false);
             setTripToPay(null);
         } catch (err) {
             setError('Error processing payment: ' + err.message);
+            errorToast("No se pudo procesar el pago", {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setPaymentLoading(false);
         }
@@ -198,10 +219,18 @@ const MyTrips = () => {
                 totalPrice: walkRequest.totalPrice
             };
             
+            success("El paseo fue creado correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
             setTrips([newTrip, ...trips]);
             handleCloseModal();
         } catch (err) {
             setError('Error creating trip: ' + err.message);
+            errorToast("No se pudo crear el paseo", {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setLoadingModal(false);
         }
@@ -225,8 +254,16 @@ const MyTrips = () => {
                     ? { ...trip, status: 'Rechazado' }
                     : trip
             ));
+            success("El paseo fue cancelado correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
             setError('Error cancelling trip: ' + err.message);
+            errorToast("No se pudo cancelar el paseo", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 

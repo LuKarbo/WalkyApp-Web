@@ -5,6 +5,8 @@ import { PetsController } from "../../../BackEnd/Controllers/PetsController";
 import { ReviewsController } from "../../../BackEnd/Controllers/ReviewsController";
 import { UserController } from "../../../BackEnd/Controllers/UserController";
 import { useNavigation } from "../../../BackEnd/Context/NavigationContext";
+import { useToast } from "../../../BackEnd/Context/ToastContext";
+
 import HeaderComponent from "../Components/ProfileComponents/HeaderComponent";
 import PersonalDetailsComponent from "../Components/ProfileComponents/PersonalDetailsComponent";
 import TripsComponent from "../Components/ProfileComponents/TripsComponent";
@@ -34,6 +36,7 @@ const MyProfile = () => {
 
     const { navigateToContent } = useNavigation();
     const user = useUser();
+    const { success, error: errorToast, info } = useToast();
 
     const loadUserProfile = useCallback(async () => {
         try {
@@ -84,12 +87,15 @@ const MyProfile = () => {
             const data = await WalksController.fetchWalksByOwner(user.id);
             setTrips(data.slice(0, 10));
         } catch (err) {
-            console.error(err);
             setTripsError("Error al cargar los paseos.");
+            errorToast("No se pudo cargar los paseos", {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setLoadingTrips(false);
         }
-    }, [user?.id]);
+    }, [user?.id, errorToast]);
 
     const loadPets = useCallback(async () => {
         try {
@@ -99,12 +105,15 @@ const MyProfile = () => {
             const data = await PetsController.fetchPetsByOwner(user.id);
             setPets(data);
         } catch (err) {
-            console.error(err);
             setPetsError("Error al cargar las mascotas.");
+            errorToast('Error al cargar las mascotas', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setLoadingPets(false);
         }
-    }, [user?.id]);
+    }, [user?.id, errorToast]);
 
     const loadReviews = useCallback(async (page = 1, search = "") => {
         try {
@@ -116,10 +125,14 @@ const MyProfile = () => {
         } catch (err) {
             console.error(err);
             setReviewsError("Error al cargar las reseñas.");
+            errorToast('Error al cargar las reseñas', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setLoadingReviews(false);
         }
-    }, [user?.id]);
+    }, [user?.id, errorToast]);
 
     useEffect(() => {
         loadTrips();
@@ -141,10 +154,15 @@ const MyProfile = () => {
                     t.id === tripId ? { ...t, status: "Cancelado" } : t
                 )
             );
-            alert("Paseo cancelado correctamente");
+            info("El paseo fue cancelado correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
-            console.error(err);
-            alert("No se pudo cancelar el paseo");
+            errorToast("No se pudo cancelar el paseo", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -154,10 +172,15 @@ const MyProfile = () => {
             
             setRefreshTrigger(prev => prev + 1);
             
-            alert("Perfil actualizado correctamente");
-        } catch (error) {
-            console.error("Error al actualizar perfil:", error);
-            alert(`Error al actualizar el perfil: ${error.message}`);
+            success('Perfil actualizado correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo actualizar el perfil", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -165,10 +188,15 @@ const MyProfile = () => {
         try {
             await PetsController.createPet(user.id, petData);
             setRefreshTrigger(prev => prev + 1);
-            alert("Mascota agregada correctamente");
-        } catch (error) {
-            console.error("Error al agregar mascota:", error);
-            alert(`Error al agregar la mascota: ${error.message}`);
+            success("Mascota agregada correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo agregar la mascota", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -176,10 +204,15 @@ const MyProfile = () => {
         try {
             await PetsController.updatePet(petId, petData);
             setRefreshTrigger(prev => prev + 1);
-            alert("Mascota actualizada correctamente");
-        } catch (error) {
-            console.error("Error al actualizar mascota:", error);
-            alert(`Error al actualizar la mascota: ${error.message}`);
+            success('Mascota actualizada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo actualizar la mascota", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -187,9 +220,15 @@ const MyProfile = () => {
         try {
             await PetsController.deletePet(petId);
             setRefreshTrigger(prev => prev + 1);
-            alert("Mascota eliminada correctamente");
-        } catch (error) {
-            console.error("Error al eliminar mascota:", error);
+            info("La mascota fue eliminada correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo eliminar la mascota", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -197,10 +236,15 @@ const MyProfile = () => {
         try {
             await ReviewsController.updateReview(reviewId, reviewData);
             setRefreshTrigger(prev => prev + 1);
-            alert("Reseña actualizada correctamente");
-        } catch (error) {
-            console.error("Error al actualizar reseña:", error);
-            alert(`Error al actualizar la reseña: ${error.message}`);
+            success('Reseña actualizada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo actualizar la reseña", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 

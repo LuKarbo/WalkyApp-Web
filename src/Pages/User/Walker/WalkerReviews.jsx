@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useUser } from "../../../BackEnd/Context/UserContext";
+import { useToast } from "../../../BackEnd/Context/ToastContext";
 import { ReviewsController } from "../../../BackEnd/Controllers/ReviewsController";
 import WalkerReviewsHeader from "../Components/WalkerReviewsComponents/WalkerReviewsHeader";
 import WalkerReviewsList from "../Components/WalkerReviewsComponents/WalkerReviewsList";
@@ -14,6 +15,7 @@ const WalkerReviews = () => {
     const [searchTerm, setSearchTerm] = useState("");
 
     const user = useUser();
+    const { error: errorToast } = useToast();
 
     const loadReviews = useCallback(async (page = 1, search = "") => {
         try {
@@ -22,18 +24,25 @@ const WalkerReviews = () => {
             
             if (!user?.id) {
                 setError("No se pudo obtener la información del usuario");
+                errorToast("No se pudo obtener la información del usuario", {
+                    title: 'Error',
+                    duration: 4000
+                });
                 return;
             }
 
             const data = await ReviewsController.fetchReviewsByWalker(user.id, page, 6, search);
             setReviewsData(data);
         } catch (err) {
-            console.error("Error loading reviews:", err);
             setError("Error al cargar las reseñas. Por favor, intenta de nuevo.");
+            errorToast("No se pudieron cargar las reseñas", {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setIsLoading(false);
         }
-    }, [user?.id]);
+    }, [user?.id, errorToast]);
 
     useEffect(() => {
         loadReviews(currentPage, searchTerm);

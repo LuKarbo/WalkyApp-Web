@@ -2,15 +2,15 @@ import { useState, useEffect, useCallback } from "react";
 import { WalkerController } from "../../../BackEnd/Controllers/WalkerController";
 import { ReviewsController } from "../../../BackEnd/Controllers/ReviewsController";
 import { useNavigation } from "../../../BackEnd/Context/NavigationContext";
+import { useToast } from "../../../BackEnd/Context/ToastContext";
 import WalkerHeaderComponent from "../Components/WalkerProfileComponents/WalkerHeaderComponent";
 import WalkerReviewsComponent from "../Components/WalkerProfileComponents/WalkerReviewsComponent";
 import GetServiceModal from "../Modals/GetServiceModal";
 
 const WalkerProfile = ({ id }) => {
-    console.log(id);
     const { walkerId } = id || {};
-    console.log(walkerId);
     const { navigateToContent } = useNavigation();
+    const { success, error: errorToast } = useToast();
     
     const [walkerData, setWalkerData] = useState(null);
     const [loadingWalker, setLoadingWalker] = useState(true);
@@ -36,12 +36,15 @@ const WalkerProfile = ({ id }) => {
             const data = await WalkerController.fetchWalkerProfile(walkerId);
             setWalkerData(data);
         } catch (err) {
-            console.error("Error loading walker data:", err);
             setWalkerError("Error al cargar la información del paseador.");
+            errorToast('No se pudo cargar la información del paseador', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setLoadingWalker(false);
         }
-    }, [walkerId]);
+    }, [walkerId, errorToast]);
 
     const loadWalkerReviews = useCallback(async (page = 1, search = "") => {
         try {
@@ -52,12 +55,15 @@ const WalkerProfile = ({ id }) => {
             const data = await ReviewsController.fetchReviewsByWalker(walkerId, page, 6, search);
             setReviewsData(data);
         } catch (err) {
-            console.error("Error loading walker reviews:", err);
             setReviewsError("Error al cargar las reseñas del paseador.");
+            errorToast('No se pudieron cargar las reseñas del paseador', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setLoadingReviews(false);
         }
-    }, [walkerId]);
+    }, [walkerId, errorToast]);
 
     useEffect(() => {
         loadWalkerData();
@@ -89,7 +95,10 @@ const WalkerProfile = ({ id }) => {
     };
 
     const handleRequestSent = () => {
-        console.log('Solicitud de paseo enviada exitosamente');
+        success('Solicitud de paseo enviada correctamente', {
+            title: 'Éxito',
+            duration: 4000
+        });
     };
 
     if (loadingWalker) {
