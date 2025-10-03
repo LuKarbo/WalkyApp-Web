@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { TicketController } from '../../../BackEnd/Controllers/TicketController';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import AdminTicketsHeaderComponent from '../Components/TicketsAdminComponents/AdminTicketsHeaderComponent';
 import AdminPendingTicketsTable from '../Components/TicketsAdminComponents/AdminPendingTicketsTable';
@@ -19,6 +20,8 @@ const TicketsAdminView = () => {
     const [isResponseModalOpen, setIsResponseModalOpen] = useState(false);
     const [responseLoading, setResponseLoading] = useState(false);
 
+    const { success, error: errorToast } = useToast();
+
     useEffect(() => {
         loadAllTickets();
     }, []);
@@ -32,7 +35,10 @@ const TicketsAdminView = () => {
             setTickets(allTickets);
         } catch (err) {
             setError('Error loading tickets: ' + err.message);
-            console.error('Error loading tickets:', err);
+            errorToast("Error al cargar los tickets" , {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setLoading(false);
         }
@@ -50,6 +56,10 @@ const TicketsAdminView = () => {
             // Validar datos antes de enviar
             const validation = TicketController.validateResponseData(responseData);
             if (!validation.isValid) {
+                errorToast("No se pudo responder el ticket" , {
+                    title: "Error",
+                    duration: 5000
+                });
                 throw new Error(validation.errors.join(', '));
             }
 
@@ -74,7 +84,10 @@ const TicketsAdminView = () => {
                 )
             );
             
-            console.log('Ticket response sent successfully:', result);
+            success("Ticket respondido exitosamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
             
             setIsResponseModalOpen(false);
             setSelectedTicket(null);
@@ -82,8 +95,11 @@ const TicketsAdminView = () => {
             await loadAllTickets();
             
         } catch (error) {
-            console.error('Error responding to ticket:', error);
             setError('Error al responder el ticket: ' + error.message);
+            errorToast("Error al responder el ticket" , {
+                title: "Error",
+                duration: 5000
+            });
         } finally {
             setResponseLoading(false);
         }
