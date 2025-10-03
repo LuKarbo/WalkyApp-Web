@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FiCalendar, FiUsers, FiEye, FiFilter } from "react-icons/fi";
 import { WalksController } from '../../../BackEnd/Controllers/WalksController';
 import { useNavigation } from '../../../BackEnd/Context/NavigationContext';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import AdminWalksHeaderComponent from '../Components/AdminWalksComponents/AdminWalksHeaderComponent';
 import AdminWalksCardComponent from '../Components/AdminWalksComponents/AdminWalksCardComponent';
@@ -18,6 +19,7 @@ const AdminWalks = () => {
     const [dateFilter, setDateFilter] = useState("all");
     
     const { navigateToContent } = useNavigation();
+    const { error: errorToast } = useToast();
 
     useEffect(() => {
         const loadWalks = async () => {
@@ -29,7 +31,11 @@ const AdminWalks = () => {
                 setWalks(walksData);
             } catch (err) {
                 setError('Error loading walks: ' + err.message);
-                console.error('Error loading walks:', err);
+                errorToast("Error al cargar los paseos" , {
+                    title: 'Error',
+                    duration: 4000
+                });
+                
             } finally {
                 setLoading(false);
             }
@@ -39,7 +45,6 @@ const AdminWalks = () => {
     }, []);
 
     const handleViewWalk = (tripId) => {
-        console.log(tripId);
         navigateToContent('trip', { tripId });
     };
 
