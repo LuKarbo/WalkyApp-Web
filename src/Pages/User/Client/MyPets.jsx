@@ -3,6 +3,7 @@ import { FiHeart, FiPlus } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
 import { useUser } from "../../../BackEnd/Context/UserContext";
 import { useNavigation } from "../../../BackEnd/Context/NavigationContext";
+import { useToast } from "../../../BackEnd/Context/ToastContext";
 import { PetsController } from "../../../BackEnd/Controllers/PetsController";
 import HeaderPetsComponent from "../Components/MyPet/HeaderPetsComponent";
 import PetCard from "../Components/MyPet/PetCard";
@@ -25,6 +26,7 @@ const MyPets = () => {
 
     const user = useUser();
     const { navigateToContent } = useNavigation();
+    const { success, error: errorToast, info } = useToast();
 
     const loadPets = useCallback(async () => {
         try {
@@ -36,10 +38,14 @@ const MyPets = () => {
         } catch (err) {
             console.error(err);
             setError("Error al cargar las mascotas.");
+            errorToast('Error al cargar las mascotas', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setLoading(false);
         }
-    }, [user?.id]);
+    }, [user?.id, errorToast]);
 
     useEffect(() => {
         loadPets();
@@ -50,10 +56,15 @@ const MyPets = () => {
             await PetsController.createPet(user.id, petData);
             setRefreshTrigger(prev => prev + 1);
             setShowAddModal(false);
-            alert("Mascota agregada correctamente");
-        } catch (error) {
-            console.error("Error al agregar mascota:", error);
-            alert(`Error al agregar la mascota: ${error.message}`);
+            success('Mascota agregada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo agregar la mascota", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -63,10 +74,15 @@ const MyPets = () => {
             setRefreshTrigger(prev => prev + 1);
             setShowEditModal(false);
             setSelectedPet(null);
-            alert("Mascota actualizada correctamente");
-        } catch (error) {
-            console.error("Error al actualizar mascota:", error);
-            alert(`Error al actualizar la mascota: ${error.message}`);
+            success('Mascota actualizada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo actualizar la mascota", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -76,10 +92,15 @@ const MyPets = () => {
             setRefreshTrigger(prev => prev + 1);
             setShowDeleteModal(false);
             setSelectedPet(null);
-            alert("Mascota eliminada correctamente");
-        } catch (error) {
-            console.error("Error al eliminar mascota:", error);
-            alert(`Error al eliminar la mascota: ${error.message}`);
+            info("La mascota fue eliminada correctamente", {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            errorToast("No se pudo eliminar la mascota", {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -103,7 +124,10 @@ const MyPets = () => {
     };
 
     const handleWalkRequestSent = () => {
-        alert("Solicitud de paseo enviada correctamente");
+        success('Solicitud de paseo enviada correctamente', {
+            title: 'Éxito',
+            duration: 4000
+        });
         setShowSelectWalkerModal(false);
         setSelectedPet(null);
     };
