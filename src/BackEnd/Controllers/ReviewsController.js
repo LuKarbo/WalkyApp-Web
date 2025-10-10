@@ -19,5 +19,13 @@ export const ReviewsController = {
 
     async deleteReview(reviewId) {
         return await ReviewsService.deleteReview(reviewId);
-    }
+    },
+
+    async createReview(reviewData){
+        return await ReviewsService.createReview(reviewData);
+    },
+
+    async fetchReviewByWalkId(walkId) {
+        return await ReviewsService.getReviewByWalkId(walkId);
+    },
 };

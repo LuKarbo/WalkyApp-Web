@@ -1,7 +1,7 @@
 import { format } from "date-fns";
-import { FiCalendar, FiMapPin, FiClock, FiXCircle, FiEye, FiCreditCard } from "react-icons/fi";
+import { FiCalendar, FiMapPin, FiClock, FiXCircle, FiEye, FiCreditCard, FiStar } from "react-icons/fi";
 
-const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => {
+const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip, onCreateReview, onViewReview }) => {
     const getStatusColor = (status) => {
         switch (status) {
             case "Solicitado":
@@ -15,6 +15,8 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => 
             case "Finalizado":
                 return "bg-gray-500/70 text-white";
             case "Rechazado":
+                return "bg-red-500/70 text-white";
+            case "Cancelado":
                 return "bg-red-500/70 text-white";
             default:
                 return "bg-neutral/70 text-black";
@@ -35,6 +37,8 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => 
                 return "Finalizado";
             case "Rechazado":
                 return "Rechazado";
+            case "Cancelado":
+                return "Cancelado";
             default:
                 return status;
         }
@@ -58,6 +62,12 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => 
     const viewTrip = (status) => {
         return ["Agendado", "Activo", "Finalizado"].includes(status);
     };
+
+    const isFinished = (status) => {
+        return status === "Finalizado";
+    };
+
+    const hasReview = trip.hasReview || false;
 
     return (
         <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-primary/10 w-full min-w-0 max-w-[450px] mx-auto h-fit min-h-[400px] max-h-[500px] flex flex-col">
@@ -161,6 +171,26 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip }) => 
                             >
                                 <FiXCircle size={12} className="mr-1" />
                                 Cancelar
+                            </button>
+                        )}
+
+                        {isFinished(trip.status) && !hasReview && (
+                            <button
+                                onClick={() => onCreateReview(trip)}
+                                className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-yellow-500 text-yellow-600 hover:bg-yellow-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                            >
+                                <FiStar className="mr-1" size={12} />
+                                Dejar Review
+                            </button>
+                        )}
+
+                        {isFinished(trip.status) && hasReview && (
+                            <button
+                                onClick={() => onViewReview(trip)}
+                                className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                            >
+                                <FiStar className="mr-1 fill-green-600" size={12} />
+                                Ver Review
                             </button>
                         )}
                     </div>

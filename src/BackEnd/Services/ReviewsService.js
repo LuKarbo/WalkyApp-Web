@@ -157,5 +157,69 @@ export const ReviewsService = {
 
         const result = await ReviewsDataAccess.deleteReview(reviewId);
         return result;
-    }
+    },
+
+    async createReview(reviewData) {
+        if (!reviewData) {
+            throw new Error("Review data is required");
+        }
+
+        if (!reviewData.walkId) {
+            throw new Error("Walk ID is required");
+        }
+
+        if (!reviewData.walkerId) {
+            throw new Error("Walker ID is required");
+        }
+
+        if (!reviewData.rating || reviewData.rating < 1 || reviewData.rating > 5) {
+            throw new Error("Rating must be between 1 and 5");
+        }
+
+        if (!reviewData.content || reviewData.content.trim().length === 0) {
+            throw new Error("Review content is required");
+        }
+
+        const newReview = await ReviewsDataAccess.createReview({
+            walkId: reviewData.walkId,
+            walkerId: reviewData.walkerId,
+            rating: parseInt(reviewData.rating),
+            content: reviewData.content.trim()
+        });
+
+        return {
+            id: newReview.id,
+            walkerName: newReview.walkerName,
+            walkerImage: newReview.walkerImage,
+            rating: newReview.rating,
+            content: newReview.content,
+            date: newReview.date,
+            petName: newReview.petName,
+            walkId: newReview.walkId
+        };
+    },
+
+    async getReviewByWalkId(walkId) {
+        if (!walkId) {
+            throw new Error("Walk ID is required");
+        }
+
+        const review = await ReviewsDataAccess.getReviewByWalkId(walkId);
+        
+        if (!review) {
+            return null;
+        }
+
+        return {
+            id: review.id,
+            walkerName: review.walkerName,
+            walkerImage: review.walkerImage,
+            rating: review.rating,
+            content: review.content,
+            date: review.date,
+            petName: review.petName,
+            walkId: review.walkId
+        };
+    },
+
 };

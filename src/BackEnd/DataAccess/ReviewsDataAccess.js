@@ -23,5 +23,13 @@ export const ReviewsDataAccess = {
 
     async deleteReview(id) {
         return await ReviewsAPI.deleteReview(id);
-    }
+    },
+
+    async createReview(reviewData) {
+        return await ReviewsAPI.createReview(reviewData);
+    },
+
+    async getReviewByWalkId(walkId) {
+        return await ReviewsAPI.getReviewByWalkId(walkId);
+    },
 };

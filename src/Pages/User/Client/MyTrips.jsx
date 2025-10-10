@@ -3,6 +3,7 @@ import { FiCalendar } from "react-icons/fi";
 import { WalksController } from '../../../BackEnd/Controllers/WalksController';
 import { WalkerController } from '../../../BackEnd/Controllers/WalkerController';
 import { PetsController } from '../../../BackEnd/Controllers/PetsController';
+import { ReviewsController } from '../../../BackEnd/Controllers/ReviewsController';
 import { useUser } from '../../../BackEnd/Context/UserContext';
 import { useNavigation } from '../../../BackEnd/Context/NavigationContext';
 
@@ -12,6 +13,8 @@ import MyTripsFilter from '../Filters/MyTrips/MyTripsFilter';
 import CancelWalkModal from '../Modals/MyTrips/CancelWalkModal';
 import GetServiceModal_Client from '../Modals/MyTrips/GetServiceModal_Client';
 import PaymentModal from '../Modals/MyTrips/PaymentModal';
+import ReviewModal from '../Modals/MyTrips/ReviewModal';
+import ViewReviewModal from '../Modals/MyTrips/ViewReviewModal';
 
 const MyTrips = () => {
     const [trips, setTrips] = useState([]);
@@ -40,6 +43,14 @@ const MyTrips = () => {
     const [tripToPay, setTripToPay] = useState(null);
     const [paymentLoading, setPaymentLoading] = useState(false);
 
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [tripToReview, setTripToReview] = useState(null);
+    const [reviewLoading, setReviewLoading] = useState(false);
+
+    const [showViewReviewModal, setShowViewReviewModal] = useState(false);
+    const [tripToViewReview, setTripToViewReview] = useState(null);
+    const [currentReview, setCurrentReview] = useState(null);
+
     const user = useUser();
     const userId = user?.id;
     const { navigateToContent } = useNavigation();
@@ -53,7 +64,18 @@ const MyTrips = () => {
                 setError(null);
                 
                 const tripsData = await WalksController.fetchWalksByOwner(userId);
-                setTrips(tripsData);
+                
+                const tripsWithReviews = await Promise.all(
+                    tripsData.map(async (trip) => {
+                        if (trip.status === 'Finalizado') {
+                            const review = await ReviewsController.fetchReviewByWalkId(trip.id);
+                            return { ...trip, hasReview: !!review, reviewId: review?.id };
+                        }
+                        return trip;
+                    })
+                );
+                
+                setTrips(tripsWithReviews);
             } catch (err) {
                 setError('Error loading trips: ' + err.message);
                 console.error('Error loading trips:', err);
@@ -131,6 +153,63 @@ const MyTrips = () => {
         setTripToPay(null);
     };
 
+    const handleCreateReview = async (trip) => {
+        const completeTrip = await WalksController.fetchWalkDetails(trip.id);
+        console.log(completeTrip);
+        setTripToReview(completeTrip);
+        setShowReviewModal(true);
+    };
+
+    const handleSubmitReview = async (reviewData) => {
+        if (!tripToReview) return;
+        
+        try {
+            setReviewLoading(true);
+            console.log(reviewData);
+            await ReviewsController.createReview({
+                walkId: reviewData.id,
+                walkerId: reviewData.walkerId,
+                rating: reviewData.rating,
+                content: reviewData.content
+            });
+            
+            setTrips(trips.map(trip => 
+                trip.id === tripToReview.id 
+                    ? { ...trip, hasReview: true }
+                    : trip
+            ));
+            
+            setShowReviewModal(false);
+            setTripToReview(null);
+        } catch (err) {
+            setError('Error creating review: ' + err.message);
+        } finally {
+            setReviewLoading(false);
+        }
+    };
+
+    const handleCloseReviewModal = () => {
+        setShowReviewModal(false);
+        setTripToReview(null);
+    };
+
+    const handleViewReview = async (trip) => {
+        try {
+            setTripToViewReview(trip);
+            const review = await ReviewsController.fetchReviewByWalkId(trip.id);
+            setCurrentReview(review);
+            setShowViewReviewModal(true);
+        } catch (err) {
+            setError('Error loading review: ' + err.message);
+        }
+    };
+
+    const handleCloseViewReviewModal = () => {
+        setShowViewReviewModal(false);
+        setTripToViewReview(null);
+        setCurrentReview(null);
+    };
+
     const loadModalData = async () => {
         try {
             setLoadingWalkers(true);
@@ -189,13 +268,15 @@ const MyTrips = () => {
                 id: createdTrip.id,
                 dogName: selectedPets.map(petId => pets.find(p => p.id === petId)?.name).join(', '),
                 walker: selectedWalker.name,
+                walkerId: selectedWalker.id,
                 startTime: walkRequest.scheduledDateTime,
                 endTime: null,
                 status: 'Solicitado',
                 duration: null,
                 distance: null,
                 notes: description,
-                totalPrice: walkRequest.totalPrice
+                totalPrice: walkRequest.totalPrice,
+                hasReview: false
             };
             
             setTrips([newTrip, ...trips]);
@@ -309,6 +390,8 @@ const MyTrips = () => {
                                 onViewTrip={handleViewTrip}
                                 onCancelTrip={handleCancelTrip}
                                 onPayTrip={handlePayTrip}
+                                onCreateReview={handleCreateReview}
+                                onViewReview={handleViewReview}
                             />
                         ))}
                     </div>
@@ -350,6 +433,21 @@ const MyTrips = () => {
                     onConfirm={handleConfirmPayment}
                     tripData={tripToPay}
                     isLoading={paymentLoading}
+                />
+
+                <ReviewModal 
+                    isOpen={showReviewModal}
+                    onClose={handleCloseReviewModal}
+                    onSubmit={handleSubmitReview}
+                    tripData={tripToReview}
+                    isLoading={reviewLoading}
+                />
+
+                <ViewReviewModal 
+                    isOpen={showViewReviewModal}
+                    onClose={handleCloseViewReviewModal}
+                    reviewData={currentReview}
+                    tripData={tripToViewReview}
                 />
             </div>
         </div>

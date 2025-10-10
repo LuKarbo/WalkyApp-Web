@@ -28,6 +28,23 @@ export const ReviewsAPI = {
         }
     },
 
+    async getReviewByWalkId(walkId) {
+        try {
+            if (!walkId) {
+                throw new Error('ID de paseo requerido');
+            }
+            
+            const response = await apiClient.get(`/reviews/walk/${walkId}`);
+            return response.data.review || null;
+        } catch (error) {
+            console.error(`Error al obtener reseña del paseo ${walkId}:`, error);
+            if (error.message && error.message.includes('404')) {
+                return null;
+            }
+            throw error;
+        }
+    },
+
     async getReviewsByUser(userId) {
         try {
             if (!userId) {
