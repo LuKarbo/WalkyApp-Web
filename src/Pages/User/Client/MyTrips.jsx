@@ -81,10 +81,10 @@ const MyTrips = () => {
         
         try {
             setCancelLoading(true);
-            await WalksController.changeWalkStatus(tripToCancel.id, 'Rechazado');
+            await WalksController.changeWalkStatus(tripToCancel.id, 'Cancelado');
             setTrips(trips.map(trip => 
                 trip.id === tripToCancel.id 
-                    ? { ...trip, status: 'Rechazado' }
+                    ? { ...trip, status: 'Cancelado' }
                     : trip
             ));
             setShowCancelModal(false);
@@ -217,19 +217,6 @@ const MyTrips = () => {
         setError(null);
     };
 
-    const handleDeleteTrip = async (tripId) => {
-        try {
-            await WalksController.changeWalkStatus(tripId, 'Rechazado');
-            setTrips(trips.map(trip => 
-                trip.id === tripId 
-                    ? { ...trip, status: 'Rechazado' }
-                    : trip
-            ));
-        } catch (err) {
-            setError('Error cancelling trip: ' + err.message);
-        }
-    };
-
     const handleViewTrip = (tripId) => {
         navigateToContent('trip', { tripId });
     };
@@ -245,7 +232,7 @@ const MyTrips = () => {
     const filteredTrips = trips.filter((trip) => {
         const isActive = activeTab === "active" ?
             ["Solicitado", "Esperando pago", "Agendado", "Activo"].includes(trip.status) :
-            ["Rechazado", "Finalizado"].includes(trip.status);
+            ["Cancelado", "Rechazado", "Finalizado"].includes(trip.status);
 
         const matchesSearch = trip.dogName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                                 trip.walker?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -258,7 +245,7 @@ const MyTrips = () => {
     ).length;
 
     const completedTripsCount = trips.filter(trip => 
-        ["Rechazado", "Finalizado"].includes(trip.status)
+        ["Cancelado", "Rechazado", "Finalizado"].includes(trip.status)
     ).length;
 
     if (loading) {

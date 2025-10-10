@@ -82,44 +82,6 @@ const WalkerService = () => {
         }
     }, [successMessage]);
 
-    const calculateEarnings = (walks, walkerSettings) => {
-        const completedWalks = walks.filter(walk => walk.status === 'Finalizado');
-        const basePrice = walkerSettings?.pricePerPet || 15000;
-        
-        const monthlyEarnings = completedWalks.reduce((total, walk) => {
-            const walkDate = new Date(walk.startTime);
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-            
-            if (walkDate.getMonth() === currentMonth && walkDate.getFullYear() === currentYear) {
-                let price = walk.price || basePrice;
-                
-                if (walkerSettings?.hasDiscount && walkerSettings?.discountPercentage > 0) {
-                    price = price * (1 - walkerSettings.discountPercentage / 100);
-                }
-                
-                return total + price;
-            }
-            return total;
-        }, 0);
-        
-        const totalEarnings = completedWalks.reduce((total, walk) => {
-            let price = walk.price || basePrice;
-            
-            if (walkerSettings?.hasDiscount && walkerSettings?.discountPercentage > 0) {
-                price = price * (1 - walkerSettings.discountPercentage / 100);
-            }
-            
-            return total + price;
-        }, 0);
-        
-        return {
-            monthly: monthlyEarnings,
-            total: totalEarnings,
-            completedWalks: completedWalks.length
-        };
-    };
-
     const generateChartData = (walks) => {
         const last7Days = [];
         const today = new Date();
@@ -183,9 +145,6 @@ const WalkerService = () => {
                 ...prev,
                 ...updatedSettings
             }));
-            
-            const updatedEarnings = calculateEarnings(walksData, updatedSettings);
-            setEarnings(updatedEarnings);
             
             setSuccessMessage('Configuración guardada exitosamente');
         } catch (err) {

@@ -10,6 +10,13 @@ const WalkerServiceEarningsComponent = ({ earnings }) => {
         }).format(amount);
     };
 
+    const calculateAveragePerWalk = () => {
+        if (!earnings || !earnings.completedWalks || earnings.completedWalks === 0) {
+            return 0;
+        }
+        return earnings.total / earnings.completedWalks;
+    };
+
     return (
         <div>
             <div className="flex items-center mb-6">
@@ -56,14 +63,14 @@ const WalkerServiceEarningsComponent = ({ earnings }) => {
                     </div>
                 </div>
                 
-                {earnings && earnings.monthly > 0 && (
+                {earnings && earnings.completedWalks > 0 && (
                     <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl">
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-accent dark:text-muted">
                                 Promedio por paseo
                             </span>
                             <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                                {formatCurrency(earnings.monthly / (earnings.completedWalks || 1))}
+                                {formatCurrency(calculateAveragePerWalk())}
                             </span>
                         </div>
                     </div>

@@ -245,30 +245,30 @@ export const WalkerService = {
     },
 
     async calculateWalkerEarnings(walkerId) {
-    try {
-        if (!walkerId) {
+        try {
+            if (!walkerId) {
+                return {
+                    monthly: 0,
+                    total: 0,
+                    completedWalks: 0
+                };
+            }
+
+            const earnings = await WalkerDataAccess.getWalkerEarnings(walkerId);
+            
+            return {
+                monthly: earnings.monthly,
+                total: earnings.total,
+                completedWalks: earnings.completedWalks
+            };
+        } catch (error) {
+            console.error(`Service - Error al calcular ganancias del paseador ${walkerId}:`, error);
+            
             return {
                 monthly: 0,
                 total: 0,
                 completedWalks: 0
             };
         }
-
-        const earnings = await WalkerDataAccess.getWalkerEarnings(walkerId);
-        
-        return {
-            monthly: earnings.monthly,
-            total: earnings.total,
-            completedWalks: earnings.completedWalks
-        };
-    } catch (error) {
-        console.error(`Service - Error al calcular ganancias del paseador ${walkerId}:`, error);
-        
-        return {
-            monthly: 0,
-            total: 0,
-            completedWalks: 0
-        };
     }
-}
 };

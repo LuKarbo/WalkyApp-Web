@@ -107,36 +107,6 @@ export const WalkerAPI = {
         }
     },
 
-    async getWalkerEarningsSettings(walkerId) {
-        console.log('earns')
-        try {
-            if (!walkerId) {
-                throw new Error('ID de paseador requerido');
-            }
-
-            const response = await apiClient.get(`/walkers/${walkerId}/earnings`);
-            const earnings = response.data.earnings;
-            
-            return {
-                pricePerPet: earnings.currentPricePerPet || 15000,
-                hasDiscount: earnings.hasDiscount || false,
-                discountPercentage: earnings.discountPercentage || 0,
-                effectivePrice: earnings.hasDiscount ? 
-                    earnings.currentPricePerPet * (1 - earnings.discountPercentage / 100) : 
-                    earnings.currentPricePerPet
-            };
-        } catch (error) {
-            console.error(`Error al obtener configuraciones de ganancias del paseador ${walkerId}:`, error);
-            
-            return {
-                pricePerPet: 15000,
-                hasDiscount: false,
-                discountPercentage: 0,
-                effectivePrice: 15000
-            };
-        }
-    },
-
     async updateWalkerLocation(walkerId, location) {
         try {
             if (!walkerId) {
@@ -170,7 +140,6 @@ export const WalkerAPI = {
 
             const { pricePerPet, hasDiscount, discountPercentage } = pricingData;
 
-            // Validaciones del lado del cliente
             if (pricePerPet !== undefined && pricePerPet < 0) {
                 throw new Error('El precio por mascota no puede ser negativo');
             }
@@ -192,7 +161,6 @@ export const WalkerAPI = {
         }
     },
 
-    // Métodos adicionales útiles
     async searchWalkers(filters = {}) {
         try {
             const queryParams = new URLSearchParams();
@@ -232,15 +200,11 @@ export const WalkerAPI = {
             if (!walkerId) {
                 throw new Error('ID de paseador requerido');
             }
-            console.log('consulta')
             const response = await apiClient.get(`/walkers/${walkerId}/earnings`);
             return response.data.earnings || {
                 monthly: 0,
                 total: 0,
-                completedWalks: 0,
-                currentPricePerPet: 15000,
-                hasDiscount: false,
-                discountPercentage: 0
+                completedWalks: 0
             };
         } catch (error) {
             console.error(`Error al obtener ganancias del paseador ${walkerId}:`, error);
@@ -248,10 +212,7 @@ export const WalkerAPI = {
             return {
                 monthly: 0,
                 total: 0,
-                completedWalks: 0,
-                currentPricePerPet: 15000,
-                hasDiscount: false,
-                discountPercentage: 0
+                completedWalks: 0
             };
         }
     },
