@@ -7,11 +7,9 @@ const WalkData = ({ tripId, walkStatus }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Verificar si el seguimiento está visible según el estado del paseo
   const isTrackingVisible = WalkTrackingController.isTrackingVisible(walkStatus);
   const trackingStatusMessage = WalkTrackingController.getTrackingStatusMessage(walkStatus);
 
-  // Cargar registros desde la API al montar el componente
   useEffect(() => {
     if (tripId && isTrackingVisible) {
       loadWalkRecords();
@@ -24,7 +22,37 @@ const WalkData = ({ tripId, walkStatus }) => {
       setError(null);
       
       const fetchedRecords = await WalkTrackingController.fetchWalkRecords(tripId);
-      setApiRecords(fetchedRecords);
+      console.log('📍 Records fetched:', fetchedRecords);
+      
+      const recordsWithAddresses = await Promise.all(
+        fetchedRecords.map(async (record) => {
+          
+          const hasRealAddress = record.address && 
+                                !record.address.startsWith('Lat:') &&
+                                record.address !== '';
+          
+          if (hasRealAddress) {
+            return record;
+          }
+          
+          try {
+            const address = await reverseGeocode(
+              parseFloat(record.lat),
+              parseFloat(record.lng)
+            );
+            return { ...record, address };
+          } catch (err) {
+            console.error('Error geocoding:', err);
+            return { 
+              ...record, 
+              address: `${record.lat}, ${record.lng}` 
+            };
+          }
+        })
+      );
+      
+      console.log('📍 Records with addresses:', recordsWithAddresses);
+      setApiRecords(recordsWithAddresses);
     } catch (err) {
       setError('Error cargando registros: ' + err.message);
       console.error('Error loading walk records:', err);
@@ -33,11 +61,38 @@ const WalkData = ({ tripId, walkStatus }) => {
     }
   };
 
-  // Ordenar por fecha descendente
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`
+      );
+      const data = await response.json();
+      
+      if (data.status === 'OK' && data.results.length > 0) {
+        
+        const streetAddress = data.results.find(
+          result => result.types.includes('street_address') ||
+                    result.types.includes('route')
+        );
+        
+        if (streetAddress) {
+          return streetAddress.formatted_address;
+        }
+        
+        return data.results[0].formatted_address;
+      }
+      
+      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    } catch (error) {
+      console.error('Reverse geocoding error:', error);
+      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    }
+  };
+
   const sortedRecords = apiRecords
     .sort((a, b) => new Date(b.timeFull) - new Date(a.timeFull));
 
-  // Si el seguimiento no es visible según el estado del paseo
   if (!isTrackingVisible) {
     return (
       <div className="bg-foreground rounded-2xl shadow-md p-6 border border-border flex-grow">
@@ -52,23 +107,20 @@ const WalkData = ({ tripId, walkStatus }) => {
 
   return (
     <div className="bg-foreground rounded-2xl shadow-md p-4 border border-border text-black flex-grow overflow-y-auto">
-      {/* Header */}
+
       <div className="flex items-center gap-2 mb-3">
         <FiActivity className="text-primary" size={20} />
         <h3 className="font-bold">Seguimiento del paseo</h3>
       </div>
       
-      {/* Status message */}
       <p className="text-xs text-gray-600 mb-3">{trackingStatusMessage}</p>
 
-      {/* Error message */}
       {error && (
         <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-md">
           <p className="text-red-600 text-sm">{error}</p>
         </div>
       )}
 
-      {/* Loading */}
       {loading && (
         <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-md">
           <div className="flex items-center gap-2">
@@ -78,7 +130,6 @@ const WalkData = ({ tripId, walkStatus }) => {
         </div>
       )}
 
-      {/* Records list */}
       {sortedRecords.length === 0 ? (
         <div className="text-center text-gray-500 py-6">
           <FiMapPin size={32} className="mx-auto mb-2 text-gray-400" />
@@ -117,7 +168,6 @@ const WalkData = ({ tripId, walkStatus }) => {
         </div>
       )}
 
-      {/* Footer info for completed walks */}
       {walkStatus?.toLowerCase() === 'finalizado' && sortedRecords.length > 0 && (
         <div className="mt-3 pt-2 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center">

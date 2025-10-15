@@ -40,11 +40,19 @@ export default function WalkMap({ tripId, walkStatus }) {
       setError(null);
       
       const route = await WalkTrackingController.fetchWalkRoute(tripId);
-      setPath(route);
+      console.log('📍 Route fetched:', route);
       
-      // Si hay ruta, calcular direcciones
-      if (route.length >= 2) {
-        setDirections(null); // Reset para que se recalcule
+      const normalizedPath = route.map(point => ({
+        lat: parseFloat(point.lat),
+        lng: parseFloat(point.lng)
+      }));
+      
+      console.log('📍 Normalized path:', normalizedPath);
+      
+      setPath(normalizedPath);
+      
+      if (normalizedPath.length >= 2) {
+        setDirections(null);
       }
     } catch (err) {
       setError('Error cargando ruta: ' + err.message);
@@ -103,12 +111,12 @@ export default function WalkMap({ tripId, walkStatus }) {
             center={center}
             zoom={13}
             options={{
-              disableDefaultUI: true,
+              disableDefaultUI: false,
               zoomControl: true,
               mapTypeControl: false,
               streetViewControl: false,
-              fullscreenControl: false,
-              gestureHandling: 'none' // no permite interactuar con clicks
+              fullscreenControl: true,
+              gestureHandling: 'greedy'
             }}
           >
             {path.length >= 2 && !directions && (
