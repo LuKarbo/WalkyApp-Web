@@ -50,7 +50,7 @@ const AdminWalks = () => {
                 tabMatch = ["Solicitado", "Esperando pago", "Agendado", "Activo"].includes(walk.status);
                 break;
             case "completed":
-                tabMatch = ["Finalizado", "Rechazado"].includes(walk.status);
+                tabMatch = ["Cancelado", "Finalizado", "Rechazado"].includes(walk.status);
                 break;
             case "pending":
                 tabMatch = ["Solicitado", "Esperando pago"].includes(walk.status);
@@ -96,7 +96,7 @@ const AdminWalks = () => {
         ["Solicitado", "Esperando pago", "Agendado", "Activo"].includes(walk.status)
     ).length;
     const completedWalksCount = walks.filter(walk => 
-        ["Finalizado", "Rechazado"].includes(walk.status)
+        ["Cancelado", "Finalizado", "Rechazado"].includes(walk.status)
     ).length;
     const pendingWalksCount = walks.filter(walk => 
         ["Solicitado", "Esperando pago"].includes(walk.status)

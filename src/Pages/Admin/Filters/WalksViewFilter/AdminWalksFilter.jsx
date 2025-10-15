@@ -15,7 +15,8 @@ const AdminWalksFilter = ({
         { value: "Agendado", label: "Agendado" },
         { value: "Activo", label: "Activo" },
         { value: "Finalizado", label: "Finalizado" },
-        { value: "Rechazado", label: "Rechazado" }
+        { value: "Rechazado", label: "Rechazado" },
+        { value: "Cancelado", label: "Cancelado" }
     ];
 
     const clearFilters = () => {

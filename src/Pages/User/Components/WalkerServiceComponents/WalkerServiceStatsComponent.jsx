@@ -39,8 +39,8 @@ const WalkerServiceStatsComponent = ({ stats }) => {
             color: "bg-gradient-to-br from-emerald-500 to-emerald-600" 
         },
         { 
-            title: "Paseos Rechazados", 
-            value: stats.rejected, 
+            title: "Paseos Rechazados y Cancelados", 
+            value: (stats.rejected + stats.canceled), 
             icon: <FaTimes className="text-2xl" />, 
             color: "bg-gradient-to-br from-red-500 to-red-600" 
         }

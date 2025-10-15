@@ -19,7 +19,8 @@ const AdminWalksFilter = ({
         { value: "Agendado", label: "Agendado", color: "text-yellow-600" },
         { value: "Activo", label: "Activo", color: "text-green-600" },
         { value: "Finalizado", label: "Finalizado", color: "text-gray-600" },
-        { value: "Rechazado", label: "Rechazado", color: "text-red-600" }
+        { value: "Rechazado", label: "Rechazado", color: "text-red-600" },
+        { value: "Cancelado", label: "Cancelado", color: "text-red-600" }
     ];
 
     const dateOptions = [

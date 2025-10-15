@@ -236,7 +236,7 @@ const WalkerWalks = () => {
                 isInTab = walk.status === "Activo";
                 break;
             case "history":
-                isInTab = ["Finalizado", "Rechazado"].includes(walk.status);
+                isInTab = ["Cancelado", "Finalizado", "Rechazado"].includes(walk.status);
                 break;
             default:
                 isInTab = false;
@@ -257,7 +257,7 @@ const WalkerWalks = () => {
     ).length;
 
     const historyCount = walks.filter(walk => 
-        ["Finalizado", "Rechazado"].includes(walk.status)
+        ["Cancelado", "Finalizado", "Rechazado"].includes(walk.status)
     ).length;
 
     useEffect(() => {

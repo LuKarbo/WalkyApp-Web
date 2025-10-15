@@ -26,6 +26,8 @@ const WalkerWalksCardComponent = ({
                 return "bg-gray-500/70 text-white";
             case "Rechazado":
                 return "bg-red-500/70 text-white";
+            case "Cancelado":
+                return "bg-red-500/70 text-white";
             default:
                 return "bg-neutral/70 text-black";
         }
@@ -45,6 +47,8 @@ const WalkerWalksCardComponent = ({
                 return "Finalizado";
             case "Rechazado":
                 return "Rechazado";
+            case "Cancelado":
+                return "Cancelado";
             default:
                 return status;
         }
@@ -138,7 +142,19 @@ const WalkerWalksCardComponent = ({
                 );
 
             case "Finalizado":
+                return (
+                    <div className="flex items-center gap-2 mt-auto">
+                        <button
+                            onClick={() => onViewWalk(walk.id)}
+                            className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-success text-success hover:bg-success hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                            <FiEye className="mr-1" size={12} />
+                            Ver Paseo
+                        </button>
+                    </div>
+                );
             case "Rechazado":
+            case "Cancelado":
             default:
                 return null;
         }

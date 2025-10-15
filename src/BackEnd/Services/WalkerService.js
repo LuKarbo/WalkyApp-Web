@@ -83,12 +83,12 @@ export const WalkerService = {
         
         return {
             location: walkerSettings.location || "",
-            pricePerPet: walkerSettings.pricePerPet || 0,
-            hasGPSTracker: walkerSettings.hasGPSTracker || false,
-            hasDiscount: walkerSettings.hasDiscount || false,
-            discountPercentage: walkerSettings.discountPercentage || 0,
-            hasMercadoPago: walkerSettings.hasMercadoPago || false,
-            tokenMercadoPago: walkerSettings.tokenMercadoPago || null
+            pricePerPet: parseFloat(walkerSettings.price_per_pet) || 0,
+            hasGPSTracker: walkerSettings.gps_tracking_enabled || false,
+            hasDiscount: walkerSettings.has_discount || false,
+            discountPercentage: parseFloat(walkerSettings.discount_percentage) || 0,
+            hasMercadoPago: walkerSettings.has_mercadopago || false,
+            tokenMercadoPago: walkerSettings.token_mercadopago || null
         };
     },
 
@@ -101,13 +101,22 @@ export const WalkerService = {
             throw new Error("Settings data is required");
         }
 
-        if (settings.pricePerPet !== undefined && settings.pricePerPet < 0) {
-            throw new Error("Price per pet cannot be negative");
+        if (settings.pricePerPet !== undefined) {
+            settings.pricePerPet = parseFloat(settings.pricePerPet);
+            
+            if (isNaN(settings.pricePerPet) || settings.pricePerPet < 0) {
+                throw new Error("Price per pet must be a valid positive number");
+            }
         }
 
-        if (settings.discountPercentage !== undefined && 
-            (settings.discountPercentage < 0 || settings.discountPercentage > 100)) {
-            throw new Error("Discount percentage must be between 0 and 100");
+        if (settings.discountPercentage !== undefined) {
+            settings.discountPercentage = parseFloat(settings.discountPercentage);
+            
+            if (isNaN(settings.discountPercentage) || 
+                settings.discountPercentage < 0 || 
+                settings.discountPercentage > 100) {
+                throw new Error("Discount percentage must be between 0 and 100");
+            }
         }
 
         if (settings.hasDiscount === false) {
@@ -122,10 +131,10 @@ export const WalkerService = {
         
         return {
             location: updatedSettings.location,
-            pricePerPet: updatedSettings.pricePerPet,
+            pricePerPet: parseFloat(updatedSettings.pricePerPet) || 0,
             hasGPSTracker: updatedSettings.hasGPSTracker,
             hasDiscount: updatedSettings.hasDiscount,
-            discountPercentage: updatedSettings.discountPercentage,
+            discountPercentage: parseFloat(updatedSettings.discountPercentage) || 0,
             hasMercadoPago: updatedSettings.hasMercadoPago,
             tokenMercadoPago: updatedSettings.tokenMercadoPago,
             updatedAt: updatedSettings.updatedAt
@@ -154,7 +163,7 @@ export const WalkerService = {
         };
 
         const updatedSettings = await WalkerDataAccess.updateWalkerMercadoPago(walkerId, settingsToUpdate);
-
+        console.log(updatedSettings);
         return {
             hasMercadoPago: updatedSettings.hasMercadoPago,
             tokenMercadoPago: updatedSettings.tokenMercadoPago,
@@ -190,15 +199,24 @@ export const WalkerService = {
             throw new Error("Pricing data is required");
         }
 
-        const { pricePerPet, hasDiscount, discountPercentage } = pricingData;
+        let { pricePerPet, hasDiscount, discountPercentage } = pricingData;
 
-        if (pricePerPet !== undefined && pricePerPet < 0) {
-            throw new Error("Price per pet cannot be negative");
+        if (pricePerPet !== undefined) {
+            pricePerPet = parseFloat(pricePerPet);
+            
+            if (isNaN(pricePerPet) || pricePerPet < 0) {
+                throw new Error("Price per pet must be a valid positive number");
+            }
         }
 
-        if (discountPercentage !== undefined && 
-            (discountPercentage < 0 || discountPercentage > 100)) {
-            throw new Error("Discount percentage must be between 0 and 100");
+        if (discountPercentage !== undefined) {
+            discountPercentage = parseFloat(discountPercentage);
+            
+            if (isNaN(discountPercentage) || 
+                discountPercentage < 0 || 
+                discountPercentage > 100) {
+                throw new Error("Discount percentage must be between 0 and 100");
+            }
         }
 
         const settingsToUpdate = {
@@ -210,9 +228,9 @@ export const WalkerService = {
         const updatedSettings = await WalkerDataAccess.updateWalkerSettings(walkerId, settingsToUpdate);
         
         return {
-            pricePerPet: updatedSettings.pricePerPet,
+            pricePerPet: parseFloat(updatedSettings.pricePerPet) || 0,
             hasDiscount: updatedSettings.hasDiscount,
-            discountPercentage: updatedSettings.discountPercentage,
+            discountPercentage: parseFloat(updatedSettings.discountPercentage) || 0,
             updatedAt: updatedSettings.updatedAt
         };
     },
@@ -220,17 +238,21 @@ export const WalkerService = {
     async validateWalkerSettings(settings) {
         const errors = [];
 
-        if (settings.pricePerPet !== undefined && settings.pricePerPet < 0) {
-            errors.push("El precio por mascota no puede ser negativo");
+        if (settings.pricePerPet !== undefined) {
+            const price = parseFloat(settings.pricePerPet);
+            if (isNaN(price) || price < 0) {
+                errors.push("El precio por mascota debe ser un número válido y no puede ser negativo");
+            }
         }
 
         if (settings.discountPercentage !== undefined) {
-            if (settings.discountPercentage < 0 || settings.discountPercentage > 100) {
+            const discount = parseFloat(settings.discountPercentage);
+            if (isNaN(discount) || discount < 0 || discount > 100) {
                 errors.push("El porcentaje de descuento debe estar entre 0 y 100");
             }
         }
 
-        if (settings.hasDiscount && (!settings.discountPercentage || settings.discountPercentage <= 0)) {
+        if (settings.hasDiscount && (!settings.discountPercentage || parseFloat(settings.discountPercentage) <= 0)) {
             errors.push("Debe especificar un porcentaje de descuento válido");
         }
 
@@ -257,8 +279,8 @@ export const WalkerService = {
             const earnings = await WalkerDataAccess.getWalkerEarnings(walkerId);
             
             return {
-                monthly: earnings.monthly,
-                total: earnings.total,
+                monthly: parseFloat(earnings.monthly) || 0,
+                total: parseFloat(earnings.total) || 0,
                 completedWalks: earnings.completedWalks
             };
         } catch (error) {

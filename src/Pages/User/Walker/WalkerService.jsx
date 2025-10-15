@@ -48,7 +48,7 @@ const WalkerService = () => {
                     WalkerController.fetchWalkerSettings(walkerId),
                     WalkerController.getWalkerEarnings(walkerId)
                 ]);
-                
+
                 setWalkerData(walker);
                 setWalksData(walks);
                 setSettings(walkerSettings);
@@ -117,7 +117,8 @@ const WalkerService = () => {
             scheduled: walksData.filter(w => w.status === 'Agendado').length,
             active: walksData.filter(w => w.status === 'Activo').length,
             completed: walksData.filter(w => w.status === 'Finalizado').length,
-            rejected: walksData.filter(w => w.status === 'Rechazado').length
+            rejected: walksData.filter(w => w.status === 'Rechazado').length,
+            canceled: walksData.filter(w => w.status === 'Cancelado').length
         };
         
         return stats;
