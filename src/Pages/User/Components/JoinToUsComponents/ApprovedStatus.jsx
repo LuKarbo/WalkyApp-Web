@@ -1,9 +1,10 @@
 import { FaCheckCircle, FaUserCheck, FaClock, FaStar } from 'react-icons/fa';
+import ImageGallery from './ImageGallery';
 
 const ApprovedStatus = ({ application }) => {
     return (
-        <div className="w-full h-full p-6 bg-background dark:bg-foreground">
-            <div className="max-w-4xl mx-auto">
+        <div className="w-full h-full p-6 bg-background dark:bg-foreground overflow-y-auto">
+            <div className="max-w-4xl mx-auto space-y-6">
                 <div className="bg-gradient-to-br from-success/10 to-primary/10 rounded-2xl p-12 text-center border border-success/20">
                     <div className="w-24 h-24 bg-success rounded-full flex items-center justify-center mx-auto mb-6">
                         <FaCheckCircle className="text-4xl text-white" />
@@ -84,6 +85,13 @@ const ApprovedStatus = ({ application }) => {
                         </div>
                     )}
                 </div>
+
+                {application.images && (
+                    <ImageGallery 
+                        images={application.images}
+                        title="Documentación Aprobada"
+                    />
+                )}
             </div>
         </div>
     );

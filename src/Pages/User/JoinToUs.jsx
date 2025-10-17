@@ -25,6 +25,7 @@ const JoinToUs = () => {
 
             try {
                 const application = await JoinToUsController.getApplicationByUserId(user.id);
+
                 setCurrentApplication(application);
             } catch (error) {
                 console.error('Error checking existing application:', error);

@@ -133,7 +133,6 @@ export const menuItems = {
         { icon: FiStar, label: "Mis Reseñas", id: "my-reviews" },
         { icon: FiSend, label: "Ser Paseador", id: "join-to-us" },
         { icon: FiMessageSquare, label: "Consultas", id: "tickets" },
-        { icon: FiMessageSquare, label: "MapChat", id: "mapchat" },
     ],
     
     // Menú para Paseador
@@ -188,7 +187,6 @@ const menuTitles = {
     'my-reviews': 'Mis Reseñas',
     'join-to-us': 'Queres ser un Paseador?',
     'tickets': 'Consultas',
-    'mapchat': 'MapChat',
 
     // Paseador
     'walker-service': 'Mi Servicio',

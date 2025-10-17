@@ -1,9 +1,10 @@
 import { FaTimes, FaExclamationTriangle, FaRedo } from 'react-icons/fa';
+import ImageGallery from './ImageGallery';
 
 const RejectedStatus = ({ application, onRetry }) => {
     return (
-        <div className="w-full h-full p-6 bg-background dark:bg-foreground">
-            <div className="max-w-4xl mx-auto">
+        <div className="w-full h-full p-6 bg-background dark:bg-foreground overflow-y-auto">
+            <div className="max-w-4xl mx-auto space-y-6">
                 <div className="bg-gradient-to-br from-danger/10 to-warning/10 rounded-2xl p-12 text-center border border-danger/20">
                     <div className="w-24 h-24 bg-danger rounded-full flex items-center justify-center mx-auto mb-6">
                         <FaTimes className="text-4xl text-white" />
@@ -54,6 +55,14 @@ const RejectedStatus = ({ application, onRetry }) => {
                         Enviar Nueva Solicitud
                     </button>
                 </div>
+
+                {/* Galería de imágenes - mostrar la documentación rechazada para referencia */}
+                {application.images && (
+                    <ImageGallery 
+                        images={application.images}
+                        title="Documentación Rechazada (para referencia)"
+                    />
+                )}
             </div>
         </div>
     );

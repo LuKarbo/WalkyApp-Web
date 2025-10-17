@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { FaCamera, FaUser, FaPhone, FaIdCard, FaMapMarkerAlt, FaUpload } from 'react-icons/fa';
+import { FaCamera, FaUser, FaPhone, FaIdCard, FaMapMarkerAlt, FaUpload, FaCloudUploadAlt } from 'react-icons/fa';
+import CloudinaryService from '../../../../BackEnd/Services/CloudinaryService';
 
 const RegistrationForm = ({ onSubmit, loading }) => {
     const [formData, setFormData] = useState({
@@ -20,6 +21,12 @@ const RegistrationForm = ({ onSubmit, loading }) => {
         dniFront: null,
         dniBack: null,
         selfieWithDni: null
+    });
+
+    const [uploadProgress, setUploadProgress] = useState({
+        dniFront: false,
+        dniBack: false,
+        selfieWithDni: false
     });
 
     const [errors, setErrors] = useState({});
@@ -131,12 +138,40 @@ const RegistrationForm = ({ onSubmit, loading }) => {
             return;
         }
 
-        const registrationData = {
-            ...formData,
-            images: images
-        };
+        try {
+            
+            setUploadProgress({
+                dniFront: true,
+                dniBack: true,
+                selfieWithDni: true
+            });
 
-        onSubmit(registrationData);
+            const uploadedFilenames = await CloudinaryService.uploadMultipleImages(images);
+            
+            setUploadProgress({
+                dniFront: false,
+                dniBack: false,
+                selfieWithDni: false
+            });
+
+            const registrationData = {
+                ...formData,
+                images: uploadedFilenames 
+            };
+
+            await onSubmit(registrationData);
+            
+        } catch (error) {
+            
+            setErrors({ 
+                submit: error.message || 'Ocurrió un error al procesar el registro. Por favor intenta nuevamente.' 
+            });
+            setUploadProgress({
+                dniFront: false,
+                dniBack: false,
+                selfieWithDni: false
+            });
+        }
     };
 
     const removeImage = (imageType) => {
@@ -149,6 +184,8 @@ const RegistrationForm = ({ onSubmit, loading }) => {
             [imageType]: null
         }));
     };
+
+    const isUploading = Object.values(uploadProgress).some(value => value);
 
     return (
         <div className="w-full h-full p-6 bg-background dark:bg-foreground overflow-y-auto">
@@ -167,6 +204,16 @@ const RegistrationForm = ({ onSubmit, loading }) => {
                     {errors.submit && (
                         <div className="mb-6 p-4 bg-danger/10 border border-danger/30 rounded-xl text-danger">
                             {errors.submit}
+                        </div>
+                    )}
+
+                    {isUploading && (
+                        <div className="mb-6 p-4 bg-info/10 border border-info/30 rounded-xl text-info flex items-center">
+                            <FaCloudUploadAlt className="text-2xl mr-3 animate-pulse" />
+                            <div>
+                                <p className="font-semibold">Subiendo imágenes a Cloudinary...</p>
+                                <p className="text-sm">Por favor espera, esto puede tomar unos momentos.</p>
+                            </div>
                         </div>
                     )}
 
@@ -192,6 +239,7 @@ const RegistrationForm = ({ onSubmit, loading }) => {
                                         errors.fullName ? 'border-danger' : 'border-border dark:border-muted hover:border-primary/50'
                                     }`}
                                     placeholder="Ingresa tu nombre completo"
+                                    disabled={loading || isUploading}
                                 />
                                 {errors.fullName && (
                                     <p className="mt-2 text-sm text-danger">{errors.fullName}</p>
@@ -212,6 +260,7 @@ const RegistrationForm = ({ onSubmit, loading }) => {
                                         errors.phone ? 'border-danger' : 'border-border dark:border-muted hover:border-primary/50'
                                     }`}
                                     placeholder="Ej: 1123456789"
+                                    disabled={loading || isUploading}
                                 />
                                 {errors.phone && (
                                     <p className="mt-2 text-sm text-danger">{errors.phone}</p>
@@ -232,6 +281,7 @@ const RegistrationForm = ({ onSubmit, loading }) => {
                                         errors.dni ? 'border-danger' : 'border-border dark:border-muted hover:border-primary/50'
                                     }`}
                                     placeholder="Sin puntos ni espacios"
+                                    disabled={loading || isUploading}
                                 />
                                 {errors.dni && (
                                     <p className="mt-2 text-sm text-danger">{errors.dni}</p>
@@ -252,6 +302,7 @@ const RegistrationForm = ({ onSubmit, loading }) => {
                                         errors.city ? 'border-danger' : 'border-border dark:border-muted hover:border-primary/50'
                                     }`}
                                     placeholder="Tu ciudad actual"
+                                    disabled={loading || isUploading}
                                 />
                                 {errors.city && (
                                     <p className="mt-2 text-sm text-danger">{errors.city}</p>
@@ -271,6 +322,7 @@ const RegistrationForm = ({ onSubmit, loading }) => {
                                         errors.province ? 'border-danger' : 'border-border dark:border-muted hover:border-primary/50'
                                     }`}
                                     placeholder="Tu provincia"
+                                    disabled={loading || isUploading}
                                 />
                                 {errors.province && (
                                     <p className="mt-2 text-sm text-danger">{errors.province}</p>
@@ -299,13 +351,20 @@ const RegistrationForm = ({ onSubmit, loading }) => {
                                 <div key={item.key} className="flex flex-col">
                                     <div className={`relative group ${imagePreview[item.key] ? 'mb-3' : ''}`}>
                                         <label className={`w-full h-48 flex flex-col items-center justify-center border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 ${
-                                            imagePreview[item.key] 
+                                            uploadProgress[item.key]
+                                                ? 'border-info bg-info/10 cursor-wait'
+                                                : imagePreview[item.key] 
                                                 ? 'border-success bg-success/5 hover:bg-success/10' 
                                                 : errors[item.key] 
                                                 ? 'border-danger bg-danger/5 hover:bg-danger/10' 
                                                 : 'border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10'
-                                        }`}>
-                                            {imagePreview[item.key] ? (
+                                        } ${(loading || isUploading) ? 'cursor-not-allowed opacity-50' : ''}`}>
+                                            {uploadProgress[item.key] ? (
+                                                <div className="flex flex-col items-center">
+                                                    <FaCloudUploadAlt className="text-4xl text-info mb-3 animate-bounce" />
+                                                    <span className="text-info font-semibold">Subiendo...</span>
+                                                </div>
+                                            ) : imagePreview[item.key] ? (
                                                 <div className="relative w-full h-full">
                                                     <img 
                                                         src={imagePreview[item.key]} 
@@ -332,15 +391,17 @@ const RegistrationForm = ({ onSubmit, loading }) => {
                                                 onChange={(e) => handleImageUpload(e, item.key)}
                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                                 accept="image/*"
+                                                disabled={loading || isUploading}
                                             />
                                         </label>
                                     </div>
                                     
-                                    {imagePreview[item.key] && (
+                                    {imagePreview[item.key] && !uploadProgress[item.key] && (
                                         <button
                                             type="button"
                                             onClick={() => removeImage(item.key)}
                                             className="text-sm text-danger hover:text-danger/80 transition-colors duration-200"
+                                            disabled={loading || isUploading}
                                         >
                                             Eliminar imagen
                                         </button>
@@ -356,10 +417,15 @@ const RegistrationForm = ({ onSubmit, loading }) => {
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || isUploading}
                         className="w-full bg-gradient-to-r from-primary to-success text-white py-5 rounded-xl hover:shadow-xl transition-all duration-300 font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02]"
                     >
-                        {loading ? (
+                        {isUploading ? (
+                            <div className="flex items-center justify-center">
+                                <FaCloudUploadAlt className="text-2xl mr-3 animate-pulse" />
+                                Subiendo Imágenes a Cloudinary...
+                            </div>
+                        ) : loading ? (
                             <div className="flex items-center justify-center">
                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
                                 Enviando Registro...

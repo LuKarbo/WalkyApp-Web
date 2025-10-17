@@ -1,9 +1,10 @@
 import { FaClock, FaFileAlt } from 'react-icons/fa';
+import ImageGallery from './ImageGallery';
 
 const PendingStatus = ({ application }) => {
     return (
-        <div className="w-full h-full p-6 bg-background dark:bg-foreground">
-            <div className="max-w-4xl mx-auto">
+        <div className="w-full h-full p-6 bg-background dark:bg-foreground overflow-y-auto">
+            <div className="max-w-4xl mx-auto space-y-6">
                 <div className="bg-gradient-to-br from-warning/10 to-primary/10 rounded-2xl p-12 text-center border border-warning/20">
                     <div className="w-24 h-24 bg-warning rounded-full flex items-center justify-center mx-auto mb-6">
                         <FaClock className="text-4xl text-white" />
@@ -37,6 +38,13 @@ const PendingStatus = ({ application }) => {
                         </div>
                     </div>
                 </div>
+
+                {application.images && (
+                    <ImageGallery 
+                        images={application.images}
+                        title="Documentación en Revisión"
+                    />
+                )}
             </div>
         </div>
     );

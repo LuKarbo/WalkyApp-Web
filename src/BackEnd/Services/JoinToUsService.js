@@ -2,11 +2,7 @@ import { JoinToUsDataAccess } from "../DataAccess/JoinToUsDataAccess.js";
 
 export const JoinToUsService = {
     async submitWalkerRegistration(registrationData) {
-        // Validaciones de entrada
         this.validateRegistrationData(registrationData);
-        
-        // Procesar imágenes
-        const processedImages = await this.processImages(registrationData.images);
         
         const registration = {
             id: this.generateRegistrationId(),
@@ -16,7 +12,7 @@ export const JoinToUsService = {
             dni: registrationData.dni.trim(),
             city: registrationData.city.trim(),
             province: registrationData.province.trim(),
-            images: processedImages,
+            images: registrationData.images, 
             status: 'pending',
             submittedAt: new Date().toISOString(),
             reviewedAt: null,
@@ -177,25 +173,6 @@ export const JoinToUsService = {
                 throw new Error(`${imageType} image is required`);
             }
         }
-    },
-
-    async processImages(images) {
-        const processedImages = {};
-        
-        for (const [key, file] of Object.entries(images)) {
-            if (file) {
-                processedImages[key] = {
-                    filename: `${key}_${Date.now()}_${file.name}`,
-                    originalName: file.name,
-                    size: file.size,
-                    type: file.type,
-                    uploadedAt: new Date().toISOString(),
-                    url: `https://storage.example.com/registrations/${key}_${Date.now()}_${file.name}`
-                };
-            }
-        }
-        
-        return processedImages;
     },
 
     generateRegistrationId() {
