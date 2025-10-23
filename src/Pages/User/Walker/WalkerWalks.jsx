@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FiCalendar } from "react-icons/fi";
 import { WalksController } from '../../../BackEnd/Controllers/WalksController';
+import { ReviewsController } from '../../../BackEnd/Controllers/ReviewsController';
 import { useUser } from '../../../BackEnd/Context/UserContext';
 import { useNavigation } from '../../../BackEnd/Context/NavigationContext';
 
@@ -12,6 +13,8 @@ import RejectWalkModal from '../Modals/WalkerWalks/RejectWalkModal';
 import WaitingPaymentModal from '../Modals/WalkerWalks/WaitingPaymentModal';
 import StartWalkModal from '../Modals/WalkerWalks/StartWalkModal';
 import FinishWalkModal from '../Modals/WalkerWalks/FinishWalkModal';
+import ReceiptModal from '../Modals/MyTrips/ReceiptModal';
+import ViewReviewModal from '../Modals/MyTrips/ViewReviewModal';
 
 const WalkerWalks = () => {
     const [walks, setWalks] = useState([]);
@@ -25,9 +28,15 @@ const WalkerWalks = () => {
     const [showWaitingPaymentModal, setShowWaitingPaymentModal] = useState(false);
     const [showStartWalkModal, setShowStartWalkModal] = useState(false);
     const [showFinishWalkModal, setShowFinishWalkModal] = useState(false);
+    const [showReceiptModal, setShowReceiptModal] = useState(false);
+    const [showViewReviewModal, setShowViewReviewModal] = useState(false);
 
     const [selectedWalk, setSelectedWalk] = useState(null);
     const [actionLoading, setActionLoading] = useState(false);
+    const [currentReceipt, setCurrentReceipt] = useState(null);
+    const [receiptLoading, setReceiptLoading] = useState(false);
+    const [walkToViewReview, setWalkToViewReview] = useState(null);
+    const [currentReview, setCurrentReview] = useState(null);
 
     // Límites (los cuales dependeran del Plan de suscripcion del usuario)
     const MAX_ACCEPTED_WALKS = 5; 
@@ -46,7 +55,18 @@ const WalkerWalks = () => {
                 setError(null);
                 
                 const walksData = await WalksController.fetchWalksByWalker(walkerId);
-                setWalks(walksData);
+                
+                const walksWithReviews = await Promise.all(
+                    walksData.map(async (walk) => {
+                        if (walk.status === 'Finalizado') {
+                            const review = await ReviewsController.fetchReviewByWalkId(walk.id);
+                            return { ...walk, hasReview: !!review, reviewId: review?.id };
+                        }
+                        return walk;
+                    })
+                );
+                
+                setWalks(walksWithReviews);
             } catch (err) {
                 setError('Error loading walks: ' + err.message);
             } finally {
@@ -215,6 +235,42 @@ const WalkerWalks = () => {
         navigateToContent('trip', { tripId: walkId });
     };
 
+    const handleViewReceipt = async (walkId) => {
+        try {
+            setReceiptLoading(true);
+            const receipt = await WalksController.getWalkReceipt(walkId);
+            setCurrentReceipt(receipt);
+            setShowReceiptModal(true);
+        } catch (err) {
+            setError('Error loading receipt: ' + err.message);
+            console.error('Error loading receipt:', err);
+        } finally {
+            setReceiptLoading(false);
+        }
+    };
+
+    const handleCloseReceiptModal = () => {
+        setShowReceiptModal(false);
+        setCurrentReceipt(null);
+    };
+
+    const handleViewReview = async (walk) => {
+        try {
+            setWalkToViewReview(walk);
+            const review = await ReviewsController.fetchReviewByWalkId(walk.id);
+            setCurrentReview(review);
+            setShowViewReviewModal(true);
+        } catch (err) {
+            setError('Error loading review: ' + err.message);
+        }
+    };
+
+    const handleCloseViewReviewModal = () => {
+        setShowViewReviewModal(false);
+        setWalkToViewReview(null);
+        setCurrentReview(null);
+    };
+
     const handleCloseModals = () => {
         setShowAcceptModal(false);
         setShowRejectModal(false);
@@ -375,6 +431,8 @@ const WalkerWalks = () => {
                                 onStartWalk={handleStartWalk}
                                 onViewWalk={handleViewWalk}
                                 onFinishWalk={handleFinishWalk}
+                                onViewReceipt={handleViewReceipt}
+                                onViewReview={handleViewReview}
                                 canAcceptMore={canAcceptWalk()}
                                 canStartMore={canStartWalk()}
                             />
@@ -418,6 +476,20 @@ const WalkerWalks = () => {
                     onConfirm={handleConfirmFinishWalk}
                     walkData={selectedWalk}
                     isLoading={actionLoading}
+                />
+
+                <ReceiptModal 
+                    isOpen={showReceiptModal}
+                    onClose={handleCloseReceiptModal}
+                    receipt={currentReceipt}
+                    loading={receiptLoading}
+                />
+
+                <ViewReviewModal 
+                    isOpen={showViewReviewModal}
+                    onClose={handleCloseViewReviewModal}
+                    reviewData={currentReview}
+                    tripData={walkToViewReview}
                 />
 
             </div>

@@ -44,6 +44,7 @@ export const WalksAPI = {
     async getWalkByOwner(ownerId) {
         try {
             const response = await apiClient.get(`/walks/owner/${ownerId}`);
+            console.log(response.data.walks);
             return response.data.walks;
         } catch (error) {
             console.error(`Error fetching walks for owner ${ownerId}:`, error);
@@ -197,6 +198,29 @@ export const WalksAPI = {
             return response.data.isValid;
         } catch (error) {
             console.error(`Error validating walk ${walkId}:`, error);
+            throw error;
+        }
+    },
+
+    async getWalkReceipt(walkId) {
+        try {
+            const response = await apiClient.get(`/walks/${walkId}/receipt`);
+            return response.data.receipt;
+        } catch (error) {
+            console.error(`Error fetching receipt for walk ${walkId}:`, error);
+            throw error;
+        }
+    },
+
+    async getReceiptsByUser(userId, userType) {
+        try {
+            if (!['owner', 'walker'].includes(userType)) {
+                throw new Error('User type must be "owner" or "walker"');
+            }
+            const response = await apiClient.get(`/walks/receipts/${userType}/${userId}`);
+            return response.data.receipts;
+        } catch (error) {
+            console.error(`Error fetching receipts for ${userType} ${userId}:`, error);
             throw error;
         }
     }

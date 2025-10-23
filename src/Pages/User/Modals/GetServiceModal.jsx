@@ -16,6 +16,7 @@ const GetServiceModal = ({
     const [pets, setPets] = useState([]);
     const [walkDate, setWalkDate] = useState('');
     const [walkTime, setWalkTime] = useState('');
+    const [startAddress, setStartAddress] = useState('');
     const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false);
     const [loadingPets, setLoadingPets] = useState(true);
@@ -93,7 +94,58 @@ const GetServiceModal = ({
     };
 
     const handleSubmit = async (e) => {
-        console.log("SOlicitud Enviada")
+        e.preventDefault();
+        
+        if (selectedPets.length === 0) {
+            setError('Debes seleccionar al menos una mascota');
+            return;
+        }
+
+        if (!walkDate || !walkTime) {
+            setError('Debes seleccionar fecha y hora del paseo');
+            return;
+        }
+
+        if (!startAddress || startAddress.trim() === '') {
+            setError('Debes ingresar la dirección de inicio del paseo');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+
+            const scheduledDateTime = new Date(`${walkDate}T${walkTime}`).toISOString();
+
+            const walkRequestData = {
+                walkerId: walker.id,
+                ownerId: userId,
+                petIds: selectedPets,
+                scheduledDateTime: scheduledDateTime,
+                startAddress: startAddress.trim(),
+                totalPrice: totalPrice,
+                description: description.trim() || undefined
+            };
+
+            const newWalk = await WalksController.createWalkRequest(walkRequestData);
+
+            if (onRequestSent) {
+                onRequestSent(newWalk);
+            }
+
+            setSelectedPets([]);
+            setWalkDate('');
+            setWalkTime('');
+            setStartAddress('');
+            setDescription('');
+            
+            onClose();
+        } catch (err) {
+            setError('Error al crear la solicitud de paseo: ' + err.message);
+            console.error('Error creating walk request:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const totalPrice = calculateFinalPrice();
@@ -279,6 +331,29 @@ const GetServiceModal = ({
                     </div>
 
                     <div className="mb-6">
+                        <h4 className="text-lg font-semibold text-foreground dark:text-background mb-3 flex items-center">
+                            <MdLocationOn className="mr-2" />
+                            Dirección de Inicio
+                        </h4>
+                        <div>
+                            <label className="block text-sm font-medium text-accent dark:text-muted mb-1">
+                                Dirección completa
+                            </label>
+                            <input
+                                type="text"
+                                value={startAddress}
+                                onChange={(e) => setStartAddress(e.target.value)}
+                                placeholder="Ej: Av. Santa Fe 1234, Palermo, Buenos Aires"
+                                className="w-full p-3 border border-primary/20 rounded-lg focus:border-primary focus:outline-none bg-background dark:bg-foreground text-foreground dark:text-background"
+                                required
+                            />
+                            <p className="text-xs text-accent dark:text-muted mt-1">
+                                Ingresa la dirección donde se iniciará el paseo
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mb-6">
                         <label className="block text-sm font-medium text-accent dark:text-muted mb-1">
                             Descripción (opcional)
                         </label>
@@ -324,6 +399,12 @@ const GetServiceModal = ({
                         </div>
                     )}
 
+                    {error && (
+                        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg">
+                            <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+                        </div>
+                    )}
+
                     <div className="flex space-x-3">
                         <button
                             type="button"
@@ -334,7 +415,7 @@ const GetServiceModal = ({
                         </button>
                         <button
                             type="submit"
-                            disabled={loading || selectedPets.length === 0 || loadingWalkerData}
+                            disabled={loading || selectedPets.length === 0 || !walkDate || !walkTime || !startAddress || loadingWalkerData}
                             className="flex-1 py-3 px-4 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Enviando...' : 

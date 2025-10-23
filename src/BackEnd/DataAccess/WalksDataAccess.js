@@ -117,5 +117,23 @@ export const WalksDataAccess = {
             console.error(`DataAccess - Error finishing walk ${walkId}:`, error);
             throw error;
         }
+    },
+
+    async getWalkReceipt(walkId) {
+        try {
+            return await WalksAPI.getWalkReceipt(walkId);
+        } catch (error) {
+            console.error(`DataAccess - Error getting receipt for walk ${walkId}:`, error);
+            throw error;
+        }
+    },
+
+    async getReceiptsByUser(userId, userType) {
+        try {
+            return await WalksAPI.getReceiptsByUser(userId, userType);
+        } catch (error) {
+            console.error(`DataAccess - Error getting receipts for ${userType} ${userId}:`, error);
+            throw error;
+        }
     }
 };

@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { FiCalendar, FiMapPin, FiClock, FiEye, FiCheck, FiX, FiInfo, FiPlay, FiCheckCircle } from "react-icons/fi";
+import { FiCalendar, FiMapPin, FiClock, FiEye, FiCheck, FiX, FiInfo, FiPlay, FiCheckCircle, FiFileText, FiStar } from "react-icons/fi";
 
 const WalkerWalksCardComponent = ({ 
     walk, 
@@ -9,6 +9,8 @@ const WalkerWalksCardComponent = ({
     onStartWalk, 
     onViewWalk,
     onFinishWalk,
+    onViewReceipt,
+    onViewReview,
     canAcceptMore = true,
     canStartMore = true
 }) => {
@@ -118,6 +120,13 @@ const WalkerWalksCardComponent = ({
                             <FiPlay className="mr-1" size={12} />
                             {canStartMore ? "Iniciar Paseo" : "Límite Activos"}
                         </button>
+                        <button
+                            onClick={() => onViewReceipt(walk.id)}
+                            className="flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                            <FiFileText className="mr-1" size={12} />
+                            Recibo
+                        </button>
                     </div>
                 );
 
@@ -130,6 +139,12 @@ const WalkerWalksCardComponent = ({
                         >
                             <FiEye className="mr-1" size={12} />
                             Ver Paseo
+                        </button>
+                        <button
+                            onClick={() => onViewReceipt(walk.id)}
+                            className="flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                            <FiFileText className="mr-1" size={12} />
                         </button>
                         <button
                             onClick={() => onFinishWalk(walk)}
@@ -149,8 +164,32 @@ const WalkerWalksCardComponent = ({
                             className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-success text-success hover:bg-success hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
                         >
                             <FiEye className="mr-1" size={12} />
-                            Ver Paseo
+                            Ver
                         </button>
+                        <button
+                            onClick={() => onViewReceipt(walk.id)}
+                            className="flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                            <FiFileText className="mr-1" size={12} />
+                        </button>
+                        {walk.reviewId ? (
+                            <button
+                                onClick={() => onViewReview(walk)}
+                                className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                            >
+                                <FiStar className="mr-1 fill-green-600" size={12} />
+                                Ver Review
+                            </button>
+                        ) : (
+                            <button
+                                disabled
+                                className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-gray-300 text-gray-400 cursor-not-allowed opacity-60"
+                                title="El cliente aún no ha dejado una reseña"
+                            >
+                                <FiStar className="mr-1" size={12} />
+                                Sin Review
+                            </button>
+                        )}
                     </div>
                 );
             case "Rechazado":
@@ -162,7 +201,6 @@ const WalkerWalksCardComponent = ({
 
     return (
         <div className={`group relative overflow-hidden rounded-3xl backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-success/10 h-full flex flex-col min-w-[325px] ${
-
             (!canAcceptMore && walk.status === "Solicitado") || (!canStartMore && walk.status === "Agendado")
                 ? "bg-gray-50/80 dark:bg-gray-800/80"
                 : "bg-white/80 dark:bg-foreground/80"
@@ -219,6 +257,15 @@ const WalkerWalksCardComponent = ({
                             {walk.endTime && ` - ${format(new Date(walk.endTime), "h:mm a")}`}
                         </span>
                     </div>
+
+                    {walk.startAddress && (
+                        <div className="flex items-start p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                            <FiMapPin className="mr-2 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" size={14} />
+                            <span className="text-xs font-semibold text-purple-800 dark:text-purple-300 line-clamp-2">
+                                {walk.startAddress}
+                            </span>
+                        </div>
+                    )}
 
                     {(walk.duration || walk.distance) && (
                         <div className="flex items-center p-2 bg-info/10 rounded-lg">

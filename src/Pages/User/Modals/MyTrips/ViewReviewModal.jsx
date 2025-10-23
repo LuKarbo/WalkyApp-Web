@@ -4,6 +4,17 @@ import { FiX, FiStar } from "react-icons/fi";
 const ViewReviewModal = ({ isOpen, onClose, reviewData, tripData }) => {
     if (!isOpen) return null;
 
+    const formatReviewDate = (date) => {
+        if (!date) return 'Fecha no disponible';
+        
+        const parsedDate = new Date(date);
+        if (isNaN(parsedDate.getTime())) {
+            return 'Fecha no disponible';
+        }
+        
+        return format(parsedDate, "dd 'de' MMMM, yyyy");
+    };
+
     const renderStars = (rating) => {
         return (
             <div className="flex gap-1">
@@ -60,7 +71,7 @@ const ViewReviewModal = ({ isOpen, onClose, reviewData, tripData }) => {
                                     {renderStars(reviewData.rating)}
                                 </div>
                                 <p className="text-xs text-accent dark:text-muted">
-                                    {format(new Date(reviewData.date), "dd 'de' MMMM, yyyy")}
+                                    {formatReviewDate(reviewData.date)}
                                 </p>
                             </div>
 

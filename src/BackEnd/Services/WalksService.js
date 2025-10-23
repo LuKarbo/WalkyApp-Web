@@ -10,6 +10,7 @@ export const WalksService = {
                 dogName: walk.dogName,
                 walker: walk.walkerName,
                 startTime: walk.startTime,
+                startAddress: walk.startAddress,
                 status: walk.status
             }));
 
@@ -45,7 +46,8 @@ export const WalksService = {
                     actualStartTime: walk.actualStartTime,
                     endTime: walk.endTime,
                     actualEndTime: walk.actualEndTime,
-                    duration: walk.duration
+                    duration: walk.duration,
+                    startAddress: walk.startAddress
                 },
                 status: walk.status,
                 metrics: {
@@ -77,6 +79,7 @@ export const WalksService = {
                 dogName: walk.dogName,
                 walker: walk.walkerName,
                 startTime: walk.startTime,
+                startAddress: walk.startAddress,
                 actualStartTime: walk.actualStartTime,
                 status: walk.status,
                 duration: walk.duration || 0
@@ -95,6 +98,7 @@ export const WalksService = {
                 id: walk.id,
                 dogName: walk.dogName,
                 walker: walk.walkerName,
+                startAddress: walk.startAddress,
                 scheduledTime: walk.startTime,
                 status: walk.status
             }));
@@ -112,6 +116,7 @@ export const WalksService = {
                 id: walk.id,
                 dogName: walk.dogName,
                 walker: walk.walkerName,
+                startAddress: walk.startAddress,
                 scheduledTime: walk.startTime,
                 status: walk.status,
                 totalPrice: walk.totalPrice
@@ -130,6 +135,7 @@ export const WalksService = {
                 id: walk.id,
                 dogName: walk.dogName,
                 walker: walk.walkerName,
+                startAddress: walk.startAddress,
                 requestedTime: walk.startTime,
                 status: walk.status,
                 totalPrice: walk.totalPrice
@@ -156,6 +162,7 @@ export const WalksService = {
                 actualStartTime: walk.actualStartTime,
                 endTime: walk.endTime,
                 actualEndTime: walk.actualEndTime,
+                startAddress: walk.startAddress,
                 status: walk.status,
                 duration: walk.duration,
                 distance: walk.distance,
@@ -188,6 +195,7 @@ export const WalksService = {
                 actualStartTime: walk.actualStartTime,
                 endTime: walk.endTime,
                 actualEndTime: walk.actualEndTime,
+                startAddress: walk.startAddress,
                 status: walk.status,
                 duration: walk.duration,
                 distance: walk.distance,
@@ -214,6 +222,9 @@ export const WalksService = {
             if (!walkRequestData.scheduledDateTime) {
                 throw new Error("Scheduled date and time is required");
             }
+            if (!walkRequestData.startAddress || !walkRequestData.startAddress.trim()) {
+                throw new Error("Start address is required");
+            }
             if (!walkRequestData.totalPrice || walkRequestData.totalPrice <= 0) {
                 throw new Error("Total price must be greater than 0");
             }
@@ -226,6 +237,7 @@ export const WalksService = {
                 ownerId: newWalkRequest.ownerId,
                 petIds: newWalkRequest.petIds,
                 scheduledDateTime: newWalkRequest.startTime,
+                startAddress: newWalkRequest.startAddress,
                 description: newWalkRequest.notes,
                 totalPrice: newWalkRequest.totalPrice,
                 status: newWalkRequest.status,
@@ -335,6 +347,82 @@ export const WalksService = {
             };
         } catch (error) {
             console.error(`Service - Error changing walk ${walkId} status to ${newStatus}:`, error);
+            throw error;
+        }
+    },
+
+    async getWalkReceipt(walkId) {
+        try {
+            if (!walkId) {
+                throw new Error("Walk ID is required");
+            }
+
+            const receipt = await WalksDataAccess.getWalkReceipt(walkId);
+            
+            if (!receipt) {
+                throw new Error("Receipt not found");
+            }
+
+            return {
+                paymentId: receipt.paymentId,
+                walkId: receipt.walkId,
+                amountPaid: receipt.amountPaid,
+                paymentDate: receipt.paymentDate,
+                paymentMethod: receipt.paymentMethod,
+                transactionId: receipt.transactionId,
+                paymentStatus: receipt.paymentStatus,
+                paymentNotes: receipt.paymentNotes,
+                walk: {
+                    scheduledStartTime: receipt.walk.scheduledStartTime,
+                    actualStartTime: receipt.walk.actualStartTime,
+                    scheduledEndTime: receipt.walk.scheduledEndTime,
+                    actualEndTime: receipt.walk.actualEndTime,
+                    startAddress: receipt.walk.startAddress,
+                    duration: receipt.walk.duration,
+                    distance: receipt.walk.distance,
+                    totalPrice: receipt.walk.totalPrice,
+                    walkPrice: receipt.walk.walkPrice,
+                    status: receipt.walk.status
+                },
+                walker: receipt.walker,
+                owner: receipt.owner,
+                pets: receipt.pets,
+                walkerSettings: receipt.walkerSettings,
+                createdAt: receipt.createdAt
+            };
+        } catch (error) {
+            console.error(`Service - Error getting receipt for walk ${walkId}:`, error);
+            throw error;
+        }
+    },
+
+    async getReceiptsByUser(userId, userType) {
+        try {
+            if (!userId) {
+                throw new Error("User ID is required");
+            }
+            if (!userType || !['owner', 'walker'].includes(userType)) {
+                throw new Error("User type must be 'owner' or 'walker'");
+            }
+
+            const receipts = await WalksDataAccess.getReceiptsByUser(userId, userType);
+            
+            return receipts.map(receipt => ({
+                paymentId: receipt.paymentId,
+                walkId: receipt.walkId,
+                amountPaid: receipt.amountPaid,
+                paymentDate: receipt.paymentDate,
+                paymentMethod: receipt.paymentMethod,
+                paymentStatus: receipt.paymentStatus,
+                scheduledStartTime: receipt.scheduledStartTime,
+                startAddress: receipt.startAddress,
+                walkStatus: receipt.walkStatus,
+                walkerName: receipt.walkerName,
+                ownerName: receipt.ownerName,
+                petNames: receipt.petNames
+            }));
+        } catch (error) {
+            console.error(`Service - Error getting receipts for ${userType} ${userId}:`, error);
             throw error;
         }
     }

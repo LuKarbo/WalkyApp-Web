@@ -18,6 +18,8 @@ const GetServiceModal_Client = ({
     setWalkDate,
     walkTime,
     setWalkTime,
+    startAddress,
+    setStartAddress,
     description,
     setDescription,
     loadingModal,
@@ -240,6 +242,29 @@ const GetServiceModal_Client = ({
                     </div>
 
                     <div className="mb-8">
+                        <h4 className="text-xl font-bold text-foreground dark:text-background mb-4 flex items-center">
+                            <MdLocationOn className="mr-2 text-primary" />
+                            Dirección de Inicio
+                        </h4>
+                        <div>
+                            <label className="block text-sm font-semibold text-accent dark:text-muted mb-2">
+                                Dirección completa donde iniciará el paseo
+                            </label>
+                            <input
+                                type="text"
+                                value={startAddress}
+                                onChange={(e) => setStartAddress(e.target.value)}
+                                placeholder="Ej: Av. Santa Fe 1234, Palermo, Buenos Aires"
+                                className="w-full p-4 border-2 border-primary/20 rounded-xl focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 bg-white dark:bg-foreground text-foreground dark:text-background transition-all duration-300"
+                                required
+                            />
+                            <p className="text-xs text-accent dark:text-muted mt-2">
+                                Proporciona la dirección exacta donde el paseador recogerá a tu(s) mascota(s)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mb-8">
                         <label className="block text-sm font-semibold text-accent dark:text-muted mb-2">
                             Instrucciones Especiales (opcional)
                         </label>
@@ -287,7 +312,7 @@ const GetServiceModal_Client = ({
                         </button>
                         <button
                             type="submit"
-                            disabled={loadingModal || !selectedWalker || selectedPets.length === 0}
+                            disabled={loadingModal || !selectedWalker || selectedPets.length === 0 || !walkDate || !walkTime || !startAddress}
                             className="flex-1 py-4 px-6 bg-gradient-to-r from-primary to-success text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
                         >
                             {loadingModal ? (

@@ -1,7 +1,9 @@
 import { format } from "date-fns";
-import { FiCalendar, FiMapPin, FiClock, FiXCircle, FiEye, FiCreditCard, FiStar } from "react-icons/fi";
+import { FiCalendar, FiMapPin, FiClock, FiXCircle, FiEye, FiCreditCard, FiStar, FiFileText } from "react-icons/fi";
 
-const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip, onCreateReview, onViewReview }) => {
+const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip, onCreateReview, onViewReview, onViewReceipt }) => {
+    
+    console.log(trip);
     const getStatusColor = (status) => {
         switch (status) {
             case "Solicitado":
@@ -68,7 +70,7 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip, onCre
     };
 
     const hasReview = trip.hasReview || false;
-
+    console.log(hasReview + " tiene review el paseo: " + trip.reviewId);
     return (
         <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-foreground/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-primary/10 w-full min-w-0 max-w-[450px] mx-auto h-fit min-h-[400px] max-h-[500px] flex flex-col">
 
@@ -114,6 +116,15 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip, onCre
                             </span>
                         </div>
 
+                        {trip.startAddress && (
+                            <div className="flex items-start p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                <FiMapPin className="mr-2 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" size={14} />
+                                <span className="text-xs font-semibold text-purple-800 dark:text-purple-300 line-clamp-2">
+                                    {trip.startAddress}
+                                </span>
+                            </div>
+                        )}
+
                         {(trip.duration || trip.distance) && (
                             <div className="flex items-center p-2 bg-info/10 rounded-lg">
                                 <FiMapPin className="mr-2 text-info flex-shrink-0" size={14} />
@@ -154,6 +165,16 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip, onCre
                             </button>
                         )}
                         
+                        { viewTrip(trip.status) && (
+                            <button
+                                onClick={() => onViewReceipt(trip.id)}
+                                className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
+                            >
+                                <FiFileText className="mr-1" size={12} />
+                                Recibo
+                            </button>
+                        )}
+                        
                         {needsPayment(trip.status) && (
                             <button
                                 onClick={() => onPayTrip(trip)}
@@ -174,7 +195,7 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip, onCre
                             </button>
                         )}
 
-                        {isFinished(trip.status) && !hasReview && (
+                        {isFinished(trip.status) && !trip.reviewId && (
                             <button
                                 onClick={() => onCreateReview(trip)}
                                 className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-yellow-500 text-yellow-600 hover:bg-yellow-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
@@ -184,7 +205,7 @@ const MyTripsCardComponent = ({ trip, onViewTrip, onCancelTrip, onPayTrip, onCre
                             </button>
                         )}
 
-                        {isFinished(trip.status) && hasReview && (
+                        {isFinished(trip.status) && trip.reviewId && (
                             <button
                                 onClick={() => onViewReview(trip)}
                                 className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"

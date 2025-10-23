@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MdClose, MdAccessTime, MdPets, MdVerified, MdStar, MdGpsFixed, MdGpsOff } from "react-icons/md";
+import { MdClose, MdAccessTime, MdPets, MdVerified, MdStar, MdGpsFixed, MdGpsOff, MdLocationOn } from "react-icons/md";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { WalkerController } from '../../../../BackEnd/Controllers/WalkerController';
 import { WalksController } from '../../../../BackEnd/Controllers/WalksController';
@@ -17,6 +17,7 @@ const SelectWalkerModal = ({
     const [selectedWalkerSettings, setSelectedWalkerSettings] = useState(null);
     const [walkDate, setWalkDate] = useState('');
     const [walkTime, setWalkTime] = useState('');
+    const [startAddress, setStartAddress] = useState('');
     const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false);
     const [loadingWalkers, setLoadingWalkers] = useState(false);
@@ -35,6 +36,7 @@ const SelectWalkerModal = ({
             setSelectedWalkerSettings(null);
             setWalkDate('');
             setWalkTime('');
+            setStartAddress('');
             setDescription('');
             setError(null);
         }
@@ -143,19 +145,26 @@ const SelectWalkerModal = ({
             return;
         }
 
+        if (!startAddress || startAddress.trim() === '') {
+            setError('Debes ingresar la dirección de inicio del paseo');
+            return;
+        }
+
         try {
             setLoading(true);
             setError(null);
 
+            const scheduledDateTime = new Date(`${walkDate}T${walkTime}`).toISOString();
             const finalPrice = calculateFinalPrice();
+            
             const walkRequest = {
                 walkerId: selectedWalker.id,
                 ownerId: userId,
                 petIds: [preSelectedPet.id],
-                scheduledDateTime: `${walkDate}T${walkTime}`,
-                description: description,
+                scheduledDateTime: scheduledDateTime,
+                startAddress: startAddress.trim(),
                 totalPrice: finalPrice,
-                status: 'Pending'
+                description: description.trim() || undefined
             };
 
             await WalksController.createWalkRequest(walkRequest);
@@ -176,6 +185,7 @@ const SelectWalkerModal = ({
         setSelectedWalkerSettings(null);
         setWalkDate('');
         setWalkTime('');
+        setStartAddress('');
         setDescription('');
         setError(null);
         onClose();
@@ -454,6 +464,29 @@ const SelectWalkerModal = ({
                         </div>
 
                         <div className="mb-6">
+                            <h4 className="text-lg font-semibold text-foreground dark:text-background mb-3 flex items-center">
+                                <MdLocationOn className="mr-2" />
+                                Dirección de Inicio
+                            </h4>
+                            <div>
+                                <label className="block text-sm font-medium text-accent dark:text-muted mb-1">
+                                    Dirección completa
+                                </label>
+                                <input
+                                    type="text"
+                                    value={startAddress}
+                                    onChange={(e) => setStartAddress(e.target.value)}
+                                    placeholder="Ej: Av. Santa Fe 1234, Palermo, Buenos Aires"
+                                    className="w-full p-3 border border-primary/20 rounded-lg focus:border-primary focus:outline-none bg-background dark:bg-foreground text-foreground dark:text-background"
+                                    required
+                                />
+                                <p className="text-xs text-accent dark:text-muted mt-1">
+                                    Ingresa la dirección donde se iniciará el paseo
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
                             <label className="block text-sm font-medium text-accent dark:text-muted mb-1">
                                 Descripción (opcional)
                             </label>
@@ -492,6 +525,12 @@ const SelectWalkerModal = ({
                             </div>
                         </div>
 
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg">
+                                <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+                            </div>
+                        )}
+
                         <div className="flex space-x-3">
                             <button
                                 type="button"
@@ -502,7 +541,7 @@ const SelectWalkerModal = ({
                             </button>
                             <button
                                 type="submit"
-                                disabled={loading || loadingWalkerSettings}
+                                disabled={loading || loadingWalkerSettings || !walkDate || !walkTime || !startAddress}
                                 className="flex-1 py-3 px-4 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {loading ? 'Enviando...' : 

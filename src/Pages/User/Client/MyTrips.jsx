@@ -15,6 +15,7 @@ import GetServiceModal_Client from '../Modals/MyTrips/GetServiceModal_Client';
 import PaymentModal from '../Modals/MyTrips/PaymentModal';
 import ReviewModal from '../Modals/MyTrips/ReviewModal';
 import ViewReviewModal from '../Modals/MyTrips/ViewReviewModal';
+import ReceiptModal from '../Modals/MyTrips/ReceiptModal';
 
 const MyTrips = () => {
     const [trips, setTrips] = useState([]);
@@ -30,6 +31,7 @@ const MyTrips = () => {
     const [selectedPets, setSelectedPets] = useState([]);
     const [walkDate, setWalkDate] = useState('');
     const [walkTime, setWalkTime] = useState('');
+    const [startAddress, setStartAddress] = useState('');
     const [description, setDescription] = useState('');
     const [loadingModal, setLoadingModal] = useState(false);
     const [loadingWalkers, setLoadingWalkers] = useState(false);
@@ -50,6 +52,10 @@ const MyTrips = () => {
     const [showViewReviewModal, setShowViewReviewModal] = useState(false);
     const [tripToViewReview, setTripToViewReview] = useState(null);
     const [currentReview, setCurrentReview] = useState(null);
+
+    const [showReceiptModal, setShowReceiptModal] = useState(false);
+    const [currentReceipt, setCurrentReceipt] = useState(null);
+    const [receiptLoading, setReceiptLoading] = useState(false);
 
     const user = useUser();
     const userId = user?.id;
@@ -210,6 +216,25 @@ const MyTrips = () => {
         setCurrentReview(null);
     };
 
+    const handleViewReceipt = async (tripId) => {
+        try {
+            setReceiptLoading(true);
+            const receipt = await WalksController.getWalkReceipt(tripId);
+            setCurrentReceipt(receipt);
+            setShowReceiptModal(true);
+        } catch (err) {
+            setError('Error loading receipt: ' + err.message);
+            console.error('Error loading receipt:', err);
+        } finally {
+            setReceiptLoading(false);
+        }
+    };
+
+    const handleCloseReceiptModal = () => {
+        setShowReceiptModal(false);
+        setCurrentReceipt(null);
+    };
+
     const loadModalData = async () => {
         try {
             setLoadingWalkers(true);
@@ -249,17 +274,25 @@ const MyTrips = () => {
             return;
         }
 
+        if (!startAddress || startAddress.trim() === '') {
+            setError('Debe ingresar la dirección de inicio del paseo');
+            return;
+        }
+
         try {
             setLoadingModal(true);
             setError(null);
+
+            const scheduledDateTime = new Date(`${walkDate}T${walkTime}`).toISOString();
 
             const walkRequest = {
                 walkerId: selectedWalker.id,
                 ownerId: userId,
                 petIds: selectedPets,
-                scheduledDateTime: `${walkDate}T${walkTime}`,
-                description: description,
+                scheduledDateTime: scheduledDateTime,
+                startAddress: startAddress.trim(),
                 totalPrice: selectedPets.length * (selectedWalker.pricePerPet || 15000),
+                description: description.trim() || undefined
             };
 
             const createdTrip = await WalksController.createWalkRequest(walkRequest);
@@ -271,6 +304,7 @@ const MyTrips = () => {
                 walkerId: selectedWalker.id,
                 startTime: walkRequest.scheduledDateTime,
                 endTime: null,
+                startAddress: createdTrip.startAddress.trim(),
                 status: 'Solicitado',
                 duration: null,
                 distance: null,
@@ -294,6 +328,7 @@ const MyTrips = () => {
         setSelectedPets([]);
         setWalkDate('');
         setWalkTime('');
+        setStartAddress('');
         setDescription('');
         setError(null);
     };
@@ -392,6 +427,7 @@ const MyTrips = () => {
                                 onPayTrip={handlePayTrip}
                                 onCreateReview={handleCreateReview}
                                 onViewReview={handleViewReview}
+                                onViewReceipt={handleViewReceipt}
                             />
                         ))}
                     </div>
@@ -412,6 +448,8 @@ const MyTrips = () => {
                     setWalkDate={setWalkDate}
                     walkTime={walkTime}
                     setWalkTime={setWalkTime}
+                    startAddress={startAddress}
+                    setStartAddress={setStartAddress}
                     description={description}
                     setDescription={setDescription}
                     loadingModal={loadingModal}
@@ -448,6 +486,13 @@ const MyTrips = () => {
                     onClose={handleCloseViewReviewModal}
                     reviewData={currentReview}
                     tripData={tripToViewReview}
+                />
+
+                <ReceiptModal 
+                    isOpen={showReceiptModal}
+                    onClose={handleCloseReceiptModal}
+                    receipt={currentReceipt}
+                    loading={receiptLoading}
                 />
             </div>
         </div>
