@@ -237,7 +237,7 @@ const Settings = () => {
 
                         <div>
                             <label className="block text-lg font-semibold text-foreground dark:text-background mb-3">
-                                Correo Electrónico (Para las notificaciones)
+                                Correo Electrónico (Para las notificaciones y Login)
                             </label>
                             <input
                                 type="email"
@@ -247,7 +247,13 @@ const Settings = () => {
                                 placeholder="tu-email@ejemplo.com"
                             />
                             <p className="text-sm text-accent dark:text-muted mt-2">
-                                Este correo se utilizará para enviarte notificaciones importantes sobre tu cuenta y servicios.
+                                Este correo se utilizará para:
+                            </p>
+                            <p className="text-sm text-accent dark:text-muted mt-2">
+                                - Enviarte notificaciones importantes sobre tu cuenta y servicios.
+                            </p>
+                            <p className="text-sm text-accent dark:text-muted mt-2">
+                                - Porder Ingresar a la web
                             </p>
                         </div>
                     </div>
