@@ -43,7 +43,7 @@ const SettingNotificationComponent = ({ settings, onToggleNotification }) => {
                         Configuración de Notificaciones
                     </h2>
                     <p className="text-accent dark:text-muted text-sm mt-1">
-                        Personaliza qué notificaciones quieres recibir por email
+                        Personaliza qué Notificaciones y Alertas quieres recibir
                     </p>
                 </div>
             </div>

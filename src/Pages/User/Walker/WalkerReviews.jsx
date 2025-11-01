@@ -26,7 +26,15 @@ const WalkerReviews = () => {
             }
 
             const data = await ReviewsController.fetchReviewsByWalker(user.id, page, 6, search);
-            setReviewsData(data);
+            
+            const uniqueReviews = Array.from(
+                new Map(data.reviews.map(review => [review.id, review])).values()
+            );
+            
+            setReviewsData({
+                reviews: uniqueReviews,
+                pagination: data.pagination
+            });
         } catch (err) {
             console.error("Error loading reviews:", err);
             setError("Error al cargar las reseñas. Por favor, intenta de nuevo.");

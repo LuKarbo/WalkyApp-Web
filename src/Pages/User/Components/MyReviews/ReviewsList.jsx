@@ -100,11 +100,6 @@ const ReviewsList = ({ reviews, onEditReview }) => {
                                     {review.content}
                                 </p>
                             </div>
-
-                            <div className="flex justify-between items-center pt-2 text-xs text-accent dark:text-muted">
-                                <span>ID del paseo: {review.walkId}</span>
-                                <span>ID de reseña: {review.id}</span>
-                            </div>
                         </div>
                     </div>
                 </div>
