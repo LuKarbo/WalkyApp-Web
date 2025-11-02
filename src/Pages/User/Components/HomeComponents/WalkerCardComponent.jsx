@@ -4,11 +4,12 @@ import { MdGpsFixed, MdGpsOff } from "react-icons/md";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useNavigation } from "../../../../BackEnd/Context/NavigationContext";
 import GetServiceModal from "../../Modals/GetServiceModal";
+import { useToast } from '../../../../BackEnd/Context/ToastContext';
 
 const WalkerCardComponent = ({ walkers }) => {
-    
+
+    const { success} = useToast();
     const { navigateToContent } = useNavigation();
-    console.log(walkers);
     
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedWalker, setSelectedWalker] = useState(null);
@@ -28,7 +29,10 @@ const WalkerCardComponent = ({ walkers }) => {
     };
 
     const handleRequestSent = () => {
-        console.log('Solicitud de paseo enviada exitosamente');
+        success('Solicitud de paseo enviada exitosamente', {
+                    title: 'Éxito',
+                    duration: 4000
+                });
     };
 
     const handleJoinToUs = () => {

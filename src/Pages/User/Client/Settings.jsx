@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaEnvelope, FaUser, FaCalendarAlt, FaCrown } from 'react-icons/fa';
 import { useUser } from '../../../BackEnd/Context/UserContext';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 import { SettingsController } from '../../../BackEnd/Controllers/SettingsController';
 import { UserController } from '../../../BackEnd/Controllers/UserController';
 import SubscriptionModal from '../Modals/SettingsModals/SubscriptionModal';
@@ -30,6 +31,7 @@ const Settings = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+    const { success, error } = useToast();
 
     useEffect(() => {
         const loadSettings = async () => {
@@ -56,7 +58,7 @@ const Settings = () => {
                     
                 }
             } catch (error) {
-                console.error('Error loading settings:', error);
+                
             } finally {
                 setLoading(false);
             }
@@ -99,8 +101,7 @@ const Settings = () => {
                 }
             };
 
-            console.log('Guardando configuraciones:', settingsToSave);
-            
+
             const updatedSettings = await SettingsController.updateUserSettings(user?.id, settingsToSave);
             
             setSettings(prev => ({
@@ -109,10 +110,15 @@ const Settings = () => {
                 notifications: updatedSettings.notifications
             }));
 
-            console.log('Configuraciones guardadas exitosamente:', updatedSettings);
-            
-        } catch (error) {
-            console.error('Error saving settings:', error);
+            success('Configuraciones guardadas exitosamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
+        } catch (err) {
+            error('Error al guardar los cambios', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setSaving(false);
         }

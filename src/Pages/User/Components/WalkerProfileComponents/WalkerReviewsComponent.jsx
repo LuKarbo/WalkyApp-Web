@@ -12,6 +12,13 @@ const WalkerReviewsComponent = ({
     const buttonBase = "px-4 py-2 rounded-lg font-semibold transition-all duration-200 shadow-sm";
     const buttonInactive = "bg-background dark:bg-foreground border border-primary text-primary hover:bg-primary hover:text-white hover:shadow-md";
 
+    const uniqueReviews = reviewsData.reviews.reduce((acc, review) => {
+        if (!acc.find(r => r.id === review.id)) {
+            acc.push(review);
+        }
+        return acc;
+    }, []);
+    
     return (
         <div className="bg-foreground-userProfile p-6 rounded-lg shadow-lg mb-6">
             
@@ -40,7 +47,7 @@ const WalkerReviewsComponent = ({
                 <div className="text-center py-8">
                     <p className="text-red-500">{reviewsError}</p>
                 </div>
-            ) : reviewsData.reviews.length === 0 ? (
+            ) : uniqueReviews.length === 0 ? (
                 <div className="text-center py-8">
                     <p className="text-accent dark:text-muted">
                         {searchTerm ? "No se encontraron reseñas con ese término de búsqueda." : "No hay reseñas disponibles."}
@@ -49,7 +56,7 @@ const WalkerReviewsComponent = ({
             ) : (
                 <div className="space-y-4">
                     
-                    {reviewsData.reviews.map((review) => (
+                    {uniqueReviews.map((review) => (
                         <div
                             key={review.id}
                             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"

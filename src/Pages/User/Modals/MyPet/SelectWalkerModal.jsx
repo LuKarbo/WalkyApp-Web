@@ -4,6 +4,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { WalkerController } from '../../../../BackEnd/Controllers/WalkerController';
 import { WalksController } from '../../../../BackEnd/Controllers/WalksController';
 import { useUser } from '../../../../BackEnd/Context/UserContext';
+import { useToast } from '../../../../BackEnd/Context/ToastContext';
 
 const SelectWalkerModal = ({ 
     isOpen, 
@@ -24,7 +25,7 @@ const SelectWalkerModal = ({
     const [loadingWalkerSettings, setLoadingWalkerSettings] = useState(false);
     const [error, setError] = useState(null);
     const [step, setStep] = useState('select-walker');
-
+    const { warning } = useToast();
     const user = useUser();
     const userId = user?.id;
 
@@ -53,7 +54,6 @@ const SelectWalkerModal = ({
             await loadAllWalkersSettings(availableWalkers);
         } catch (err) {
             setError('Error loading walkers: ' + err.message);
-            console.error('Error loading walkers:', err);
         } finally {
             setLoadingWalkers(false);
         }
@@ -65,7 +65,6 @@ const SelectWalkerModal = ({
                 const settings = await WalkerController.fetchWalkerSettings(walker.id);
                 return { walkerId: walker.id, settings };
             } catch (err) {
-                console.error(`Error loading settings for walker ${walker.id}:`, err);
                 return {
                     walkerId: walker.id,
                     settings: {
@@ -92,7 +91,6 @@ const SelectWalkerModal = ({
             const settings = await WalkerController.fetchWalkerSettings(walkerId);
             setSelectedWalkerSettings(settings);
         } catch (err) {
-            console.error('Error loading walker settings:', err);
             setSelectedWalkerSettings({
                 pricePerPet: 15000,
                 hasGPSTracker: false,
@@ -172,8 +170,10 @@ const SelectWalkerModal = ({
             onRequestSent && onRequestSent();
             onClose();
         } catch (err) {
-            setError('Error creating walk request: ' + err.message);
-            console.error('Error creating walk request:', err);
+            warning('Una o varias de las mascotas seleccionadas ya tienen un paseo activo/pendiente', {
+                title: 'Error al solicitar el paseo:',
+                duration: 4000
+            });
         } finally {
             setLoading(false);
         }

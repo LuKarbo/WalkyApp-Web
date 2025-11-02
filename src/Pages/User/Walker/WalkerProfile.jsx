@@ -5,11 +5,12 @@ import { useNavigation } from "../../../BackEnd/Context/NavigationContext";
 import WalkerHeaderComponent from "../Components/WalkerProfileComponents/WalkerHeaderComponent";
 import WalkerReviewsComponent from "../Components/WalkerProfileComponents/WalkerReviewsComponent";
 import GetServiceModal from "../Modals/GetServiceModal";
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 const WalkerProfile = ({ id }) => {
     
     const { walkerId } = id || {};
-    
+    const { success } = useToast();
     const { navigateToContent } = useNavigation();
     
     const [walkerData, setWalkerData] = useState(null);
@@ -37,8 +38,6 @@ const WalkerProfile = ({ id }) => {
             const [walkerProfile, walkerConfig] = await Promise.all([
                 WalkerController.fetchWalkerProfile(walkerId),
                 WalkerController.fetchWalkerSettings(walkerId).catch(err => {
-                    console.warn('Error loading walker settings:', err);
-                    
                     return {
                         pricePerPet: 15000,
                         hasGPSTracker: false,
@@ -52,42 +51,40 @@ const WalkerProfile = ({ id }) => {
             setWalkerData(walkerProfile);
             setWalkerSettings(walkerConfig);
         } catch (err) {
-            console.error("Error loading walker data:", err);
             setWalkerError("Error al cargar la información del paseador.");
         } finally {
             setLoadingWalker(false);
         }
     }, [walkerId]);
 
-    const loadWalkerReviews = useCallback(async (page = 1, search = "") => {
-        try {
-            setLoadingReviews(true);
-            setReviewsError(null);
-            if (!walkerId) return;
-            
-            const data = await ReviewsController.fetchReviewsByWalker(walkerId, page, 6, search);
-            setReviewsData(data);
-        } catch (err) {
-            console.error("Error loading walker reviews:", err);
-            setReviewsError("Error al cargar las reseñas del paseador.");
-            
-            setReviewsData({ reviews: [], pagination: {} });
-        } finally {
-            setLoadingReviews(false);
+    useEffect(() => {
+        const loadWalkerReviews = async () => {
+            try {
+                setLoadingReviews(true);
+                setReviewsError(null);
+                if (!walkerId) return;
+                
+                const data = await ReviewsController.fetchReviewsByWalker(walkerId, currentPage, 6, searchTerm);
+                
+                setReviewsData(data);
+            } catch (err) {
+                setReviewsError("Error al cargar las reseñas del paseador.");
+                setReviewsData({ reviews: [], pagination: {} });
+            } finally {
+                setLoadingReviews(false);
+            }
+        };
+
+        if (walkerId) {
+            loadWalkerReviews();
         }
-    }, [walkerId]);
+    }, [walkerId, currentPage, searchTerm]); 
 
     useEffect(() => {
         if (walkerId) {
             loadWalkerData();
         }
     }, [loadWalkerData, walkerId]);
-
-    useEffect(() => {
-        if (walkerId) {
-            loadWalkerReviews(currentPage, searchTerm);
-        }
-    }, [loadWalkerReviews, currentPage, searchTerm, walkerId]);
 
     const handleSearch = (search) => {
         setSearchTerm(search);
@@ -111,7 +108,10 @@ const WalkerProfile = ({ id }) => {
     };
 
     const handleRequestSent = () => {
-        console.log('Solicitud de paseo enviada exitosamente');
+        success('Solicitud de paseo enviada exitosamente', {
+            title: 'Éxito',
+            duration: 4000
+        });
         setIsModalOpen(false);
     };
 
@@ -148,7 +148,6 @@ const WalkerProfile = ({ id }) => {
 
     const completeWalkerData = {
         ...walkerData,
-        
         pricePerPet: walkerSettings?.pricePerPet || walkerData.pricePerPet || 15000,
         hasGPSTracking: walkerSettings?.hasGPSTracker || walkerData.hasGPSTracking || false,
         location: walkerSettings?.location || walkerData.location || 'Ubicación no disponible',

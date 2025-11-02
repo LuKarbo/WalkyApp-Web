@@ -34,7 +34,6 @@ const SearchWalker = () => {
                 setAvailableLocations(uniqueLocations);
             } catch (err) {
                 setError('Error loading walkers: ' + err.message);
-                console.error('Error loading walkers:', err);
             } finally {
                 setLoading(false);
             }

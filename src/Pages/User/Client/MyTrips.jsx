@@ -6,6 +6,7 @@ import { PetsController } from '../../../BackEnd/Controllers/PetsController';
 import { ReviewsController } from '../../../BackEnd/Controllers/ReviewsController';
 import { useUser } from '../../../BackEnd/Context/UserContext';
 import { useNavigation } from '../../../BackEnd/Context/NavigationContext';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import MyTripsHeaderComponent from '../Components/MyTripsComponents/MyTripsHeaderComponent';
 import MyTripsCardComponent from '../Components/MyTripsComponents/MyTripsCardComponent';
@@ -60,6 +61,7 @@ const MyTrips = () => {
     const user = useUser();
     const userId = user?.id;
     const { navigateToContent } = useNavigation();
+    const { success, warning } = useToast();
 
     useEffect(() => {
         const loadTrips = async () => {
@@ -84,7 +86,6 @@ const MyTrips = () => {
                 setTrips(tripsWithReviews);
             } catch (err) {
                 setError('Error loading trips: ' + err.message);
-                console.error('Error loading trips:', err);
             } finally {
                 setLoading(false);
             }
@@ -117,8 +118,15 @@ const MyTrips = () => {
             ));
             setShowCancelModal(false);
             setTripToCancel(null);
+            success('Paseo cancelado', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
-            setError('Error cancelling trip: ' + err.message);
+            warning('Error al cancelar el paseo', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setCancelLoading(false);
         }
@@ -147,8 +155,15 @@ const MyTrips = () => {
             ));
             setShowPaymentModal(false);
             setTripToPay(null);
+            success('Pago realizado correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
-            setError('Error processing payment: ' + err.message);
+            warning('Error al realizar el pago, contacte con un administrador', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setPaymentLoading(false);
         }
@@ -161,7 +176,6 @@ const MyTrips = () => {
 
     const handleCreateReview = async (trip) => {
         const completeTrip = await WalksController.fetchWalkDetails(trip.id);
-        console.log(completeTrip);
         setTripToReview(completeTrip);
         setShowReviewModal(true);
     };
@@ -171,7 +185,6 @@ const MyTrips = () => {
         
         try {
             setReviewLoading(true);
-            console.log(reviewData);
             await ReviewsController.createReview({
                 walkId: reviewData.id,
                 walkerId: reviewData.walkerId,
@@ -187,8 +200,15 @@ const MyTrips = () => {
             
             setShowReviewModal(false);
             setTripToReview(null);
+            success('Review creada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
-            setError('Error creating review: ' + err.message);
+            warning('Error al crear la review correctamente', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setReviewLoading(false);
         }
@@ -206,7 +226,10 @@ const MyTrips = () => {
             setCurrentReview(review);
             setShowViewReviewModal(true);
         } catch (err) {
-            setError('Error loading review: ' + err.message);
+            warning('Error al cargar la review', {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -223,8 +246,10 @@ const MyTrips = () => {
             setCurrentReceipt(receipt);
             setShowReceiptModal(true);
         } catch (err) {
-            setError('Error loading receipt: ' + err.message);
-            console.error('Error loading receipt:', err);
+            warning('Error al cargar el recibo', {
+                title: 'Error',
+                duration: 4000
+            });
         } finally {
             setReceiptLoading(false);
         }
@@ -315,8 +340,15 @@ const MyTrips = () => {
             
             setTrips([newTrip, ...trips]);
             handleCloseModal();
+            success('Solicitud de paseo enviada exitosamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (err) {
-            setError('Error creating trip: ' + err.message);
+            warning('Una o varias de las mascotas seleccionadas ya tienen un paseo activo/pendiente', {
+                title: 'Error al solicitar el paseo:',
+                duration: 4000
+            });
         } finally {
             setLoadingModal(false);
         }

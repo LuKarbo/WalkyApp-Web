@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useUser } from "../../../BackEnd/Context/UserContext";
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 import { ReviewsController } from "../../../BackEnd/Controllers/ReviewsController";
 import ReviewsHeader from "../Components/MyReviews/ReviewsHeader";
 import ReviewsList from "../Components/MyReviews/ReviewsList";
@@ -16,6 +17,7 @@ const MyReviews = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const { success, warning } = useToast();
 
     const user = useUser();
 
@@ -40,7 +42,6 @@ const MyReviews = () => {
                 pagination: data.pagination
             });
         } catch (err) {
-            console.error("Error loading reviews:", err);
             setError("Error al cargar las reseñas. Por favor, intenta de nuevo.");
         } finally {
             setIsLoading(false);
@@ -72,19 +73,16 @@ const MyReviews = () => {
             setShowEditModal(false);
             setSelectedReview(null);
             setRefreshTrigger(prev => prev + 1);
-            
-            if (window.showNotification) {
-                window.showNotification("Reseña actualizada correctamente", "success");
-            } else {
-                alert("Reseña actualizada correctamente");
-            }
+
+            success('Reseña actualizada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (error) {
-            console.error("Error updating review:", error);
-            if (window.showNotification) {
-                window.showNotification(`Error al actualizar la reseña: ${error.message}`, "error");
-            } else {
-                alert(`Error al actualizar la reseña: ${error.message}`);
-            }
+            warning('Error al actualizar la reseña', {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { FiHeart, FiPlus } from "react-icons/fi";
-import { MdPets } from "react-icons/md";
 import { useUser } from "../../../BackEnd/Context/UserContext";
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 import { useNavigation } from "../../../BackEnd/Context/NavigationContext";
 import { PetsController } from "../../../BackEnd/Controllers/PetsController";
 import HeaderPetsComponent from "../Components/MyPet/HeaderPetsComponent";
@@ -16,7 +16,7 @@ const MyPets = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-
+    const { success, warning } = useToast();
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -34,7 +34,6 @@ const MyPets = () => {
             const data = await PetsController.fetchPetsByOwner(user.id);
             setPets(data);
         } catch (err) {
-            console.error(err);
             setError("Error al cargar las mascotas.");
         } finally {
             setLoading(false);
@@ -48,12 +47,17 @@ const MyPets = () => {
     const handleAddPet = async (petData) => {
         try {
             await PetsController.createPet(user.id, petData);
+            success('Mascota agregada', {
+                title: 'Éxito',
+                duration: 4000
+            });
             setRefreshTrigger(prev => prev + 1);
             setShowAddModal(false);
-            alert("Mascota agregada correctamente");
         } catch (error) {
-            console.error("Error al agregar mascota:", error);
-            alert(`Error al agregar la mascota: ${error.message}`);
+            warning('Error al agregar mascota', {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -63,10 +67,15 @@ const MyPets = () => {
             setRefreshTrigger(prev => prev + 1);
             setShowEditModal(false);
             setSelectedPet(null);
-            alert("Mascota actualizada correctamente");
+            success('Mascota Editada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (error) {
-            console.error("Error al actualizar mascota:", error);
-            alert(`Error al actualizar la mascota: ${error.message}`);
+            warning('No puedes editar tu mascota porque está asignada a un paseo activo o programado', {
+                title: 'Error al actualizar la mascota:',
+                duration: 4000
+            });
         }
     };
 
@@ -76,10 +85,15 @@ const MyPets = () => {
             setRefreshTrigger(prev => prev + 1);
             setShowDeleteModal(false);
             setSelectedPet(null);
-            alert("Mascota eliminada correctamente");
+            success('Mascota eliminada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         } catch (error) {
-            console.error("Error al eliminar mascota:", error);
-            alert(`Error al eliminar la mascota: ${error.message}`);
+            warning('No puedes eliminar tu mascota porque está asignada a un paseo activo o programado', {
+                title: 'Error al eliminar la mascota:',
+                duration: 4000
+            });
         }
     };
 
@@ -103,7 +117,10 @@ const MyPets = () => {
     };
 
     const handleWalkRequestSent = () => {
-        alert("Solicitud de paseo enviada correctamente");
+        success('Solicitud de paseo enviada correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
         setShowSelectWalkerModal(false);
         setSelectedPet(null);
     };

@@ -7,7 +7,6 @@ const GetServiceModal_Client = ({
     showCreateForm,
     onCloseModal,
     onSubmit,
-    error,
     walkers,
     pets,
     selectedWalker,
@@ -62,12 +61,6 @@ const GetServiceModal_Client = ({
 
                 <div className="flex-1 overflow-y-auto">
                     <form id="create-trip-form" onSubmit={onSubmit} className="p-6">
-                        {error && (
-                            <div className="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
-                                <p className="font-semibold">{error}</p>
-                            </div>
-                        )}
-
                         <div className="mb-8">
                             <h4 className="text-xl font-bold text-foreground dark:text-background mb-4 flex items-center">
                                 <MdLocationOn className="mr-2 text-primary" />

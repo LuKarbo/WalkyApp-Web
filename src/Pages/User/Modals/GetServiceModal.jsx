@@ -5,6 +5,7 @@ import { PetsController } from '../../../BackEnd/Controllers/PetsController';
 import { WalksController } from '../../../BackEnd/Controllers/WalksController';
 import { WalkerController } from '../../../BackEnd/Controllers/WalkerController';
 import { useUser } from '../../../BackEnd/Context/UserContext';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 const GetServiceModal = ({ 
     isOpen, 
@@ -23,7 +24,7 @@ const GetServiceModal = ({
     const [loadingWalkerData, setLoadingWalkerData] = useState(false);
     const [error, setError] = useState(null);
     const [walkerSettings, setWalkerSettings] = useState(null);
-
+    const { warning } = useToast();
     const user = useUser();
     const userId = user?.id;
 
@@ -51,7 +52,6 @@ const GetServiceModal = ({
             setPets(userPets);
         } catch (err) {
             setError('Error cargando mascotas: ' + err.message);
-            console.error('Error loading pets:', err);
         } finally {
             setLoadingPets(false);
         }
@@ -63,7 +63,6 @@ const GetServiceModal = ({
             const settings = await WalkerController.fetchWalkerSettings(walker.id);
             setWalkerSettings(settings);
         } catch (err) {
-            console.error('Error loading walker settings:', err);
             
             setWalkerSettings({
                 pricePerPet: 15000,
@@ -141,8 +140,10 @@ const GetServiceModal = ({
             
             onClose();
         } catch (err) {
-            setError('Error al crear la solicitud de paseo: ' + err.message);
-            console.error('Error creating walk request:', err);
+            warning('Una o varias de las mascotas seleccionadas ya tienen un paseo activo/pendiente', {
+                title: 'Error al solicitar el paseo:',
+                duration: 4000
+            });
         } finally {
             setLoading(false);
         }

@@ -4,6 +4,7 @@ import MyTicketsComponent from "./Components/TicketsComponents/MyTicketsComponen
 import CreateTicketModal from "./Modals/TicketsModals/CreateTicketModal";
 import { TicketController } from "../../BackEnd/Controllers/TicketController";
 import { useUser } from "../../BackEnd/Context/UserContext";
+import { useToast } from '../../BackEnd/Context/ToastContext';
 
 const Tickets = () => {
     const [activeTab, setActiveTab] = useState("faq");
@@ -11,7 +12,8 @@ const Tickets = () => {
     const [tickets, setTickets] = useState([]);
     const [faqs, setFAQs] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [errorState, seterrorState] = useState(null);
+    const { success, error } = useToast();
 
     const user = useUser();
     const userId = user?.id;
@@ -20,7 +22,7 @@ const Tickets = () => {
         const loadData = async () => {
             try {
                 setLoading(true);
-                setError(null);
+                seterrorState(null);
                 
                 const [faqsData, ticketsData] = await Promise.all([
                     TicketController.fetchFAQs(),
@@ -30,8 +32,7 @@ const Tickets = () => {
                 setFAQs(faqsData);
                 setTickets(ticketsData);
             } catch (err) {
-                setError('Error loading data: ' + err.message);
-                console.error('Error loading data:', err);
+                seterrorState('errorState loading data: ' + err.message);
             } finally {
                 setLoading(false);
             }
@@ -48,11 +49,18 @@ const Tickets = () => {
                 ...ticketData,
                 userId
             });
+            success('Ticket creado correctamente', {
+                title: 'Éxito',
+                duration: 4000
+            });
             setTickets(prev => [newTicket, ...prev]);
             setIsCreateModalOpen(false);
             setActiveTab("my-tickets");
-        } catch (error) {
-            console.error('Error creating ticket:', error);
+        } catch (err) {
+            error('Error al crear el ticket', {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -60,8 +68,11 @@ const Tickets = () => {
         try {
             const ticketsData = await TicketController.fetchTicketsByUser(userId);
             setTickets(ticketsData);
-        } catch (error) {
-            console.error('Error refreshing tickets:', error);
+        } catch (err) {
+            error('Error actualizar los tickets', {
+                title: 'Error',
+                duration: 4000
+            });
         }
     };
 
@@ -76,11 +87,11 @@ const Tickets = () => {
         );
     }
 
-    if (error) {
+    if (errorState) {
         return (
             <div className="w-full h-full p-6 bg-background dark:bg-foreground">
                 <div className="flex justify-center items-center h-64">
-                    <p className="text-lg text-red-500">{error}</p>
+                    <p className="text-lg text-red-500">{errorState}</p>
                 </div>
             </div>
         );

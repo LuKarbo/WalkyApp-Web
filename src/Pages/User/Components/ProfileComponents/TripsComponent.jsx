@@ -221,13 +221,24 @@ const TripsComponent = ({ trips, onCancel, onView, tripsError, tripsLoading }) =
                                         )}
                                         
                                         {needsPayment(trip.status) && (
-                                            <button
-                                                onClick={() => console.log('Pay trip:', trip.id)}
-                                                className="flex-1 flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
-                                            >
-                                                <FiCreditCard className="mr-1" size={12} />
-                                                Pagar
-                                            </button>
+                                            <div className="flex-1 relative group">
+                                                <button
+                                                    disabled
+                                                    className="w-full flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 cursor-not-allowed transition-all duration-300"
+                                                >
+                                                    <FiCreditCard className="mr-1" size={12} />
+                                                    Pagar
+                                                </button>
+                                                
+                                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                                    <div className="bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap shadow-xl">
+                                                        Para pagar debe ir a la vista "Mis Paseos"
+                                                        <svg className="absolute top-full left-1/2 transform -translate-x-1/2" width="16" height="8" viewBox="0 0 16 8">
+                                                            <path d="M8 8L0 0h16z" fill="currentColor" className="text-gray-900 dark:text-gray-700"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         )}
                                         
                                         {canCancel(trip.status) && (

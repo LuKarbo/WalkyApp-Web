@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
 import { JoinToUsController } from '../../BackEnd/Controllers/JoinToUsController';
 import { useUser } from '../../BackEnd/Context/UserContext';
+import { useToast } from '../../BackEnd/Context/ToastContext';
 
 import PendingStatus from './Components/JoinToUsComponents/PendingStatus';
 import RejectedStatus from './Components/JoinToUsComponents/RejectedStatus';
@@ -15,6 +16,7 @@ const JoinToUs = () => {
     const [submitted, setSubmitted] = useState(false);
     const [currentApplication, setCurrentApplication] = useState(null);
     const [errors, setErrors] = useState({});
+    const { success, error } = useToast();
 
     useEffect(() => {
         const checkExistingApplication = async () => {
@@ -27,8 +29,11 @@ const JoinToUs = () => {
                 const application = await JoinToUsController.getApplicationByUserId(user.id);
 
                 setCurrentApplication(application);
-            } catch (error) {
-                console.error('Error checking existing application:', error);
+            } catch (er) {
+                error('Ocurrió un error al buscar su solicitud.', {
+                    title: 'Error',
+                    duration: 4000
+                });
             } finally {
                 setInitialLoading(false);
             }
@@ -48,14 +53,20 @@ const JoinToUs = () => {
             };
 
             const result = await JoinToUsController.submitWalkerRegistration(completeData);
+            
+            success('Solicitud Enviada', {
+                    title: 'Éxito',
+                    duration: 4000
+                });
             setCurrentApplication(result);
             setSubmitted(true);
             
-        } catch (error) {
-            console.error('Error al enviar registro:', error);
-            setErrors({ 
-                submit: error.message || 'Ocurrió un error al enviar el registro. Por favor intenta nuevamente.' 
-            });
+
+        } catch (er) {
+            error('Ocurrió un error al enviar el registro. Por favor intenta nuevamente.', {
+                    title: 'Error',
+                    duration: 4000
+                });
         } finally {
             setLoading(false);
         }
@@ -67,12 +78,12 @@ const JoinToUs = () => {
         
         try {
             await JoinToUsController.retryRejectedApplication(user?.id);
-            setCurrentApplication(null); // Esto permitirá mostrar el formulario nuevamente
-        } catch (error) {
-            console.error('Error al reintentar solicitud:', error);
-            setErrors({ 
-                retry: error.message || 'Ocurrió un error al procesar la solicitud. Por favor intenta nuevamente.' 
-            });
+            setCurrentApplication(null);
+        } catch (er) {
+            error('Ocurrió un error al procesar la solicitud. Por favor intenta nuevamente.', {
+                    title: 'Error',
+                    duration: 4000
+                });
         } finally {
             setLoading(false);
         }

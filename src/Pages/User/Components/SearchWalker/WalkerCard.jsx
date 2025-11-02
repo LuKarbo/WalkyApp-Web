@@ -3,6 +3,7 @@ import { AiOutlineStar } from "react-icons/ai";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdGpsFixed, MdGpsOff } from "react-icons/md";
 import GetServiceModal from "../../Modals/GetServiceModal";
+import { useToast } from '../../../../BackEnd/Context/ToastContext';
 
 const WalkerCard = ({ 
     walker, 
@@ -10,7 +11,8 @@ const WalkerCard = ({
 }) => {
     
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    
+    const { success} = useToast();
     const StarRating = ({ rating }) => {
         return (
             <div className="flex items-center space-x-1">
@@ -31,7 +33,10 @@ const WalkerCard = ({
     };
 
     const handleRequestSent = () => {
-        console.log('Solicitud de paseo enviada exitosamente');
+        success('Solicitud de paseo enviada exitosamente', {
+            title: 'Éxito',
+            duration: 4000
+        });
     };
 
     return (

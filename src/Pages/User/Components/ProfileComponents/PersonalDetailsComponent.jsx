@@ -19,7 +19,6 @@ const PersonalDetailsComponent = ({ userData }) => {
                 return "Fecha inválida";
             }
         } catch (error) {
-            console.error("Error formatting date:", error);
             return "Fecha inválida";
         }
     };
@@ -39,10 +38,6 @@ const PersonalDetailsComponent = ({ userData }) => {
                 <div>
                     <p className="text-accent dark:text-muted">Teléfono</p>
                     <p className="font-semibold text-background">{userData.contact || "No disponible"}</p>
-                </div>
-                <div>
-                    <p className="text-accent dark:text-muted">Suscripción</p>
-                    <p className="font-semibold text-background">{userData.suscription || "No disponible"}</p>
                 </div>
                 <div>
                     <p className="text-accent dark:text-muted">Localidad</p>

@@ -8,13 +8,14 @@ import { WalkerController } from '../../BackEnd/Controllers/WalkerController';
 import { WalksController } from '../../BackEnd/Controllers/WalksController';
 import { BannersController } from '../../BackEnd/Controllers/BannersController';
 import { useUser } from '../../BackEnd/Context/UserContext';
+import { useToast } from '../../BackEnd/Context/ToastContext';
 
 const Home = ({ navigateToContent }) => {
     const [walkers, setWalkers] = useState([]);
     const [walks, setWalks] = useState([]);
     const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [errorState, seterrorState] = useState(null);
 
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [tripToCancel, setTripToCancel] = useState(null);
@@ -26,7 +27,9 @@ const Home = ({ navigateToContent }) => {
 
     const user = useUser();
     const userId = user?.id;
-    
+
+    const { success, error } = useToast();
+
     useEffect(() => {
         loadData();
     }, [userId]);
@@ -36,7 +39,7 @@ const Home = ({ navigateToContent }) => {
         
         try {
             setLoading(true);
-            setError(null);
+            seterrorState(null);
             
             const [walkersData, walksData, bannersData] = await Promise.all([
                 WalkerController.fetchWalkersForHome(),
@@ -51,8 +54,7 @@ const Home = ({ navigateToContent }) => {
             setWalks(activeWalks);
             setAnnouncements(bannersData);
         } catch (err) {
-            setError('Error loading data: ' + err.message);
-            console.error('Error loading data:', err);
+            seterrorState('errorState loading data: ' + err.message);
         } finally {
             setLoading(false);
         }
@@ -68,18 +70,26 @@ const Home = ({ navigateToContent }) => {
         
         try {
             setCancelLoading(true);
-            await WalksController.changeWalkStatus(tripToCancel.id, 'Rechazado');
+            await WalksController.changeWalkStatus(tripToCancel.id, 'Cancelado');
             
+            success('Paseo cancelado exitosamente', {
+                    title: 'Éxito',
+                    duration: 4000
+                });
+
             setWalks(walks.map(trip => 
                 trip.id === tripToCancel.id 
-                    ? { ...trip, status: 'Rechazado' }
+                    ? { ...trip, status: 'Cancelado' }
                     : trip
             ).filter(trip => ["Solicitado", "Esperando pago", "Agendado", "Activo"].includes(trip.status)));
             
             setShowCancelModal(false);
             setTripToCancel(null);
         } catch (err) {
-            setError('Error cancelling trip: ' + err.message);
+            error('Fallo al cancelar el paseo, intente más tarde', {
+                    title: 'Error',
+                    duration: 4000
+                });
         } finally {
             setCancelLoading(false);
         }
@@ -108,10 +118,18 @@ const Home = ({ navigateToContent }) => {
                     : trip
             ));
             
+            success('Paseo pagado exitosamente', {
+                    title: 'Éxito',
+                    duration: 4000
+                });
+
             setShowPaymentModal(false);
             setTripToPay(null);
         } catch (err) {
-            setError('Error processing payment: ' + err.message);
+            error('Fallo al acreditar el pago del paseo, contacte con un Administrador', {
+                    title: 'Error',
+                    duration: 4000
+                });
         } finally {
             setPaymentLoading(false);
         }
@@ -133,12 +151,12 @@ const Home = ({ navigateToContent }) => {
         );
     }
 
-    if (error) {
+    if (errorState) {
         return (
             <div className="w-full h-full p-6 bg-background dark:bg-foreground">
                 <div className="flex justify-center items-center h-64">
                     <div className="text-center">
-                        <p className="text-lg text-red-500 mb-4">{error}</p>
+                        <p className="text-lg text-red-500 mb-4">{errorState}</p>
                         <button 
                             onClick={loadData} 
                             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
