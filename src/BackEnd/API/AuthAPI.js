@@ -249,5 +249,62 @@ export const AuthAPI = {
             }
             throw new Error(error.message || 'Error al eliminar usuario');
         }
+    },
+
+    async forgotPassword(email) {
+        console.log("Simulando solicitud de recuperación de contraseña:", email);
+        
+        try {
+            const response = await apiClient.post('/auth/forgot-password', {
+                email: email.toLowerCase()
+            });
+
+            return {
+                success: response.data.success || true,
+                message: response.data.message || "Código enviado correctamente"
+            };
+        } catch (error) {
+            console.error("Error en forgot password:", error);
+            throw new Error(error.message || 'Error al solicitar recuperación de contraseña');
+        }
+    },
+
+    async verifyResetToken(email, token) {
+        console.log("Simulando verificación de código:", { email, token });
+        
+        try {
+            const response = await apiClient.post('/auth/verify-reset-token', {
+                email: email.toLowerCase(),
+                token: token
+            });
+
+            return {
+                valid: response.data.valid || true,
+                message: response.data.message || "Código verificado correctamente"
+            };
+        } catch (error) {
+            console.error("Error verificando código:", error);
+            throw new Error(error.message || 'Código inválido o expirado');
+        }
+    },
+
+    async resetPassword(email, token, newPassword) {
+        console.log("Simulando cambio de contraseña con token");
+        
+        try {
+            const response = await apiClient.post('/auth/reset-password', {
+                email: email.toLowerCase(),
+                token: token,
+                newPassword: newPassword
+            });
+
+            return {
+                success: response.data.success || true,
+                message: response.data.message || "Contraseña actualizada correctamente"
+            };
+        } catch (error) {
+            console.error("Error cambiando contraseña:", error);
+            throw new Error(error.message || 'Error al cambiar contraseña');
+        }
     }
 };

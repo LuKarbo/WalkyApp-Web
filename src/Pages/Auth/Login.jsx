@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import ForgotPasswordModal from "./Modal/ForgotPasswordModal";
 
 function Login({ onLogin, switchToRegister }) {
     const [showPassword, setShowPassword] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -174,6 +176,7 @@ function Login({ onLogin, switchToRegister }) {
                             
                             <button 
                                 type="button" 
+                                onClick={() => setShowForgotPassword(true)}
                                 className="text-sm text-primary hover:text-ring"
                                 disabled={loading}
                             >
@@ -216,6 +219,17 @@ function Login({ onLogin, switchToRegister }) {
                     </form>
                 </div>
             </div>
+
+            <ForgotPasswordModal
+                isOpen={showForgotPassword}
+                onClose={() => setShowForgotPassword(false)}
+                onSuccess={() => {
+                    setShowForgotPassword(false);
+                    setErrors({ 
+                        general: "Contraseña cambiada correctamente. Por favor, inicia sesión con tu nueva contraseña." 
+                    });
+                }}
+            />
         </div>
     );
 }

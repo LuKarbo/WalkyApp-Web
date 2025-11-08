@@ -82,4 +82,44 @@ export const AuthService = {
     async logout() {
         return await AuthDataAccess.logout();
     },
+
+    async requestPasswordReset(email) {
+        if (!email || !email.includes("@")) {
+            throw new Error("Email inválido");
+        }
+
+        return await AuthDataAccess.requestPasswordReset(email.toLowerCase().trim());
+    },
+
+    async verifyResetCode(email, code) {
+        if (!email || !email.includes("@")) {
+            throw new Error("Email inválido");
+        }
+
+        if (!code || code.length !== 6) {
+            throw new Error("Código inválido");
+        }
+
+        return await AuthDataAccess.verifyResetCode(email.toLowerCase().trim(), code.trim());
+    },
+
+    async resetPasswordWithCode(email, code, newPassword) {
+        if (!email || !email.includes("@")) {
+            throw new Error("Email inválido");
+        }
+
+        if (!code || code.length !== 6) {
+            throw new Error("Código inválido");
+        }
+
+        if (!newPassword || newPassword.length < 6) {
+            throw new Error("La contraseña debe tener al menos 6 caracteres");
+        }
+
+        return await AuthDataAccess.resetPasswordWithCode(
+            email.toLowerCase().trim(),
+            code.trim(),
+            newPassword
+        );
+    }
 };

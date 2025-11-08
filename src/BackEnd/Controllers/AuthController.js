@@ -16,4 +16,16 @@ export const AuthController = {
     async logout() {
         return await AuthService.logout();
     },
+
+    async requestPasswordReset(email) {
+        return await AuthService.requestPasswordReset(email);
+    },
+
+    async verifyResetCode(email, code) {
+        return await AuthService.verifyResetCode(email, code);
+    },
+
+    async resetPasswordWithCode(email, code, newPassword) {
+        return await AuthService.resetPasswordWithCode(email, code, newPassword);
+    }
 };
