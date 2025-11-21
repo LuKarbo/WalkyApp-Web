@@ -1,71 +1,46 @@
 import {
     FiMenu,
     FiX,
-    FiHome,
-    FiUsers,
-    FiSettings,
-    FiPieChart,
-    FiFileText,
-    FiBookOpen,
-    FiClock,
-    FiDollarSign,
-    FiTrendingUp,
-    FiMessageSquare,
-    FiHelpCircle,
-    FiAlertCircle,
-    FiEdit,
-    FiShield,
-    FiBell,
-    FiLogOut,
     FiMoon,
     FiSun,
-    FiCalendar,
 } from "react-icons/fi";
 
-const menuItems = {
-    admin: [
-        { icon: FiHome, label: "Dashboard", id: "dashboard" },
-        { icon: FiUsers, label: "User Management", id: "users" },
-        { icon: FiSettings, label: "System Configuration", id: "config" },
-        { icon: FiPieChart, label: "Analytics", id: "analytics" },
-        { icon: FiFileText, label: "Reporting", id: "reports" },
-    ],
-    client: [
-        { icon: FiBookOpen, label: "My Services", id: "services" },
-        { icon: FiClock, label: "Booking History", id: "bookings" },
-        { icon: FiMessageSquare, label: "Support Tickets", id: "tickets" },
-        { icon: FiSettings, label: "Profile Settings", id: "settings" },
-    ],
-    walker: [
-        { icon: FiClock, label: "Active Walks", id: "walks" },
-        { icon: FiCalendar, label: "Schedule", id: "schedule" },
-        { icon: FiDollarSign, label: "Earnings", id: "earnings" },
-        { icon: FiTrendingUp, label: "Performance Stats", id: "stats" },
-    ],
-    support: [
-        { icon: FiMessageSquare, label: "Open Tickets", id: "open-tickets" },
-        { icon: FiHelpCircle, label: "Customer Inquiries", id: "inquiries" },
-        { icon: FiBookOpen, label: "Knowledge Base", id: "knowledge" },
-        { icon: FiAlertCircle, label: "Escalation Management", id: "escalations" },
-    ],
-};
-
-const commonMenuItems = [
-    { icon: FiEdit, label: "Profile Edit", id: "profile" },
-    { icon: FiShield, label: "Security Settings", id: "security" },
-    { icon: FiBell, label: "Notifications", id: "notifications" },
-    { icon: FiLogOut, label: "Logout", id: "logout" },
-];
+import { getAllMenuItemsByRole } from '../../BackEnd/Generics/Menu.jsx';
+import { useNavigation } from '../../BackEnd/Context/NavigationContext';
+import { useHistory } from '../../BackEnd/Context/HistoryContext';
 
 const Navbar = ({
     isOpen,
     toggleSidebar,
-    isDarkMode,
-    toggleDarkMode,
+    isLightMode,
+    toggleLightMode,
     activeItem,
     setActiveItem,
+    navigateToContent,
     user,
+    onLogout,
 }) => {
+    const { navigateToContent: navContextNavigate } = useNavigation();
+    const { clearHistory } = useHistory();
+
+    const handleMenuClick = (id) => {
+        if (id === "logout") {
+            clearHistory();
+            onLogout();
+        } else {
+            
+            if (navContextNavigate) {
+                navContextNavigate(id);
+            } else if (navigateToContent) {
+                navigateToContent(id);
+            } else {
+                setActiveItem(id);
+            }
+        }
+    };
+
+    const { roleItems, commonItems } = getAllMenuItemsByRole(user?.role);
+
     return (
         <aside
             className={`${
@@ -73,7 +48,6 @@ const Navbar = ({
             } relative transition-all duration-300 ease-in-out bg-card dark:bg-foreground shadow-lg flex flex-col`}
         >
 
-        {/* Logo */}
         <div className="p-4 flex justify-between items-center">
             <h1
                 className={`${
@@ -90,7 +64,6 @@ const Navbar = ({
             </button>
         </div>
 
-        {/* User Simple Data */}
         <div className="p-4 border-b border-border dark:border-accent">
             <div className="flex items-center space-x-4">
                 <img
@@ -116,12 +89,12 @@ const Navbar = ({
             </div>
         </div>
 
-        {/* Menu */}
         <nav className="p-4 space-y-2 flex-1 overflow-auto">
-            {menuItems[user?.role || "client"].map((item) => (
+            
+            {roleItems.map((item) => (
             <button
                 key={item.id}
-                onClick={() => setActiveItem(item.id)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-colors
                 ${
                     activeItem === item.id
@@ -134,18 +107,21 @@ const Navbar = ({
             </button>
             ))}
 
-            <div className="border-t border-border dark:border-accent my-4"></div>
+            {commonItems?.length > 0 && (
+                <div className="border-t border-border dark:border-accent my-4"></div>
+            )}
 
-            {/* Cargar secciones del menu */}
-            {commonMenuItems.map((item) => (
+            {commonItems?.map((item) => (
             <button
                 key={item.id}
-                onClick={() => setActiveItem(item.id)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-colors
                 ${
                     activeItem === item.id
                     ? "bg-primary text-white"
-                    : "hover:bg-muted dark:hover:bg-accent text-foreground dark:text-background"
+                    : item.id === "logout" 
+                        ? "hover:bg-destructive hover:text-white text-foreground dark:text-background"
+                        : "hover:bg-muted dark:hover:bg-accent text-foreground dark:text-background"
                 }`}
             >
                 <item.icon size={20} />
@@ -154,14 +130,13 @@ const Navbar = ({
             ))}
         </nav>
 
-        {/* Cambio de Modo Claro/Oscuro */}
         <div className="p-4 border-t border-border dark:border-accent">
             <button
-            onClick={toggleDarkMode}
+            onClick={toggleLightMode}
             className="w-full flex items-center justify-center space-x-2 p-2 rounded-lg bg-muted dark:bg-accent hover:bg-primary dark:hover:bg-primary text-foreground dark:text-background"
             >
-            {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-            {isOpen && <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>}
+            {isLightMode ? <FiSun size={20} /> : <FiMoon size={20} />}
+            {isOpen && <span>{isLightMode ? "Light Mode" : "Dark Mode"}</span>}
             </button>
         </div>
         </aside>
