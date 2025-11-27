@@ -2,7 +2,6 @@ import apiClient from '../ApiClient.js';
 
 export const AuthAPI = {
     async login(credentials) {
-        console.log("Simulando llamada API login:", credentials);
         
         try {
             const response = await apiClient.post('/auth/login', {
@@ -32,13 +31,11 @@ export const AuthAPI = {
                 token: userData.token
             };
         } catch (error) {
-            console.error("Error en login:", error);
             throw new Error("Credenciales inválidas o cuenta inactiva");
         }
     },
 
     async register(data) {
-        console.log("Simulando llamada API register:", data);
         
         try {
             const response = await apiClient.post('/auth/register', {
@@ -72,7 +69,6 @@ export const AuthAPI = {
                 token: userData.token
             };
         } catch (error) {
-            console.error("Error en register:", error);
             if (error.message.includes('email ya está registrado')) {
                 throw new Error("El email ya está registrado");
             }
@@ -81,7 +77,6 @@ export const AuthAPI = {
     },
 
     async checkSession(token) {
-        console.log("Simulando verificación de sesión con token:", token);
         
         try {
             const response = await apiClient.post('/auth/check-session', null, {
@@ -111,7 +106,6 @@ export const AuthAPI = {
                 token: userData.token || token
             };
         } catch (error) {
-            console.error("Error en checkSession:", error);
             apiClient.removeToken();
             throw new Error("Sesión inválida o expirada");
         }

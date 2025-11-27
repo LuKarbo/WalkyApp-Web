@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiSend, FiMessageCircle } from "react-icons/fi";
 import { ChatController } from "../../../../BackEnd/Controllers/ChatController";
 import { useUser } from "../../../../BackEnd/Context/UserContext";
@@ -62,7 +62,6 @@ const WalkChat = ({ tripId, walkStatus }) => {
                 await ChatController.markMessagesAsRead(tripId, userId);
             }
         } catch (err) {
-            console.error("Error loading messages:", err);
             setError("Error al cargar mensajes");
         } finally {
             setLoading(false);

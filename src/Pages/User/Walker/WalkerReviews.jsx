@@ -36,7 +36,6 @@ const WalkerReviews = () => {
                 pagination: data.pagination
             });
         } catch (err) {
-            console.error("Error loading reviews:", err);
             setError("Error al cargar las reseñas. Por favor, intenta de nuevo.");
         } finally {
             setIsLoading(false);

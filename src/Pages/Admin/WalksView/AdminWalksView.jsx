@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { WalksController } from '../../../BackEnd/Controllers/WalksController';
 import { useNavigation } from '../../../BackEnd/Context/NavigationContext';
+import { useToast } from '../../../BackEnd/Context/ToastContext';
 
 import AdminWalksHeaderComponent from '../Components/WalksViewComponents/AdminWalksHeaderComponent';
 import AdminActiveWalksTable from '../Components/WalksViewComponents/AdminActiveWalksTable';
@@ -17,6 +18,8 @@ const AdminWalksView = () => {
     const [dateFilter, setDateFilter] = useState("");
 
     const { navigateToContent } = useNavigation();
+
+    const { success, warning } = useToast();
 
     useEffect(() => {
         loadAllWalks();
@@ -48,8 +51,7 @@ const AdminWalksView = () => {
             
             setWalks(detailedWalks);
         } catch (err) {
-            setError('Error loading walks: ' + err.message);
-            console.error('Error loading walks:', err);
+            setError('Error al cargar los paseos');
         } finally {
             setLoading(false);
         }

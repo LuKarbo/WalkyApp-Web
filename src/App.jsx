@@ -50,7 +50,6 @@ const App = () => {
   // Método para cambiar contenido del MainContent
   // para utilizarlo se necesita el useNavegation del NavigationContext (pero solo funciona dentro de los componentes de NavigationProvider)
   const navigateToContent = (contentId, params = null) => {
-    console.log("navigateToContent called:", { contentId, params });
     setActiveItem(contentId);
     setContentParams(params);
     
@@ -79,7 +78,6 @@ const App = () => {
     const loggedUser = await AuthController.login(credentials);
     sessionStorage.setItem("token", loggedUser.token);
     setUser(loggedUser);
-    console.log(loggedUser);
     
     const defaultItem = getDefaultActiveItem(loggedUser.role);
     setActiveItem(defaultItem);
@@ -129,7 +127,6 @@ const App = () => {
         }
 
       } catch (err) {
-        console.log("Session verification failed:", err);
 
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("activeItem");
