@@ -47,7 +47,29 @@ const Home = ({ navigateToContent }) => {
                 BannersController.getActiveBanners()
             ]);
             
-            setWalkers(walkersData);
+            const walkersWithSettings = await Promise.all(
+                walkersData.map(async (walker) => {
+                    if (walker.isPlaceholder) {
+                        return walker;
+                    }
+                    try {
+                        const settings = await WalkerController.fetchWalkerSettings(walker.id);
+                        return {
+                            ...walker,
+                            hasGPSTracker: settings?.hasGPSTracker || false,
+                            pricePerPet: settings?.pricePerPet || walker.pricePerPet || 15000
+                        };
+                    } catch (err) {
+                        return {
+                            ...walker,
+                            hasGPSTracker: false,
+                            pricePerPet: walker.pricePerPet || 15000
+                        };
+                    }
+                })
+            );
+            
+            setWalkers(walkersWithSettings);
             const activeWalks = walksData
                 .filter(walk => ["Solicitado", "Esperando pago", "Agendado", "Activo"].includes(walk.status))
                 .slice(0, 5);
