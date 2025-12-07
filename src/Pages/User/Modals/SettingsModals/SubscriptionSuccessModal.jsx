@@ -32,7 +32,34 @@ const SubscriptionSuccessModal = ({ isOpen, onClose, subscription, previousPlan 
         }
     };
 
-    const currentPlanConfig = planConfig[subscription?.plan] || planConfig.free;
+    const randomPlanConfigs = [
+        { icon: FaCrown, color: 'from-blue-400 to-blue-600' },
+        { icon: MdDiamond, color: 'from-pink-400 to-pink-600' },
+        { icon: FaStar, color: 'from-indigo-400 to-indigo-600' },
+        { icon: FaCrown, color: 'from-red-400 to-red-600' },
+        { icon: MdDiamond, color: 'from-teal-400 to-teal-600' },
+        { icon: FaStar, color: 'from-orange-400 to-orange-600' },
+        { icon: FaCrown, color: 'from-cyan-400 to-cyan-600' },
+        { icon: MdDiamond, color: 'from-lime-400 to-lime-600' }
+    ];
+
+    const getRandomPlanConfig = (planName) => {
+        const randomIndex = Math.abs(planName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % randomPlanConfigs.length;
+        return randomPlanConfigs[randomIndex];
+    };
+
+    const getPlanConfig = () => {
+        if (planConfig[subscription?.plan]) {
+            return planConfig[subscription?.plan];
+        }
+        const randomConfig = getRandomPlanConfig(subscription?.plan || 'default');
+        return {
+            ...randomConfig,
+            name: subscription?.plan ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1) : 'Plan Personalizado'
+        };
+    };
+
+    const currentPlanConfig = getPlanConfig();
     const IconComponent = currentPlanConfig.icon;
 
     const formatDate = (dateString) => {
