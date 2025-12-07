@@ -104,7 +104,7 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
             setSelectedPlan(planId);
             
             const result = await SettingsController.updateSubscription(user?.id, planId);
-            onSubscriptionUpdate(result);
+            onSubscriptionUpdate(result, currentSubscription?.plan);
             
             onClose();
             setSelectedPlan(null);

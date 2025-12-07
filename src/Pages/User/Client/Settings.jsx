@@ -5,6 +5,7 @@ import { useToast } from '../../../BackEnd/Context/ToastContext';
 import { SettingsController } from '../../../BackEnd/Controllers/SettingsController';
 import { UserController } from '../../../BackEnd/Controllers/UserController';
 import SubscriptionModal from '../Modals/SettingsModals/SubscriptionModal';
+import SubscriptionSuccessModal from '../Modals/SettingsModals/SubscriptionSuccessModal';
 import SettingNotificationComponent from '../Components/SettingsComponents/SettingNotificationComponent';
 import SettingSubscriptionComponent from '../Components/SettingsComponents/SettingSubscriptionComponent';
 
@@ -31,6 +32,8 @@ const Settings = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [previousPlan, setPreviousPlan] = useState(null);
     const { success, error } = useToast();
 
     useEffect(() => {
@@ -132,9 +135,16 @@ const Settings = () => {
         setShowSubscriptionModal(false);
     };
 
-    const handleSubscriptionUpdate = (newSubscription) => {
+    const handleSubscriptionUpdate = (newSubscription, oldPlan) => {
         setSubscription(newSubscription);
+        setPreviousPlan(oldPlan);
         closeSubscriptionModal();
+        setShowSuccessModal(true);
+    };
+
+    const closeSuccessModal = () => {
+        setShowSuccessModal(false);
+        setPreviousPlan(null);
     };
 
     const formatDate = (dateString) => {
@@ -286,6 +296,13 @@ const Settings = () => {
                 onClose={closeSubscriptionModal}
                 currentSubscription={subscription}
                 onSubscriptionUpdate={handleSubscriptionUpdate}
+            />
+
+            <SubscriptionSuccessModal
+                isOpen={showSuccessModal}
+                onClose={closeSuccessModal}
+                subscription={subscription}
+                previousPlan={previousPlan}
             />
         </div>
     );
