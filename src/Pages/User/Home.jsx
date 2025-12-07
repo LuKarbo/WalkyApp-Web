@@ -4,6 +4,7 @@ import WalkerCardComponent from './Components/HomeComponents/WalkerCardComponent
 import TableComponent from './Components/HomeComponents/TableComponent';
 import CancelWalkModal from './Modals/MyTrips/CancelWalkModal';
 import PaymentModal from './Modals/MyTrips/PaymentModal';
+import PaymentProcessModal from './Modals/MyTrips/PaymentProcessModal';
 import { WalkerController } from '../../BackEnd/Controllers/WalkerController';
 import { WalksController } from '../../BackEnd/Controllers/WalksController';
 import { BannersController } from '../../BackEnd/Controllers/BannersController';
@@ -24,6 +25,7 @@ const Home = ({ navigateToContent }) => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [tripToPay, setTripToPay] = useState(null);
     const [paymentLoading, setPaymentLoading] = useState(false);
+    const [showPaymentProcessModal, setShowPaymentProcessModal] = useState(false);
 
     const user = useUser();
     const userId = user?.id;
@@ -130,6 +132,9 @@ const Home = ({ navigateToContent }) => {
     const handleConfirmPayment = async () => {
         if (!tripToPay) return;
         
+        setShowPaymentModal(false);
+        setShowPaymentProcessModal(true);
+        
         try {
             setPaymentLoading(true);
             await WalksController.changeWalkStatus(tripToPay.id, 'Agendado');
@@ -139,15 +144,8 @@ const Home = ({ navigateToContent }) => {
                     ? { ...trip, status: 'Agendado' }
                     : trip
             ));
-            
-            success('Paseo pagado exitosamente', {
-                    title: 'Éxito',
-                    duration: 4000
-                });
-
-            setShowPaymentModal(false);
-            setTripToPay(null);
         } catch (err) {
+            setShowPaymentProcessModal(false);
             error('Fallo al acreditar el pago del paseo, contacte con un Administrador', {
                     title: 'Error',
                     duration: 4000
@@ -159,6 +157,11 @@ const Home = ({ navigateToContent }) => {
 
     const handleClosePaymentModal = () => {
         setShowPaymentModal(false);
+        setTripToPay(null);
+    };
+
+    const handleClosePaymentProcessModal = () => {
+        setShowPaymentProcessModal(false);
         setTripToPay(null);
     };
 
@@ -224,6 +227,13 @@ const Home = ({ navigateToContent }) => {
                 onConfirm={handleConfirmPayment}
                 tripData={tripToPay}
                 isLoading={paymentLoading}
+            />
+
+            <PaymentProcessModal 
+                isOpen={showPaymentProcessModal}
+                onClose={handleClosePaymentProcessModal}
+                tripData={tripToPay}
+                totalAmount={tripToPay?.totalPrice ? tripToPay.totalPrice + Math.round(tripToPay.totalPrice * 0.035) : 0}
             />
         </div>
     );
