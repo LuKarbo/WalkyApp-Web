@@ -14,7 +14,7 @@ export const JoinToUsService = {
             province: registrationData.province.trim(),
             images: registrationData.images, 
             status: 'pending',
-            submittedAt: new Date().toISOString(),
+            submittedAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
             reviewedAt: null,
             reviewedBy: null,
             adminNotes: '',
@@ -84,7 +84,7 @@ export const JoinToUsService = {
 
         const updateData = {
             status: status,
-            reviewedAt: new Date().toISOString(),
+            reviewedAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
             adminNotes: adminNotes.trim()
         };
 

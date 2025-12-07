@@ -31,7 +31,7 @@ export default function Map({ onPointAdded, onClear }) {
         const address = results[0].formatted_address;
         const record = {
           time: new Date().toLocaleTimeString(),
-          timeFull: new Date().toISOString(),
+          timeFull: new Date().toISOString().slice(0, 19).replace('T', ' '),
           address,
           lat: newPoint.lat,
           lng: newPoint.lng,

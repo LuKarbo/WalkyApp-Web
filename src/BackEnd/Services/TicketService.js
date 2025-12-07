@@ -117,7 +117,7 @@ export const TicketService = {
             content: responseData.content.trim(),
             agentName: responseData.agentName.trim(),
             status: responseData.status,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString().slice(0, 19).replace('T', ' ')
         };
 
         try {

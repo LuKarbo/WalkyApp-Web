@@ -66,10 +66,10 @@ const TicketsAdminView = () => {
                             status: responseData.status,
                             response: {
                                 agentName: responseData.agentName,
-                                date: new Date().toISOString(),
+                                date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                                 content: responseData.content
                             },
-                            updatedAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
                             cancellationReason: responseData.status === "Cancelada" ? responseData.content : undefined
                         }
                         : ticket

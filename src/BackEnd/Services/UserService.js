@@ -15,8 +15,8 @@ export const UserService = {
             location: user.location || "No disponible",
             suscription: user.suscription || "Basic",
             status: user.status || "active",
-            joinedDate: user.joinedDate || new Date().toISOString(),
-            lastLogin: user.lastLogin || new Date().toISOString()
+            joinedDate: user.joinedDate || new Date().toISOString().slice(0, 19).replace('T', ' '),
+            lastLogin: user.lastLogin || new Date().toISOString().slice(0, 19).replace('T', ' ')
         }));
     },
 
@@ -33,8 +33,8 @@ export const UserService = {
             location: user.location || "No disponible",
             suscription: user.suscription || "Basic",
             status: user.status || "active",
-            joinedDate: user.joinedDate || new Date().toISOString(),
-            lastLogin: user.lastLogin || new Date().toISOString()
+            joinedDate: user.joinedDate || new Date().toISOString().slice(0, 19).replace('T', ' '),
+            lastLogin: user.lastLogin || new Date().toISOString().slice(0, 19).replace('T', ' ')
         };
     },
 
@@ -67,8 +67,8 @@ export const UserService = {
             location: updatedUser.location || "No disponible",
             suscription: updatedUser.suscription || "Basic",
             status: updatedUser.status || "active",
-            joinedDate: updatedUser.joinedDate || new Date().toISOString(),
-            lastLogin: updatedUser.lastLogin || new Date().toISOString()
+            joinedDate: updatedUser.joinedDate || new Date().toISOString().slice(0, 19).replace('T', ' '),
+            lastLogin: updatedUser.lastLogin || new Date().toISOString().slice(0, 19).replace('T', ' ')
         };
     },
 
@@ -115,8 +115,8 @@ export const UserService = {
             location: updatedUser.location || "No disponible",
             suscription: updatedUser.suscription || "Basic",
             status: updatedUser.status || "active",
-            joinedDate: updatedUser.joinedDate || new Date().toISOString(),
-            lastLogin: updatedUser.lastLogin || new Date().toISOString()
+            joinedDate: updatedUser.joinedDate || new Date().toISOString().slice(0, 19).replace('T', ' '),
+            lastLogin: updatedUser.lastLogin || new Date().toISOString().slice(0, 19).replace('T', ' ')
         };
     },
 

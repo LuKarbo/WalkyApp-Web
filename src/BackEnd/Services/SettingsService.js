@@ -109,7 +109,7 @@ export const SettingsService = {
         }
 
         let expiryDate = null;
-        let startDate = new Date().toISOString();
+        let startDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
         if (planId !== 'free' && selectedPlan) {
             expiryDate = new Date();

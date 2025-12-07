@@ -45,7 +45,7 @@ export const TicketController = {
                 agentName: responseData?.agentName,
                 status: responseData?.status,
                 contentLength: responseData?.content?.length,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString().slice(0, 19).replace('T', ' ')
             });
 
             const result = await TicketService.respondToTicket(ticketId, responseData);
