@@ -3,6 +3,7 @@ import { FaTimes, FaCrown, FaCheck, FaStar, FaInfoCircle, FaExclamationTriangle 
 import { MdDiamond } from 'react-icons/md';
 import { SettingsController } from '../../../../BackEnd/Controllers/SettingsController';
 import { useUser } from '../../../../BackEnd/Context/UserContext';
+import SubscriptionConfirmModal from './SubscriptionConfirmModal';
 
 const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptionUpdate }) => {
     const user = useUser();
@@ -10,6 +11,8 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [plans, setPlans] = useState([]);
     const [plansLoading, setPlansLoading] = useState(true);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [planToConfirm, setPlanToConfirm] = useState(null);
 
     const planConfig = {
         free: {
@@ -111,8 +114,20 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
         return policyMap[policy] || 'Política estándar';
     };
 
-    const handlePlanSelect = async (planId) => {
-        if (loading || planId === currentSubscription?.plan) return;
+    const handlePlanSelect = (planId) => {
+        if (loading) return;
+
+        const plan = plans.find(p => (p.plan_id || p.id) === planId);
+        if (!plan) return;
+
+        setPlanToConfirm(plan);
+        setShowConfirmModal(true);
+    };
+
+    const handleConfirmSubscription = async () => {
+        if (!planToConfirm) return;
+
+        const planId = planToConfirm.plan_id || planToConfirm.id;
 
         try {
             setLoading(true);
@@ -121,6 +136,8 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
             const result = await SettingsController.updateSubscription(user?.id, planId);
             onSubscriptionUpdate(result, currentSubscription?.plan);
             
+            setShowConfirmModal(false);
+            setPlanToConfirm(null);
             onClose();
             setSelectedPlan(null);
             
@@ -129,6 +146,14 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
             setSelectedPlan(null);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCloseConfirmModal = () => {
+        if (!loading) {
+            setShowConfirmModal(false);
+            setPlanToConfirm(null);
+            setSelectedPlan(null);
         }
     };
 
@@ -365,6 +390,15 @@ const SubscriptionModal = ({ isOpen, onClose, currentSubscription, onSubscriptio
                     )}
                 </div>
             </div>
+
+            <SubscriptionConfirmModal
+                isOpen={showConfirmModal}
+                onClose={handleCloseConfirmModal}
+                onConfirm={handleConfirmSubscription}
+                selectedPlan={planToConfirm}
+                currentSubscription={currentSubscription}
+                isLoading={loading}
+            />
         </div>
     );
 };
