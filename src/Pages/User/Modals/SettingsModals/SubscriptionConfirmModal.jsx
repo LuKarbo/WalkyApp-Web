@@ -6,49 +6,64 @@ const SubscriptionConfirmModal = ({
     onConfirm, 
     selectedPlan, 
     currentSubscription,
-    isLoading 
+    isLoading,
+    allPlans
 }) => {
     if (!isOpen) return null;
 
-    const planPrices = {
-        free: 0,
-        bronze: 9990,
-        silver: 19990,
-        gold: 29990,
-        platinum: 49990
-    };
+    const currentPlan = allPlans?.find(p => (p.plan_id || p.id) === currentSubscription?.plan);
+    const currentPlanPrice = parseFloat(currentPlan?.price) || 0;
+    const selectedPlanPrice = parseFloat(selectedPlan?.price) || 0;
+    
+    const discountPercentage = parseFloat(selectedPlan?.discount_percentage) || 0;
+    const discountAmount = (selectedPlanPrice * discountPercentage) / 100;
+    const finalPrice = selectedPlanPrice - discountAmount;
 
     const isExpired = currentSubscription?.expiryDate && new Date(currentSubscription.expiryDate) < new Date();
     const isCurrentPlan = currentSubscription?.plan === selectedPlan?.plan_id;
     const isRenewal = isCurrentPlan && isExpired;
-    const isUpgrade = planPrices[selectedPlan?.plan_id] > planPrices[currentSubscription?.plan];
-    const isDowngrade = planPrices[selectedPlan?.plan_id] < planPrices[currentSubscription?.plan] && currentSubscription?.plan !== 'free';
+    const isUpgrade = finalPrice > currentPlanPrice && !isRenewal;
+    const isDowngrade = finalPrice < currentPlanPrice && currentSubscription?.plan !== 'free' && !isRenewal;
     
-    const currentPrice = planPrices[currentSubscription?.plan] || 0;
-    const newPrice = planPrices[selectedPlan?.plan_id] || 0;
-    const priceDifference = Math.abs(newPrice - currentPrice);
+    const priceDifference = Math.abs(finalPrice - currentPlanPrice);
 
     const getModalContent = () => {
-        // Caso 1: Renovación de plan vencido
         if (isRenewal) {
+            const details = [
+                { label: 'Plan', value: selectedPlan?.name, icon: <FaCrown /> },
+                { label: 'Precio Original', value: `$${selectedPlanPrice.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: <FaDollarSign /> }
+            ];
+            
+            if (discountPercentage > 0) {
+                details.push({ 
+                    label: `Descuento (${discountPercentage}%)`, 
+                    value: `-$${discountAmount.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 
+                    icon: <FaDollarSign className="text-green-500" /> 
+                });
+                details.push({ 
+                    label: 'Total a Pagar', 
+                    value: `$${finalPrice.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 
+                    icon: <FaDollarSign className="text-primary" /> 
+                });
+            }
+            
+            details.push({ label: 'Duración', value: selectedPlan?.duration || '30 días', icon: <FaCheckCircle /> });
+            
             return {
                 icon: <FaCheckCircle className="text-5xl text-orange-500" />,
                 iconBg: 'from-orange-400 to-orange-600',
                 title: '¿Renovar Suscripción?',
                 description: `Estás a punto de renovar tu plan ${selectedPlan?.name}`,
-                details: [
-                    { label: 'Plan', value: selectedPlan?.name, icon: <FaCrown /> },
-                    { label: 'Costo', value: `$${newPrice.toLocaleString()}`, icon: <FaDollarSign /> },
-                    { label: 'Duración', value: selectedPlan?.duration || '30 días', icon: <FaCheckCircle /> }
-                ],
-                message: 'Tu suscripción se renovará por el período completo.',
+                details,
+                message: discountPercentage > 0 
+                    ? `Tu suscripción se renovará con un ${discountPercentage}% de descuento.`
+                    : 'Tu suscripción se renovará por el período completo.',
                 messageType: 'info',
                 confirmText: 'Confirmar Renovación',
                 confirmColor: 'from-orange-500 to-orange-600'
             };
         }
 
-        // Caso 2: Upgrade (pasar a plan más costoso)
         if (isUpgrade) {
             return {
                 icon: <FaArrowRight className="text-5xl text-blue-500" />,
@@ -58,16 +73,15 @@ const SubscriptionConfirmModal = ({
                 details: [
                     { label: 'Plan Actual', value: currentSubscription?.plan || 'Gratuito', icon: <FaCrown /> },
                     { label: 'Nuevo Plan', value: selectedPlan?.name, icon: <FaCrown className="text-blue-500" /> },
-                    { label: 'Diferencia a Pagar', value: `$${priceDifference.toLocaleString()}`, icon: <FaDollarSign className="text-blue-500" /> }
+                    { label: 'Diferencia a Pagar', value: `$${priceDifference.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: <FaDollarSign className="text-blue-500" /> }
                 ],
-                message: `Deberás pagar la diferencia de $${priceDifference.toLocaleString()} para actualizar tu plan.`,
+                message: `Deberás pagar la diferencia de $${priceDifference.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} para actualizar tu plan.`,
                 messageType: 'warning',
                 confirmText: 'Confirmar Upgrade',
                 confirmColor: 'from-blue-500 to-blue-600'
             };
         }
 
-        // Caso 3: Downgrade (pasar a plan menos costoso)
         if (isDowngrade) {
             return {
                 icon: <FaExclamationCircle className="text-5xl text-yellow-500" />,
@@ -77,27 +91,46 @@ const SubscriptionConfirmModal = ({
                 details: [
                     { label: 'Plan Actual', value: currentSubscription?.plan, icon: <FaCrown /> },
                     { label: 'Nuevo Plan', value: selectedPlan?.name, icon: <FaCrown className="text-yellow-500" /> },
-                    { label: 'Ahorro', value: `$${priceDifference.toLocaleString()}`, icon: <FaDollarSign className="text-green-500" /> }
+                    { label: 'Ahorro', value: `$${priceDifference.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: <FaDollarSign className="text-green-500" /> }
                 ],
-                message: 'Perderás acceso a algunas funciones premium del plan actual.',
+                message: isExpired 
+                    ? `Deberás pagar $${finalPrice.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} por el nuevo plan ya que tu plan actual está vencido.`
+                    : `Tu plan actual seguirá activo hasta que expire. Luego se activará el nuevo plan y tendrás un crédito de $${priceDifference.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} para tu próxima renovación.`,
                 messageType: 'warning',
                 confirmText: 'Confirmar Cambio',
                 confirmColor: 'from-yellow-500 to-yellow-600'
             };
         }
 
-        // Caso 4: Nueva suscripción (desde free)
+        const details = [
+            { label: 'Plan', value: selectedPlan?.name, icon: <FaCrown /> },
+            { label: 'Precio Original', value: `$${selectedPlanPrice.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: <FaDollarSign /> }
+        ];
+        
+        if (discountPercentage > 0) {
+            details.push({ 
+                label: `Descuento (${discountPercentage}%)`, 
+                value: `-$${discountAmount.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 
+                icon: <FaDollarSign className="text-green-500" /> 
+            });
+            details.push({ 
+                label: 'Total a Pagar', 
+                value: `$${finalPrice.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 
+                icon: <FaDollarSign className="text-primary" /> 
+            });
+        }
+        
+        details.push({ label: 'Duración', value: selectedPlan?.duration || '30 días', icon: <FaCheckCircle /> });
+        
         return {
             icon: <FaCrown className="text-5xl text-green-500" />,
             iconBg: 'from-green-400 to-green-600',
             title: '¿Suscribirse a Plan Premium?',
             description: `Estás a punto de suscribirte al plan ${selectedPlan?.name}`,
-            details: [
-                { label: 'Plan', value: selectedPlan?.name, icon: <FaCrown /> },
-                { label: 'Costo', value: `$${newPrice.toLocaleString()}`, icon: <FaDollarSign /> },
-                { label: 'Duración', value: selectedPlan?.duration || '30 días', icon: <FaCheckCircle /> }
-            ],
-            message: 'Obtendrás acceso a todas las funciones premium de inmediato.',
+            details,
+            message: discountPercentage > 0 
+                ? `Obtendrás un ${discountPercentage}% de descuento en tu primera suscripción.`
+                : 'Obtendrás acceso a todas las funciones premium de inmediato.',
             messageType: 'success',
             confirmText: 'Confirmar Suscripción',
             confirmColor: 'from-green-500 to-green-600'
@@ -119,12 +152,22 @@ const SubscriptionConfirmModal = ({
         }
     };
 
+    const handleConfirm = () => {
+        if (typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    };
+
+    const handleClose = () => {
+        onClose();
+    };
+
     return (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
             <div className="bg-background dark:bg-foreground rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scale-in">
                 <div className="relative p-8">
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         disabled={isLoading}
                         className="absolute top-4 right-4 text-accent dark:text-muted hover:text-foreground dark:hover:text-background transition-colors p-2 rounded-full hover:bg-muted/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -165,14 +208,14 @@ const SubscriptionConfirmModal = ({
 
                     <div className="flex flex-col sm:flex-row gap-3">
                         <button
-                            onClick={onClose}
+                            onClick={handleClose}
                             disabled={isLoading}
                             className="flex-1 py-3 px-6 bg-muted/30 text-foreground dark:text-background rounded-xl hover:bg-muted/50 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Cancelar
                         </button>
                         <button
-                            onClick={onConfirm}
+                            onClick={handleConfirm}
                             disabled={isLoading}
                             className={`flex-1 py-3 px-6 bg-gradient-to-r ${content.confirmColor} text-white rounded-xl hover:opacity-90 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
                         >
